@@ -7,7 +7,7 @@
 
 constexpr float HEIGH_FACTOR = 5;
 constexpr unsigned char WATER_LEVEL = 80;
-constexpr unsigned char STONE_LEVEL = 100;
+constexpr unsigned char STONE_LEVEL = 130;
 constexpr unsigned char SNOW_LEVEL = 180;
 
 
@@ -38,7 +38,7 @@ RenderEngine::RenderEngine()
 	_mouse_y = -1;
 
 	ofImage noise;
-	std::cout<<noise.load("noise_1024x1024.jpg");
+	std::cout<<noise.load("noise_4096x4096.jpg");
 	int noise_width = noise.getWidth();
 	
 	const ofColor COLOR_TABLE[4] = { ofColor(42, 104, 134), ofColor(63, 155, 11), ofColor(137, 125, 107), ofColor(255, 200, 200) };

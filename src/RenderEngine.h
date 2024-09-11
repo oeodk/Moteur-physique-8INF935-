@@ -33,8 +33,8 @@ private :
 
 	int _old_mouse_x, _old_mouse_y, _mouse_x, _mouse_y;
 
-	static constexpr int _TERRAIN_SIZE = 5000;
-	static constexpr int _TERRAIN_DIVISION = 1024;
+	static constexpr int _TERRAIN_SIZE = 20000;
+	static constexpr int _TERRAIN_DIVISION = 2048;
 	ofVboMesh  _terrain;
 
 public : 
