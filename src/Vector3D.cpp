@@ -129,6 +129,11 @@ Vector3D operator/(const Vector3D& v1, float value)
     return Vector3D(v1.x / value, v1.y / value, v1.z / value);
 }
 
+Vector3D operator*(float value, const Vector3D& v1)
+{
+    return Vector3D(v1.x * value, v1.y * value, v1.z * value);
+}
+
 
 void testVector3D()
 {
