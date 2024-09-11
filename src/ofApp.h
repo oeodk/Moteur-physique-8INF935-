@@ -1,6 +1,7 @@
 #pragma once
 #include "ofMain.h"
 #include "RenderEngine.h"
+#include "Terrain.h"
 #include <vector>
 
 
@@ -23,6 +24,8 @@ private :
 	unsigned char selected_particle_;
 	std::array< ofParameter<int>, 2> shoot_angles_;
 	ofxButton shoot_button_;
+
+	Terrain _terrain;
 
 public:
 	void setup();

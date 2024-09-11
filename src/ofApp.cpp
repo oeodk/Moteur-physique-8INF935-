@@ -10,6 +10,7 @@ constexpr float TRAJECTORY_POINT_NUMBER = 100;
 //--------------------------------------------------------------
 void ofApp::setup()
 {
+	time(NULL);
 	elapsed_time_ = 0;
 
 	constexpr unsigned int GUI_WIDTH = 250;
@@ -45,6 +46,10 @@ void ofApp::setup()
 	selected_particle_ = 0;
 
 	particles_selection_parameters_[selected_particle_].set(true);
+
+	_terrain.sedRenderDistance(render_engine_.getFarPlane());
+	_terrain.setup();
+	render_engine_.setCameraPosition(Vector3D(0,1300, 0));
 }
 
 //--------------------------------------------------------------
@@ -55,7 +60,13 @@ void ofApp::update()
 	label_fps_.setup("Frame duration", std::to_string(1.0 / frame_duration_) + "fps");
 	elapsed_time_ += frame_duration_;
 
+	_terrain.update(render_engine_.getCameraPosition());
 	render_engine_.update(frame_duration_);
+	const auto& terrain_rendered_chunk = _terrain.getRenderedChunk();
+	for (const auto& chunk : terrain_rendered_chunk)
+	{
+		render_engine_.addRenderTarget(chunk);
+	}
 }
 
 //--------------------------------------------------------------

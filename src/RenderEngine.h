@@ -1,11 +1,21 @@
 #pragma once
+//#define DEBUG_CAMERA
+
+
+#ifdef DEBUG_CAMERA
+#include <ofEasyCam.h>
+#endif
+
 #include <ofxGui.h>
 #include <ofParameter.h>
 #include <ofCamera.h>
 #include <ofLight.h>
 
+#include "Vector3D.h"
+
 #include <unordered_map>
 #include <vector>
+
 
 class Drawable;
 
@@ -33,9 +43,11 @@ private :
 
 	int _old_mouse_x, _old_mouse_y, _mouse_x, _mouse_y;
 
-	static constexpr int _TERRAIN_SIZE = 20000;
-	static constexpr int _TERRAIN_DIVISION = 2048;
-	ofVboMesh  _terrain;
+	bool willRender(const Vector3D& target_position) const;
+
+#ifdef DEBUG_CAMERA
+	ofEasyCam _debug_camera;
+#endif
 
 public : 
 	RenderEngine();
@@ -53,5 +65,8 @@ public :
 	void keyReleased(ofKeyEventArgs& key);
 
 	void addRenderTarget(Drawable * render_target, bool use_light = true);
-};
 
+	void setCameraPosition(const Vector3D& new_position);
+	Vector3D getCameraPosition() const { return Vector3D(_camera.getPosition()); }
+	float getFarPlane() const { return _camera.getFarClip(); }
+};
