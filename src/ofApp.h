@@ -11,8 +11,6 @@ private :
 
 	RenderEngine render_engine_;
 
-	bool pause_;
-	bool display_trajectory_;
 	double elapsed_time_;
 	double frame_duration_;
 
@@ -25,8 +23,6 @@ private :
 	unsigned char selected_particle_;
 	std::array< ofParameter<int>, 2> shoot_angles_;
 	ofxButton shoot_button_;
-
-	float theta_, phi_;
 
 public:
 	void setup();

@@ -10,8 +10,6 @@ constexpr float TRAJECTORY_POINT_NUMBER = 100;
 //--------------------------------------------------------------
 void ofApp::setup()
 {
-	pause_ = false;
-	display_trajectory_ = true;
 	elapsed_time_ = 0;
 
 	constexpr unsigned int GUI_WIDTH = 250;
@@ -44,8 +42,6 @@ void ofApp::setup()
 
 	gui_.enableHeader();
 
-	theta_ = shoot_angles_[0].get();
-	phi_= shoot_angles_[1].get();
 	selected_particle_ = 0;
 
 	particles_selection_parameters_[selected_particle_].set(true);
@@ -60,22 +56,6 @@ void ofApp::update()
 	elapsed_time_ += frame_duration_;
 
 	render_engine_.update(frame_duration_);
-
-	if(!pause_)
-	{
-		for (size_t i = 0; i < particles_.size(); i++)
-		{
-			//particles_[i]->update(frame_duration_);
-			//if (particles_[i]->willDisappear())
-			//{
-			//	delete particles_[i];
-			//	particles_.erase(particles_.begin() + i);
-			//	i--;
-			//}
-		}
-		//for_each(std::execution::par, particles_test_.begin(), particles_test_.end(), [&](Particle& p) { p.update(frame_duration_); });
-	}
-
 }
 
 //--------------------------------------------------------------
@@ -119,14 +99,6 @@ void ofApp::updateSelectedParticle(bool& state)
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 
-	if (key == ofKey::OF_KEY_RETURN)
-	{
-		display_trajectory_ = !display_trajectory_;
-	}
-	if(key == ' ')
-	{
-		pause_ = !pause_;
-	}
 }
 
 //--------------------------------------------------------------
