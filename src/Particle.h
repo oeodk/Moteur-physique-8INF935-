@@ -23,7 +23,7 @@ public:
 	/* Compute the next position using the Verlet integration formula.
 	   Takes the frame length (in milliseconds) as parameter. */
 
-	void integrateVerlet(float duration):
+	void integrateVerlet(float duration);
 
 
 };
