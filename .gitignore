@@ -3,6 +3,11 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+*.make
+*.sln
+*.vcxproj
+*.vcxproj.*
+
 # User-specific files
 *.rsuser
 *.suo
@@ -79,7 +84,6 @@ StyleCopReport.xml
 *.pch
 *.pdb
 *.ipdb
-*.pgc
 *.pgd
 *.rsp
 *.sbr
