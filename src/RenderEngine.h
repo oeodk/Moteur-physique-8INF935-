@@ -48,7 +48,8 @@ private :
 #ifdef DEBUG_CAMERA
 	ofEasyCam _debug_camera;
 #endif
-
+	ofVboMesh _test;
+	int removeModifier(ofKeyEventArgs& key);
 public : 
 	RenderEngine();
 	RenderEngine(const RenderEngine&) = delete;

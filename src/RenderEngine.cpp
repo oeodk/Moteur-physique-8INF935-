@@ -4,7 +4,6 @@
 #include "Vector3D.h"
 #include "Drawable.h"
 
-
 RenderEngine::RenderEngine()
 {
 	ofAddListener(ofEvents().mouseMoved, this, &RenderEngine::mouseMoved);
@@ -50,6 +49,20 @@ RenderEngine::RenderEngine()
 	// Optional: Set fog density (if using GL_EXP or GL_EXP2)
 	// glFogf(GL_FOG_DENSITY, 0.35);
 #endif
+
+	_test.addVertex(Vector3D(0, 1000, 0));
+	_test.addVertex(Vector3D(10, 1000, 10));
+	_test.addVertex(Vector3D(-10, 1000, 10));
+	_test.addVertex(Vector3D(10, 1000, -10));
+	_test.addVertex(Vector3D(-10, 1000, -10));
+
+	_test.addIndex(0);
+	_test.addIndex(1);
+	_test.addIndex(2);
+	_test.addIndex(3);
+	_test.addIndex(4);
+
+	_test.setMode(OF_PRIMITIVE_POINTS);
 }
 
 RenderEngine::~RenderEngine()
@@ -166,6 +179,11 @@ void RenderEngine::render()
 	ofEnableDepthTest();
 	ofEnableAlphaBlending();
 
+	ofSetColor(ofColor::red);
+	
+	glPointSize(10);
+	_test.draw();
+	
 	for (Drawable* render_target : _render_targets_no_light)
 	{
 		if(willRender(*render_target->getPosition()))
@@ -199,21 +217,47 @@ void RenderEngine::render()
 
 void RenderEngine::keyPressed(ofKeyEventArgs& key)
 {
-	auto found = _camera_movement.find(key.key);
+	int k = removeModifier(key);
+
+	auto found = _camera_movement.find(k);
+	//printf("key pressed");
 	if (found != _camera_movement.end())
 	{
-		_camera_movement.at(key.key) = true;
+		_camera_movement.at(k) = true;
 	}
 }
 
 void RenderEngine::keyReleased(ofKeyEventArgs& key)
 {
-	auto found = _camera_movement.find(key.key);
+	int k = removeModifier(key);
+	
+	std::cout << key.key << " "<<(int)' ' << std::endl;
+	std::cout << key.modifiers << std::endl;
+
+	auto found = _camera_movement.find(k);
 	if (found != _camera_movement.end())
 	{
-		_camera_movement.at(key.key) = false;
+		_camera_movement.at(k) = false;
 	}
 }
+
+int RenderEngine::removeModifier(ofKeyEventArgs& key)
+{
+	int k = key.key;
+	if(key.key != ' ' && key.key != ofKey::OF_KEY_LEFT_CONTROL && key.key != ofKey::OF_KEY_LEFT_SHIFT)
+	{
+		if (key.hasModifier(2))
+		{
+			k += 96;
+		}
+		if (key.hasModifier(1))
+		{
+			k += 32;
+		}
+	}
+	return k;
+}
+
 
 void RenderEngine::addRenderTarget(Drawable* render_target, bool use_light)
 {
