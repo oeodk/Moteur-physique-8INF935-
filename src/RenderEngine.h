@@ -10,7 +10,7 @@
 #include <ofParameter.h>
 #include <ofCamera.h>
 #include <ofLight.h>
-
+#include <of3dPrimitives.h>
 #include "Vector3D.h"
 
 #include <unordered_map>
@@ -50,6 +50,8 @@ private :
 #endif
 	ofVboMesh _test;
 	int removeModifier(ofKeyEventArgs& key);
+
+	ofCylinderPrimitive _cannon;
 public : 
 	RenderEngine();
 	RenderEngine(const RenderEngine&) = delete;

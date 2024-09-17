@@ -1,7 +1,7 @@
 #pragma once
 #include "Drawable.h"
 #include "ofVboMesh.h"
-#include "Vector3D.h
+#include "Vector3D.h"
 
 class Chunk :
     public Drawable
@@ -12,8 +12,6 @@ private :
 	std::vector<unsigned int> _bushes_to_draw;
 	Vector3D _grid_coordinate;
 	Vector3D _spatial_coordinate;
-
-
 
 	float terrainNoise(float x, float y, int octaves, float persistence, float lacunarity);
 public :
