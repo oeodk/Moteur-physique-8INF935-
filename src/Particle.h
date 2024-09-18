@@ -15,16 +15,22 @@ private:
 
 
 public:
+	enum IntegrationMethods { EULER, VERLET };
+
 	Particle();
 	Particle(Vector3D init_pos, Vector3D init_vel, Vector3D init_acc, float mass);
 	~Particle();
 
-	void integrate(float duration);
+	void integrate(float dt, IntegrationMethods method);
+
+	Vector3D eulerUpdateVelocity(float dt);
+	Vector3D eulerUpdatePosition(float dt);
+	void integrateEuler(float dt);
 
 	/* Compute the next position using the Verlet integration formula.
 	   Takes the frame length (in milliseconds) as parameter. */
 
-	void integrateVerlet(float duration);
+	void integrateVerlet(float dt);
 
 
 };
