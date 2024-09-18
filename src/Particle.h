@@ -32,7 +32,7 @@ public:
 
 	void integrateVerlet(float dt);
 
-
+	static void testParticle();
 };
 
 Particle::Particle() : _position(), _previous_position(), _velocity(), _acceleration(0,-g,0), _inverse_mass(0) {}
