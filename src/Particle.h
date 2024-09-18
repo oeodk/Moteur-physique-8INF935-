@@ -1,0 +1,44 @@
+#pragma once
+#include "Vector3D.h"
+
+constexpr float g = 9.81;
+
+class Particle
+{
+private:
+	Vector3D _position;
+	Vector3D _previous_position;
+	Vector3D _velocity;
+	Vector3D _acceleration;
+
+	float _inverse_mass;
+
+
+public:
+	enum IntegrationMethods { EULER, VERLET };
+
+	Particle();
+	Particle(Vector3D init_pos, Vector3D init_vel, Vector3D init_acc, float mass);
+	~Particle();
+
+	void integrate(float dt, IntegrationMethods method);
+
+	Vector3D eulerUpdateVelocity(float dt);
+	Vector3D eulerUpdatePosition(float dt);
+	void integrateEuler(float dt);
+
+	/* Compute the next position using the Verlet integration formula.
+	   Takes the frame length (in milliseconds) as parameter. */
+
+	void integrateVerlet(float dt);
+
+
+};
+
+Particle::Particle() : _position(), _previous_position(), _velocity(), _acceleration(0,-g,0), _inverse_mass(0) {}
+
+Particle::Particle(Vector3D init_pos, Vector3D init_vel, Vector3D init_acc, float mass) : _position(init_pos), _velocity(init_vel), _acceleration(init_acc) {
+	_inverse_mass = mass == 0 ? 0 : 1 / mass;
+}
+
+Particle::~Particle() {}
