@@ -8,7 +8,7 @@ public:
 	FireballParticle() {};
 	~FireballParticle() = default;
 
-	FireballParticle(Vector3D init_pos, Vector3D init_acc);
+	FireballParticle(Vector3D init_pos, Vector3D init_dir, Vector3D init_acc);
 
 private:
 

@@ -1,9 +1,10 @@
 #pragma once
 #include "Vector3D.h"
+#include "Drawable.h"
 
 constexpr float g = 9.81;
 
-class Particle
+class Particle : public Drawable
 {
 private:
 	Vector3D _position;
@@ -11,6 +12,7 @@ private:
 	Vector3D _velocity;
 	Vector3D _acceleration;
 	float _inverse_mass;
+	float _radius;
 
 	Vector3D _color;
 	float _alpha;
@@ -20,8 +22,8 @@ private:
 public:
 	enum IntegrationMethods { EULER, VERLET };
 
-	Particle() : _position(), _previous_position(), _velocity(), _acceleration(0, -g, 0), _inverse_mass(0), _color(), _alpha() {};
-	Particle(Vector3D init_pos, Vector3D init_vel, Vector3D init_acc, float mass, Vector3D color, float alpha);
+	Particle() : _position(), _previous_position(), _velocity(), _acceleration(0, -g, 0), _inverse_mass(0), _radius(), _color(), _alpha() {};
+	Particle(Vector3D init_pos, Vector3D init_vel, Vector3D init_acc, float mass, float radius, Vector3D color, float alpha);
 	~Particle() = default;
 
 	void integrate(float dt, IntegrationMethods method);
@@ -38,6 +40,8 @@ public:
 	   Takes the frame length (in milliseconds) as parameter. */
 
 	void integrateVerlet(float dt);
+
+	void draw();
 
 
 };

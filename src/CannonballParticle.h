@@ -8,7 +8,7 @@ public:
 	CannonballParticle() {};
 	~CannonballParticle() = default;
 
-	CannonballParticle(Vector3D init_pos, Vector3D init_acc);
+	CannonballParticle(Vector3D init_pos, Vector3D init_dir, Vector3D init_acc);
 
 private:
 

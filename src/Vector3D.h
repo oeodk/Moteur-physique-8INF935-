@@ -27,7 +27,7 @@ public :
 	void operator+=(const Vector3D& v);
 	void operator-=(const Vector3D& v);
 
-	operator glm::vec3() { return glm::vec3(x, y, z); }
+	operator glm::vec3() const { return glm::vec3(x, y, z); }
 
 	static Vector3D elementWiseProduct(const Vector3D& v1, const Vector3D v2);
 	static Vector3D pow(const Vector3D& v, float exponent);
