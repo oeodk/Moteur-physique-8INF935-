@@ -1,5 +1,6 @@
 #include "Vector3D.h"
 #include <cmath>
+#include <stdexcept>
 
 Vector3D::Vector3D(float px, float py, float pz)
     : x(px), y(py), z(pz)
@@ -9,6 +10,9 @@ Vector3D::Vector3D(float px, float py, float pz)
 
 void Vector3D::normalize()
 {
+    if (getNorm() == 0.0f) {
+        throw std::runtime_error("Norm = 0");
+    }
     set(*this / getNorm());
 }
 
@@ -46,6 +50,9 @@ void Vector3D::operator*=(float value)
 
 void Vector3D::operator/=(float value)
 {
+    if (value == 0.0f) {
+        throw std::runtime_error("Division by 0");
+    }
     x /= value;
     y /= value;
     z /= value;
@@ -126,7 +133,16 @@ Vector3D operator*(const Vector3D& v1, float value)
 
 Vector3D operator/(const Vector3D& v1, float value)
 {
+    if (value == 0.0f) {
+        throw std::runtime_error("Division by 0");
+    }
     return Vector3D(v1.x / value, v1.y / value, v1.z / value);
+
+}
+
+Vector3D operator*(float value, const Vector3D& v1)
+{
+    return Vector3D(v1.x * value, v1.y * value, v1.z * value);
 }
 
 
