@@ -1,6 +1,7 @@
 #pragma once
 #include "ofMain.h"
 #include "RenderEngine.h"
+#include "PhysicsEngine.h"
 #include "Terrain.h"
 #include <vector>
 
@@ -8,12 +9,13 @@
 class ofApp : public ofBaseApp
 {
 private :
-	std::vector<class Particle*> particles_;
+	std::vector<class Particle*> _particles;
 
-	RenderEngine render_engine_;
+	PhysicsEngine _physics_engine;
+	RenderEngine _render_engine;
 
-	double elapsed_time_;
-	double frame_duration_;
+	double _elapsed_time;
+	double _dt;
 
 	ofxPanel gui_;
 	ofxLabel label_dt_;
