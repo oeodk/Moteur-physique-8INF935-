@@ -33,7 +33,7 @@ public :
 	static Vector3D pow(const Vector3D& v, float exponent);
 	static Vector3D crossProduct(const Vector3D& v1, const Vector3D& v2);
 	static float dotProduct(const Vector3D& v1, const Vector3D& v2);
-
+	static void testVector3D();
 
 };
 
@@ -45,7 +45,7 @@ Vector3D operator-(const Vector3D& v1, const Vector3D& v2);
 bool operator==(const Vector3D& v1, const Vector3D& v2);
 bool operator!=(const Vector3D& v1, const Vector3D& v2);
 
-void testVector3D();
+
 
 namespace constants
 {

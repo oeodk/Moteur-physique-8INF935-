@@ -3,8 +3,6 @@
 #include <execution>
 #include <cmath>
 
-
-//constexpr float g = 9.81 * 10;
 constexpr int SPEED_RANGE = 100;
 constexpr float TRAJECTORY_POINT_NUMBER = 100;
 
@@ -12,10 +10,11 @@ constexpr float TRAJECTORY_POINT_NUMBER = 100;
 void ofApp::setup()
 {
 	time(NULL);
-	elapsed_time_ = 0;
+	_elapsed_time = 0;
 
 	constexpr unsigned int GUI_WIDTH = 250;
 
+	// A mettre dans le GUI
 	gui_.setup();
 	gui_.setWidthElements(GUI_WIDTH);
 	gui_.add(frame_information_.setup("Frames informations"));
@@ -48,40 +47,45 @@ void ofApp::setup()
 
 	particles_selection_parameters_[selected_particle_].set(true);
 
-	_terrain.sedRenderDistance(render_engine_.getFarPlane());
+	_terrain.sedRenderDistance(_render_engine.getFarPlane());
 	_terrain.setup();
-	render_engine_.setCameraPosition(Vector3D(0,1300, 0));
+	_render_engine.setCameraPosition(Vector3D(0,1300, 0));
 }
 
 //--------------------------------------------------------------
 void ofApp::update()
 {
-	frame_duration_ = ofGetLastFrameTime();
-	label_dt_.setup("Frame duration", std::to_string(frame_duration_) + "s");
-	label_fps_.setup("Frame duration", std::to_string(1.0 / frame_duration_) + "fps");
-	elapsed_time_ += frame_duration_;
+	_dt = ofGetLastFrameTime();
+	_elapsed_time += _dt;
 
-	_terrain.update(render_engine_.getCameraPosition());
-	render_engine_.update(frame_duration_);
+	_physics_engine.updateParticles(_dt, _particles);
+	_terrain.update(_render_engine.getCameraPosition());
+
+	_render_engine.update(_dt);
 	const auto& terrain_rendered_chunk = _terrain.getRenderedChunk();
 	for (const auto& chunk : terrain_rendered_chunk)
 	{
-		render_engine_.addRenderTarget(chunk);
+		_render_engine.addRenderTarget(chunk);
 	}
+
+	// A mettre dans le GUI
+	label_dt_.setup("Frame duration", std::to_string(_dt) + "s");
+	label_fps_.setup("Frame duration", std::to_string(1.0 / _dt) + "fps");
+
 }
 
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-	render_engine_.render();
+	_render_engine.render();
 	gui_.draw();
 }
 
 void ofApp::exit()
 {
-	for (size_t i = 0; i < particles_.size(); i++)
+	for (size_t i = 0; i < _particles.size(); i++)
 	{
-		delete particles_[i];
+		delete _particles[i];
 	}
 	shoot_button_.removeListener(this, &ofApp::shootProjectile);
 }
@@ -90,6 +94,7 @@ void ofApp::shootProjectile()
 {
 }
 
+// A mettre dans le GUI
 void ofApp::updateSelectedParticle(bool& state)
 {
 	bool success = false;
