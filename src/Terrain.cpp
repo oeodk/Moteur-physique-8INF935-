@@ -12,6 +12,10 @@ Terrain::Terrain()
 {
 	ofAddListener(ofEvents().keyPressed, this, &Terrain::keyPressed);
 	_chunk_size = 320;// _terrain_size / (static_cast<float>(_terrain_division) / (CHUNK_DIVISION + 2));
+	for (size_t i = 0; i < _block_chunk_movement.size(); i++)
+	{
+		_block_chunk_movement[i] = nullptr;
+	}
 }
 
 Terrain::~Terrain()
@@ -29,7 +33,7 @@ void Terrain::setup()
 	//ofImage noise;
 	//std::cout << noise.load("noise_1024x1024.jpg");
 	//int noise_width = noise.getWidth();
-
+	//_chunk_generators.reserve(10);
 	_seed = 0;
 	if(RANDOM_SEED)
 	{
@@ -65,6 +69,7 @@ void Terrain::generateChunk(int x, int z, Chunk* chunk_to_edit)
 
 void Terrain::refreshChunk()
 {
+	_chunk_to_move.clear();
 	int chunk_reseted = 0;
 	for (int i = -_generation_distance + player_previous_chunk.x; i < _generation_distance + 1 + player_previous_chunk.x; i++)
 	{
@@ -85,10 +90,17 @@ void Terrain::update(const Vector3D& player_position)
 {
 	for (auto& future : _chunk_generators)
 	{
-		future.wait();
+		if(future.valid())
+		{
+			future.wait();
+		}
+	}
+	for (size_t i = 0; i < _block_chunk_movement.size(); i++)
+	{
+		_block_chunk_movement[i] = nullptr;
 	}
 	_rendered_chunks.clear();
-	_chunk_generators.clear();
+	//_chunk_generators.clear();
 	int chunk_number = _chunks.size();
 
 	auto [player_chunk_x, player_chunk_z] = getInGridCoordinate(player_position.x, player_position.z);
@@ -114,16 +126,51 @@ void Terrain::update(const Vector3D& player_position)
 			{
 				if (chunk_grid_coordinate.z > _generation_distance + player_chunk_z + 0.5 || chunk_grid_coordinate.z < player_chunk_z - (_generation_distance + 0.5))
 				{
-					_chunk_generators.push_back(std::async(std::launch::async, &Terrain::generateChunk, chunk_grid_coordinate.x, 2 * player_chunk_z - chunk_grid_coordinate.z + (player_previous_chunk.z - player_chunk_z), _chunks[i]));
+					_chunks[i]->setGridCoordinate(Vector3D(chunk_grid_coordinate.x, 0, 2 * player_chunk_z - chunk_grid_coordinate.z + (player_previous_chunk.z - player_chunk_z)));
+					_chunk_to_move.push_back(_chunks[i]);
+					//_chunk_generators.push_back(std::async(std::launch::async, &Terrain::generateChunk, chunk_grid_coordinate.x, 2 * player_chunk_z - chunk_grid_coordinate.z + (player_previous_chunk.z - player_chunk_z), _chunks[i]));
 				}
 			}
 			else
 			{
 				if (chunk_grid_coordinate.x > _generation_distance + player_chunk_x + 0.5 || chunk_grid_coordinate.x < player_chunk_x - (_generation_distance + 0.5))
 				{
-					_chunk_generators.push_back(std::async(std::launch::async, &Terrain::generateChunk, 2 * player_chunk_x - chunk_grid_coordinate.x + (player_previous_chunk.x - player_chunk_x), chunk_grid_coordinate.z, _chunks[i]));
+					_chunks[i]->setGridCoordinate(Vector3D(2 * player_chunk_x - chunk_grid_coordinate.x + (player_previous_chunk.x - player_chunk_x), 0, chunk_grid_coordinate.z));
+					_chunk_to_move.push_back(_chunks[i]);
+					//_chunk_generators.push_back(std::async(std::launch::async, &Terrain::generateChunk, 2 * player_chunk_x - chunk_grid_coordinate.x + (player_previous_chunk.x - player_chunk_x), chunk_grid_coordinate.z, _chunks[i]));
 				}
 			}
+		}
+	}
+	//for(int i = 0;i<5;i++)
+	//_chunk_to_move.push_back(_chunks[rand() % _chunks.size()]);
+	size_t index = 0;
+	int blocked_generation = 0;
+	while (_chunk_to_move.size() > 0 && index < 10 && blocked_generation < _chunk_to_move.size())
+	{
+		bool generate = true;
+		for (size_t i = 0; i < _block_chunk_movement.size(); i++)
+		{
+			if (_block_chunk_movement[i] == nullptr)
+			{
+				break;
+			}
+			if (_block_chunk_movement[i] == _chunk_to_move.front())
+			{
+				generate = false;
+				_chunk_to_move.push_back(_chunk_to_move.front());
+				_chunk_to_move.erase(_chunk_to_move.begin());
+				blocked_generation++;
+				break;
+			}
+		}
+		if (generate)
+		{
+			const Vector3D& chunk_grid_coordinate(_chunk_to_move.front()->getGridCoordinate());
+			_chunk_generators[index] = (std::async(std::launch::async, &Terrain::generateChunk, chunk_grid_coordinate.x, chunk_grid_coordinate.z, _chunk_to_move.front()));
+			_block_chunk_movement[index] = _chunk_to_move.front();
+			_chunk_to_move.erase(_chunk_to_move.begin());
+			index++;
 		}
 	}
 	if (_z_update)

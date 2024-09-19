@@ -43,7 +43,7 @@ private :
 
 	int _old_mouse_x, _old_mouse_y, _mouse_x, _mouse_y;
 
-	bool willRender(const Vector3D& target_position) const;
+	bool willRender(Vector3D target_position) const;
 
 #ifdef DEBUG_CAMERA
 	ofEasyCam _debug_camera;

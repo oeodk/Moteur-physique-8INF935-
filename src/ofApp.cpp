@@ -3,7 +3,8 @@
 #include <execution>
 #include <cmath>
 
-constexpr float g = 9.81 * 10;
+
+//constexpr float g = 9.81 * 10;
 constexpr int SPEED_RANGE = 100;
 constexpr float TRAJECTORY_POINT_NUMBER = 100;
 

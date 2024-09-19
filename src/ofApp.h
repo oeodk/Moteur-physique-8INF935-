@@ -4,7 +4,6 @@
 #include "Terrain.h"
 #include <vector>
 
-
 class ofApp : public ofBaseApp
 {
 private :

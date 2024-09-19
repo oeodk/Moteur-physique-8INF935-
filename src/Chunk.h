@@ -17,11 +17,11 @@ private :
 public :
 	Chunk() = default;
 	Chunk(const Chunk&) = delete;
-	void setup(float chunk_size, int chunk_division, const Vector3D& space_coordinate, int seed);
+	void setup(float chunk_size, int chunk_division, const Vector3D& grid_coordinate, int seed);
 	void draw() override;
 
 	const Vector3D& getGridCoordinate() const {return _grid_coordinate;}
 	const Vector3D& getSpatialCoordinate() const { return _spatial_coordinate; }
-
+	void setGridCoordinate(const Vector3D& grid_coordinate) { _grid_coordinate.set(grid_coordinate); }
 };
 

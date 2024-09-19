@@ -4,7 +4,7 @@
 #include "Vector3D.h"
 #include "Drawable.h"
 
-constexpr int RENDER_DISTANCE = 2000;
+constexpr int RENDER_DISTANCE = 5000;
 
 RenderEngine::RenderEngine()
 {
@@ -68,6 +68,13 @@ RenderEngine::RenderEngine()
 
 	_cannon.set(1, 20, 20, 2);
 	_cannon.rotateDeg(100, 1, 0, 0);
+
+
+	Vector3D side_dir(_camera.getSideDir());
+	Vector3D look_at_dir(_camera.getLookAtDir());
+	Vector3D down_dir(Vector3D::crossProduct(look_at_dir, side_dir));
+	_cannon.setPosition(_camera.getPosition() + side_dir * 6 + down_dir * 7 + look_at_dir * 5);
+
 	//_cannon.col(ofColor::black);
 	//_cannon.setPosition(20, 0, 0);
 }
@@ -183,6 +190,7 @@ void RenderEngine::update(float delta_t)
 	{
 		_cannon.setPosition(_camera.getPosition() + side_dir * 6 + down_dir * 7 + look_at_dir * 5);
 	}
+
 }
 
 void RenderEngine::render()
@@ -219,16 +227,19 @@ void RenderEngine::render()
 		if (willRender(*render_target->getPosition()))
 		{
 			render_target->draw();
-
 		}
-	}
-	//_cannon.draw();
+	}	
+	
+	ofSetColor(ofColor(65, 104, 74));
+	_cannon.draw();
+	
 #ifdef DEBUG_CAMERA
 	_debug_camera.end();
 #else
 	_camera.end();
 #endif // DEBUG_CAMERA
 	ofDisableDepthTest();
+
 
 	_light_source.disable();
 	ofDisableLighting();
@@ -294,10 +305,14 @@ void RenderEngine::addRenderTarget(Drawable* render_target, bool use_light)
 void RenderEngine::setCameraPosition(const Vector3D& new_position)
 {
 	_camera.setPosition(new_position);
+	Vector3D side_dir(_camera.getSideDir());
+	Vector3D look_at_dir(_camera.getLookAtDir());
+	Vector3D down_dir(Vector3D::crossProduct(look_at_dir, side_dir));
+	_cannon.setPosition(_camera.getPosition() + side_dir * 6 + down_dir * 7 + look_at_dir * 5);
 }
 
 
-bool RenderEngine::willRender(const Vector3D& target_position) const
+bool RenderEngine::willRender(Vector3D target_position) const
 {
 	Vector3D look_at_dir(_camera.getLookAtDir());
 	Vector3D camera_target_vector(target_position - _camera.getPosition());
