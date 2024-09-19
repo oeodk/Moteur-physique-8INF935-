@@ -8,6 +8,6 @@ using namespace std;
 class PhysicsEngine
 {
 public:
-	void updateParticles(float dt, std::vector<class Particle*> particles);
+	void updateParticles(float dt, const std::vector<class Particle*>& particles);
 };
 

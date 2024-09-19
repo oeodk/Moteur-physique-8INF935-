@@ -8,4 +8,4 @@ enum BulletType
 	BUBBLE
 };
 
-const Vector3D g_acc = Vector3D(0, -9.81, 0);
+const Vector3D G_ACC = Vector3D(0, -9.81, 0);

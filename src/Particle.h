@@ -22,7 +22,7 @@ private:
 public:
 	enum IntegrationMethods { EULER, VERLET };
 
-	Particle() : _position(), _previous_position(), _velocity(), _acceleration(0, -g, 0), _inverse_mass(0), _radius(), _color(), _alpha() {};
+	Particle() : _position(), _previous_position(), _velocity(), _acceleration(0, -g, 0), _inverse_mass(0), _radius(), _color(), _alpha() { _world_position = &_position; };
 	Particle(Vector3D init_pos, Vector3D init_vel, Vector3D init_acc, float mass, float radius, Vector3D color, float alpha);
 	~Particle() = default;
 

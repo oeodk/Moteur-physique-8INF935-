@@ -5,6 +5,7 @@
 Particle::Particle(Vector3D init_pos, Vector3D init_vel, Vector3D init_acc, float mass, float radius, Vector3D color, float alpha)
 	: _position(init_pos), _velocity(init_vel), _acceleration(init_acc), _radius(radius), _color(color), _alpha(alpha) {
 	_inverse_mass = mass == 0 ? 0 : 1 / mass;
+	_world_position = &_position;
 }
 
 void Particle::integrate(float dt, IntegrationMethods method) {
@@ -37,5 +38,6 @@ void Particle::integrateVerlet(float dt) {
 }
 
 void Particle::draw() {
+	ofSetColor(ofColor::red);
 	ofDrawSphere(_position, _radius);
 }

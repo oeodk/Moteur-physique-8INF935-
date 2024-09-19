@@ -71,6 +71,10 @@ void ofApp::update()
 	{
 		_render_engine.addRenderTarget(chunk);
 	}
+	for (auto particle : _particles)
+	{
+		_render_engine.addRenderTarget(particle);
+	}
 
 	// A mettre dans le GUI
 	label_dt_.setup("Frame duration", std::to_string(_dt) + "s");
@@ -83,9 +87,7 @@ void ofApp::draw()
 {
 	_render_engine.render();
 	gui_.draw();
-	for (auto particle : _particles) {
-		particle->draw();
-	}
+	
 }
 
 void ofApp::exit()
@@ -190,19 +192,19 @@ void ofApp::spawnParticle(BulletType type) {
 	switch (type)
 	{
 	case BULLET:
-		newParticle = new BulletParticle(currentPosition, currentDirection, g_acc);
+		newParticle = new BulletParticle(currentPosition, currentDirection, G_ACC);
 		_particles.push_back(newParticle);
 		break;
 	case CANNONBALL:
-		newParticle = new CannonballParticle(currentPosition, currentDirection, g_acc);
+		newParticle = new CannonballParticle(currentPosition, currentDirection, G_ACC);
 		_particles.push_back(newParticle);
 		break;
 	case FIREBALL:
-		newParticle = new FireballParticle(currentPosition, currentDirection, g_acc);
+		newParticle = new FireballParticle(currentPosition, currentDirection, G_ACC);
 		_particles.push_back(newParticle);
 		break;
 	case BUBBLE:
-		newParticle = new BubbleParticle(currentPosition, currentDirection, g_acc);
+		newParticle = new BubbleParticle(currentPosition, currentDirection, G_ACC);
 		_particles.push_back(newParticle);
 		break;
 	default:
