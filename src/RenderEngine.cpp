@@ -125,21 +125,23 @@ void RenderEngine::update(float delta_t)
 {
 	Vector3D side_dir(_camera.getSideDir());
 	Vector3D look_at_dir(_camera.getLookAtDir());
-	Vector3D down_dir(Vector3D::crossProduct(look_at_dir, side_dir));
 	bool update_cannon_position = false;
 
 	if (_old_mouse_x != _mouse_x)
 	{
 		_camera.rotate((_old_mouse_x - _mouse_x) / _MOUSE_SENSIBILITY, 0.f, 1.f, 0.f);
-		//_cannon.rotate((_old_mouse_x - _mouse_x) / _MOUSE_SENSIBILITY, 0.f, 1.f, 0.f);
 		update_cannon_position = true;
+		_camera.lookAt(_camera.getPosition() + _camera.getLookAtDir(), Vector3D(0, 1, 0));
 		_old_mouse_x = _mouse_x;
 	}
 	if (_old_mouse_y != _mouse_y)
 	{
-		_camera.rotate((_old_mouse_y - _mouse_y) / _MOUSE_SENSIBILITY, side_dir);
-		//_cannon.rotate((_old_mouse_y - _mouse_y) / _MOUSE_SENSIBILITY, side_dir);
-		update_cannon_position = true;
+		if(Vector3D::dotProduct(_camera.getLookAtDir(), Vector3D(0, 1, 0)) > -0.9 || (_old_mouse_y - _mouse_y)> 0)
+		{
+			_camera.rotate((_old_mouse_y - _mouse_y) / _MOUSE_SENSIBILITY, side_dir);
+			_camera.lookAt(_camera.getPosition() + _camera.getLookAtDir(), Vector3D(0, 1, 0));
+			update_cannon_position = true;
+		}
 		_old_mouse_y = _mouse_y;
 	}
 

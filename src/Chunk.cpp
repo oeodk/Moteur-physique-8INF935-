@@ -1,6 +1,9 @@
 #include "Chunk.h"
 #include <of3dGraphics.h>
 #include <ofGraphics.h>
+#include <chrono>
+#include <thread>
+using namespace std::chrono_literals;
 
 constexpr float HEIGH_FACTOR = 5;
 constexpr unsigned char WATER_LEVEL = 80;
@@ -16,6 +19,7 @@ constexpr float BUSH_RADIUS = 20;
 
 void Chunk::setup(float chunk_size, int chunk_division, const Vector3D& grid_coordinate, int seed)
 {
+	_distance_range = 0;
 	srand(seed);
 	_world_position = &_spatial_coordinate;
 	_terrain.clear();
@@ -67,7 +71,7 @@ void Chunk::setup(float chunk_size, int chunk_division, const Vector3D& grid_coo
 					bush_pos.x += rand() % 20 - 10;
 					bush_pos.z += rand() % 20 - 10;
 					float bush_noise = ofNoise(seed + (noise_offset_x + i) * NOISE_SCALE * 2 + 1, seed + (noise_offset_y + j) * NOISE_SCALE * 2 + 1);
-					if (bush_noise > 0.9)
+					if (bush_noise > 0.8)
 					{
 						_bushes.push_back(bush_pos);
 					}
@@ -76,7 +80,6 @@ void Chunk::setup(float chunk_size, int chunk_division, const Vector3D& grid_coo
 			}
 		}
 	}
-
 	auto vertices = _terrain.getVertices();
 
 	for (int i = 0; i < chunk_division - 1; i++)
@@ -138,13 +141,80 @@ void Chunk::draw()
 	
 	_terrain.draw();
 	ofSetColor(ofColor(65, 104, 74));
-	for (size_t i = 0; i < _bushes.size(); i++)
-	{
-		ofDrawCone(_bushes[i], BUSH_RADIUS, -BUSH_RADIUS * 3);
-	}
+	//if (_tree_loader.valid())
+	//{
+	//	_tree_loader.wait();
+	//}
+	_trees.draw();
+	//for (size_t i = 0; i < _bushes.size(); i++)
+	//{
+	//	ofDrawCone(_bushes[i], BUSH_RADIUS, -BUSH_RADIUS * 3);
+	//}
 	//ofSetColor(ofColor(255, 0, 255, 50));
 	//ofNoFill();
 	//ofDrawBox(_spatial_coordinate.x, 500, _spatial_coordinate.z, 640, 5000, 640);
+}
+
+void Chunk::update(float player_distance)
+{
+	bool generate_trees = false;
+	int section_count = 0;
+	if (player_distance < 160 * 160)
+	{
+		if(_distance_range != 100)
+		{
+			_distance_range = 100;
+			generate_trees = true;
+			section_count = 20;
+		}
+
+	}
+	else
+	{
+		if (player_distance < (5 * 160) * (5 * 160))
+		{
+			if(_distance_range != 1000)
+			{
+				_distance_range = 1000;
+				generate_trees = true;
+				section_count = 10;
+			}
+
+		}
+		else
+		{
+			if (_distance_range != 2000)
+			{
+				_distance_range = 2000;
+				generate_trees = true;
+				section_count = 3;
+			}
+		}
+	}
+	if (generate_trees)
+	{
+		_tree_loading_queue.push_back(section_count);
+		//generateTrees(section_count, this);
+		
+	}
+	if (_tree_loading_queue.size() != 0)
+	{
+		std::future_status status = std::future_status::ready;
+		if(_tree_loader.valid())
+		{
+			status = _tree_loader.wait_for(std::chrono::nanoseconds(10));
+		}
+		if (status == std::future_status::ready)
+		{
+			if (_tree_loader.valid())
+			{
+				_tree_loader.wait();
+			}
+			_trees.clear();
+			_tree_loader = std::async(std::launch::async, &Chunk::generateTrees, _tree_loading_queue.front(), this);
+			_tree_loading_queue.erase(_tree_loading_queue.begin());
+		}
+	}
 }
 
 
@@ -166,6 +236,30 @@ float Chunk::terrainNoise(float x, float y, int octaves, float persistence, floa
 	}
 
 	return total / max_value;  // Normalize the result
+}
+
+void Chunk::generateTrees(int section_point, Chunk* chunk)
+{
+	for (const auto& tree : chunk->_bushes)
+	{
+		ofConePrimitive c(BUSH_RADIUS, -BUSH_RADIUS * 3, section_point, 1, 2, OF_PRIMITIVE_TRIANGLES);
+		for (const auto& v : c.getMesh().getVertices())
+		{
+			chunk->_trees.addVertex(v + tree);
+		}
+
+		for (const auto& n : c.getMesh().getNormals())
+		{
+			chunk->_trees.addNormal(-n);
+		}
+
+		int base_index = chunk->_trees.getNumVertices();
+		for (const auto& ind : c.getMesh().getIndices())
+		{
+			chunk->_trees.addIndex(ind + base_index);
+		}
+	}
+
 }
 
 

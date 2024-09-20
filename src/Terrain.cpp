@@ -22,6 +22,13 @@ Terrain::~Terrain()
 {
 	ofRemoveListener(ofEvents().keyPressed, this, &Terrain::keyPressed);
 
+	for (auto& future : _chunk_generators)
+	{
+		if (future.valid())
+		{
+			future.wait();
+		}
+	}
 	for (size_t i = 0; i < _chunks.size(); i++)
 	{
 		delete _chunks[i];
@@ -118,6 +125,7 @@ void Terrain::update(const Vector3D& player_position)
 		float chunk_distance_squared_norm = chunk_distance.squareNorm();
 		if (chunk_distance_squared_norm < _render_distance * _render_distance)
 		{
+			_chunks[i]->update(chunk_distance_squared_norm);
 			_rendered_chunks.push_back(_chunks[i]);
 		}
 		else
