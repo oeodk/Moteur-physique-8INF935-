@@ -23,7 +23,7 @@ class RenderEngine
 {
 private : 
 	ofCamera _camera;
-	ofLight _light_source;
+	ofLight _light_source, _light_source_weapon;
 
 	std::unordered_map<int, bool> _camera_movement;
 
@@ -52,6 +52,7 @@ private :
 	int removeModifier(ofKeyEventArgs& key);
 
 	ofCylinderPrimitive _cannon;
+	ofColor _cannon_color;
 public : 
 	RenderEngine();
 	RenderEngine(const RenderEngine&) = delete;
@@ -66,10 +67,13 @@ public :
 
 	void keyPressed(ofKeyEventArgs& key);
 	void keyReleased(ofKeyEventArgs& key);
+	void windowResized(ofResizeEventArgs& event);
 
 	void addRenderTarget(Drawable * render_target, bool use_light = true);
 
 	void setCameraPosition(const Vector3D& new_position);
 	Vector3D getCameraPosition() const { return Vector3D(_camera.getPosition()); }
 	float getFarPlane() const { return _camera.getFarClip(); }
+
+	void setWeaponColor(const ofColor& new_color) { _cannon_color = new_color; }
 };

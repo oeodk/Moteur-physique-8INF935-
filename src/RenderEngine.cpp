@@ -12,9 +12,12 @@ RenderEngine::RenderEngine()
 	ofAddListener(ofEvents().mouseDragged, this, &RenderEngine::mouseDragged);
 	ofAddListener(ofEvents().keyPressed, this, &RenderEngine::keyPressed);
 	ofAddListener(ofEvents().keyReleased, this, &RenderEngine::keyReleased);
+	ofAddListener(ofEvents().windowResized, this, &RenderEngine::windowResized);
 
 	_light_source.setDirectional();
 	_light_source.rotate(45, 1, 0, 0);
+	_light_source_weapon.setDirectional();
+	_light_source_weapon.rotate(-45, 1, 0, 0);
 
 	_camera.setFov(70);
 	_camera.setFarClip(RENDER_DISTANCE);
@@ -67,14 +70,12 @@ RenderEngine::RenderEngine()
 	_test.setMode(OF_PRIMITIVE_POINTS);
 
 	_cannon.set(1, 20, 20, 2);
-	_cannon.rotateDeg(100, 1, 0, 0);
+	_cannon.rotateDeg(90, 1, 0, 0);
 
 
-	Vector3D side_dir(_camera.getSideDir());
-	Vector3D look_at_dir(_camera.getLookAtDir());
-	Vector3D down_dir(Vector3D::crossProduct(look_at_dir, side_dir));
-	_cannon.setPosition(_camera.getPosition() + side_dir * 6 + down_dir * 7 + look_at_dir * 5);
-
+	_cannon.setPosition(ofGetWidth() * 0.9, ofGetHeight() * 0.9, 0);
+	_cannon.setScale(100);
+	_cannon_color = ofColor(65, 104, 74);
 	//_cannon.col(ofColor::black);
 	//_cannon.setPosition(20, 0, 0);
 }
@@ -130,14 +131,14 @@ void RenderEngine::update(float delta_t)
 	if (_old_mouse_x != _mouse_x)
 	{
 		_camera.rotate((_old_mouse_x - _mouse_x) / _MOUSE_SENSIBILITY, 0.f, 1.f, 0.f);
-		_cannon.rotate((_old_mouse_x - _mouse_x) / _MOUSE_SENSIBILITY, 0.f, 1.f, 0.f);
+		//_cannon.rotate((_old_mouse_x - _mouse_x) / _MOUSE_SENSIBILITY, 0.f, 1.f, 0.f);
 		update_cannon_position = true;
 		_old_mouse_x = _mouse_x;
 	}
 	if (_old_mouse_y != _mouse_y)
 	{
 		_camera.rotate((_old_mouse_y - _mouse_y) / _MOUSE_SENSIBILITY, side_dir);
-		_cannon.rotate((_old_mouse_y - _mouse_y) / _MOUSE_SENSIBILITY, side_dir);
+		//_cannon.rotate((_old_mouse_y - _mouse_y) / _MOUSE_SENSIBILITY, side_dir);
 		update_cannon_position = true;
 		_old_mouse_y = _mouse_y;
 	}
@@ -188,14 +189,14 @@ void RenderEngine::update(float delta_t)
 	}
 	if(update_cannon_position)
 	{
-		_cannon.setPosition(_camera.getPosition() + side_dir * 6 + down_dir * 7 + look_at_dir * 5);
+		//_cannon.setPosition(_camera.getPosition() + side_dir * 6 + down_dir * 7 + look_at_dir * 5);
 	}
-
 }
 
 void RenderEngine::render()
 {
 	ofBackgroundGradient(ofColor(0, 200, 255), ofColor(0, 150, 205));
+
 	//ofBackground(ofColor(0, 200, 255));
 #ifdef DEBUG_CAMERA
 	_debug_camera.begin();
@@ -230,18 +231,21 @@ void RenderEngine::render()
 		}
 	}	
 	
-	ofSetColor(ofColor(65, 104, 74));
-	_cannon.draw();
+	
 	
 #ifdef DEBUG_CAMERA
 	_debug_camera.end();
 #else
 	_camera.end();
 #endif // DEBUG_CAMERA
-	ofDisableDepthTest();
-
-
 	_light_source.disable();
+
+	_light_source_weapon.enable();
+	ofSetColor(_cannon_color);
+	_cannon.draw();
+	_light_source_weapon.disable();
+	
+	ofDisableDepthTest();
 	ofDisableLighting();
 	ofDisableAlphaBlending();
 
@@ -270,6 +274,11 @@ void RenderEngine::keyReleased(ofKeyEventArgs& key)
 	{
 		_camera_movement.at(k) = false;
 	}
+}
+
+void RenderEngine::windowResized(ofResizeEventArgs& event)
+{
+	_cannon.setPosition(ofGetWidth() * 0.9, ofGetHeight() * 0.9, 0);
 }
 
 int RenderEngine::removeModifier(ofKeyEventArgs& key)
@@ -308,7 +317,7 @@ void RenderEngine::setCameraPosition(const Vector3D& new_position)
 	Vector3D side_dir(_camera.getSideDir());
 	Vector3D look_at_dir(_camera.getLookAtDir());
 	Vector3D down_dir(Vector3D::crossProduct(look_at_dir, side_dir));
-	_cannon.setPosition(_camera.getPosition() + side_dir * 6 + down_dir * 7 + look_at_dir * 5);
+	//_cannon.setPosition(_camera.getPosition() + side_dir * 6 + down_dir * 7 + look_at_dir * 5);
 }
 
 

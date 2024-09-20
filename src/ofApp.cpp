@@ -78,6 +78,7 @@ void ofApp::update()
 void ofApp::draw()
 {
 	_render_engine.render();
+
 	gui_.draw();
 }
 
