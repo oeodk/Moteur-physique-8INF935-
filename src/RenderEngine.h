@@ -56,6 +56,7 @@ private :
 
 	// Remove the key modifier (ex : Ctrl + Z => Z)
 	int removeModifier(ofKeyEventArgs& key);
+
 public : 
 	RenderEngine();
 	RenderEngine(const RenderEngine&) = delete;

@@ -48,6 +48,8 @@ void Chunk::setup(float chunk_size, int chunk_division, const Vector3D& grid_coo
 	_terrain.clear();
 	_trees_positions.clear();
 
+	_chunk_division = chunk_division;
+
 	_lod = ChunkLod::NONE;
 	srand(seed);
 	_world_position = &_spatial_coordinate;
@@ -238,6 +240,25 @@ void Chunk::update(float player_distance)
 			_tree_loading_queue.erase(_tree_loading_queue.begin());
 		}
 	}
+}
+
+float Chunk::getHeight(float x, float z) const
+{
+	const auto& vertices = _terrain.getVertices();
+	int i = 0;
+	while (i < _chunk_division && vertices[i].z < z)
+	{
+		i++;
+	}
+	while (i < _chunk_division * _chunk_division && vertices[i].x < x)
+	{
+		i += _chunk_division;
+	}
+	if (i < _chunk_division * _chunk_division)
+	{
+		return vertices[i].y;
+	}
+	return 0.0f;
 }
 
 float Chunk::terrainNoise(float x, float y, int octaves, float persistence, float lacunarity)

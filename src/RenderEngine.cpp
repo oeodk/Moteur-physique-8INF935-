@@ -116,7 +116,7 @@ void RenderEngine::update(float delta_t)
 	}
 	if (_old_mouse_y != _mouse_y)
 	{
-		if(Vector3D::dotProduct(_camera.getLookAtDir(), Vector3D(0, 1, 0)) > -0.9 || (_old_mouse_y - _mouse_y)> 0)
+		if((Vector3D::dotProduct(_camera.getLookAtDir(), Vector3D(0, 1, 0)) > -0.9 || (_old_mouse_y - _mouse_y) > 0) && (Vector3D::dotProduct(_camera.getLookAtDir(), Vector3D(0, 1, 0)) < 0.9 || (_old_mouse_y - _mouse_y) < 0))
 		{
 			_camera.rotate((_old_mouse_y - _mouse_y) / _MOUSE_SENSIBILITY, side_dir);
 			_camera.lookAt(_camera.getPosition() + _camera.getLookAtDir(), Vector3D(0, 1, 0));
@@ -199,6 +199,8 @@ void RenderEngine::render()
 		}
 	}	
 	
+
+
 #ifdef DEBUG_CAMERA
 	_debug_camera.end();
 #else

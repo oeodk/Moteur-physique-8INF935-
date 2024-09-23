@@ -43,5 +43,7 @@ public :
 	const std::vector<Chunk*>& getRenderedChunk() const { return _rendered_chunks; }
 	void sedRenderDistance(float value);
 	void keyPressed(ofKeyEventArgs& key);
+
+	float getHeight(float x, float z) const;
 };
 

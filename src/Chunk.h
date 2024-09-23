@@ -13,6 +13,7 @@ class Chunk :
 {
 private :
 	ofVboMesh _terrain;
+	int _chunk_division;
 	Vector3D _grid_coordinate;
 	Vector3D _spatial_coordinate;
 
@@ -45,5 +46,6 @@ public :
 	const Vector3D& getGridCoordinate() const {return _grid_coordinate;}
 	const Vector3D& getSpatialCoordinate() const { return _spatial_coordinate; }
 	void setGridCoordinate(const Vector3D& grid_coordinate) { _grid_coordinate.set(grid_coordinate); }
+	float getHeight(float x, float z) const;
 };
 
