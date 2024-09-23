@@ -33,13 +33,15 @@ private :
 	static constexpr float _CAMERA_SPEED = 200.f;
 	static constexpr float _MOUSE_SENSIBILITY = 5.f;
 
-	static constexpr int _FORWARD_KEY    = 'z';
-	static constexpr int _BACKWARD_KEY   = 's';
-	static constexpr int _RIGHT_KEY		 = 'd';
-	static constexpr int _LEFT_KEY		 = 'q';
-	static constexpr int _UP_KEY		 = ' ';
-	static constexpr int _DOWN_KEY		 = ofKey::OF_KEY_LEFT_SHIFT;
-	static constexpr int _SRINT_KEY		 = ofKey::OF_KEY_LEFT_CONTROL;
+	static constexpr int _FORWARD_KEY     = 'z';
+	static constexpr int _FORWARD_KEY_ALT = 'w';
+	static constexpr int _BACKWARD_KEY    = 's';
+	static constexpr int _RIGHT_KEY		  = 'd';
+	static constexpr int _LEFT_KEY		  = 'q';
+	static constexpr int _LEFT_KEY_ALT	  = 'a';
+	static constexpr int _UP_KEY		  = ' ';
+	static constexpr int _DOWN_KEY		  = ofKey::OF_KEY_LEFT_SHIFT;
+	static constexpr int _SRINT_KEY		  = ofKey::OF_KEY_LEFT_CONTROL;
 
 	int _old_mouse_x, _old_mouse_y, _mouse_x, _mouse_y;
 

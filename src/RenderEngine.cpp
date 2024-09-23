@@ -25,9 +25,11 @@ RenderEngine::RenderEngine()
 	_camera.setPosition(0, 225, 100);
 
 	_camera_movement.insert({ _FORWARD_KEY   , false });
+	_camera_movement.insert({ _FORWARD_KEY_ALT   , false });
 	_camera_movement.insert({ _BACKWARD_KEY , false });
 	_camera_movement.insert({ _RIGHT_KEY, false });
 	_camera_movement.insert({ _LEFT_KEY , false });
+	_camera_movement.insert({ _LEFT_KEY_ALT , false });
 	_camera_movement.insert({ _UP_KEY , false });
 	_camera_movement.insert({ _DOWN_KEY , false });
 	_camera_movement.insert({ _SRINT_KEY , false });
@@ -124,7 +126,7 @@ void RenderEngine::update(float delta_t)
 	// Update camera position
 	const float SPEED = _CAMERA_SPEED * delta_t;
 	Vector3D movement;
-	if (_camera_movement.at(_FORWARD_KEY))
+	if (_camera_movement.at(_FORWARD_KEY) || _camera_movement.at(_FORWARD_KEY_ALT))
 	{
 		Vector3D camera_direction(look_at_dir);
 		camera_direction.y = 0;
@@ -142,7 +144,7 @@ void RenderEngine::update(float delta_t)
 	{
 		movement += side_dir;
 	}
-	if (_camera_movement.at(_LEFT_KEY))
+	if (_camera_movement.at(_LEFT_KEY) || _camera_movement.at(_LEFT_KEY_ALT))
 	{
 		movement -= side_dir;
 	}
