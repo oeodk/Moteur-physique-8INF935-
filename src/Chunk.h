@@ -2,29 +2,35 @@
 #include "Drawable.h"
 #include "ofVboMesh.h"
 #include "Vector3D.h"
+#include "GlobalConstants.h"
 #include <future>
 #include <of3dPrimitives.h>
+
+// Part of the terrain
 
 class Chunk :
     public Drawable
 {
 private :
 	ofVboMesh _terrain;
+	Vector3D _grid_coordinate;
+	Vector3D _spatial_coordinate;
+
 	ofVboMesh* _trees_buffer[2];
 	char _used_tree_buffer;
 	std::atomic<bool> _can_edit_tree;
-	std::vector<Vector3D> _bushes;
-	std::vector<unsigned int> _bushes_to_draw;
-	Vector3D _grid_coordinate;
-	Vector3D _spatial_coordinate;
-	int _distance_range;
+	std::vector<Vector3D> _trees_positions;
+	// Level of detail of the trees
+	ChunkLod _lod;
 
-	inline static bool _primitive_initialized = false;
+	// Base primitives for the trees
 	inline static ofConePrimitive _trees_primitive[3];
+	inline static bool _primitive_initialized = false;
 
+	// Threes loading thread
 	std::future<void> _tree_loader;
-	bool _delete_old_buffer;
 	std::list<int> _tree_loading_queue;
+	bool _delete_old_buffer;
 
 	float terrainNoise(float x, float y, int octaves, float persistence, float lacunarity);
 	static void generateTrees(int primitive_index, Chunk* chunk);

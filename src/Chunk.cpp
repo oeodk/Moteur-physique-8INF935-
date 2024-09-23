@@ -10,10 +10,15 @@ constexpr unsigned char WATER_LEVEL = 80;
 constexpr unsigned char STONE_LEVEL = 130;
 constexpr unsigned char SNOW_LEVEL = 180;
 
-constexpr float NOISE_SCALE = 0.004;  // Base scale for noise (0.005)
-constexpr int OCTAVES = 10;  // Number of noise layers to combine
-constexpr float PERSISTANCE = 0.4;  // How much amplitude decreases each octave
-constexpr float LACUNARITY = 2.0;   // How much frequency increases each octave
+// Constants for the terrain noise
+// Base scale for noise
+constexpr float NOISE_SCALE = 0.004; 
+// Number of noise layers to combine
+constexpr int OCTAVES = 10;  
+// How much amplitude decreases each octave
+constexpr float PERSISTANCE = 0.4;  
+// How much frequency increases each octave
+constexpr float LACUNARITY = 2.0;   
 
 constexpr float BUSH_RADIUS = 20;
 
@@ -21,11 +26,6 @@ Chunk::Chunk()
 {
 	_used_tree_buffer = 0;
 	_can_edit_tree = true;
-	//_trees_buffer[0]->disableTextures();
-	//_trees_buffer[0]->disableColors();
-	//				
-	//_trees_buffer[1]->disableTextures();
-	//_trees_buffer[1]->disableColors();
 
 	_trees_buffer[0] = nullptr;
 	_trees_buffer[1] = nullptr;
@@ -45,11 +45,12 @@ Chunk::Chunk()
 
 void Chunk::setup(float chunk_size, int chunk_division, const Vector3D& grid_coordinate, int seed)
 {
-	_distance_range = 0;
+	_terrain.clear();
+	_trees_positions.clear();
+
+	_lod = ChunkLod::NONE;
 	srand(seed);
 	_world_position = &_spatial_coordinate;
-	_terrain.clear();
-	_bushes.clear();
 	_grid_coordinate = grid_coordinate;
 	_spatial_coordinate.x = chunk_size * grid_coordinate.x * ((chunk_division - 3) / static_cast<float>(chunk_division));
 	_spatial_coordinate.y = 0;
@@ -64,17 +65,16 @@ void Chunk::setup(float chunk_size, int chunk_division, const Vector3D& grid_coo
 	{
 		for (int j = 0; j < chunk_division; j++)
 		{
-			float color = terrainNoise(seed + (noise_offset_x + i) * NOISE_SCALE, seed + (noise_offset_y + j) * NOISE_SCALE, OCTAVES, PERSISTANCE, LACUNARITY);
-			float color_squared = (color + 0.5) * (color + 0.5);
+			float height = terrainNoise(seed + (noise_offset_x + i) * NOISE_SCALE, seed + (noise_offset_y + j) * NOISE_SCALE, OCTAVES, PERSISTANCE, LACUNARITY);
+			float height_squared = (height + 0.5) * (height + 0.5);
 
-			color *= 255;
-			//unsigned char color = noise.getColor(j * (noise_width / _TERRAIN_DIVISION) + i * noise_width).r;
-			if (color < WATER_LEVEL)
+			height *= 255;
+			if (height < WATER_LEVEL)
 			{
-				color = WATER_LEVEL;
+				height = WATER_LEVEL;
 			}
-			_terrain.addVertex(Vector3D(_spatial_coordinate.x - (chunk_size / 2) + chunk_size * (i / static_cast<float>(chunk_division)), color * color / 50.f, _spatial_coordinate.z - (chunk_size / 2) + chunk_size * (j / static_cast<float>(chunk_division))));
-			if (color == WATER_LEVEL)
+			_terrain.addVertex(Vector3D(_spatial_coordinate.x - (chunk_size / 2) + chunk_size * (i / static_cast<float>(chunk_division)), height * height / 50.f, _spatial_coordinate.z - (chunk_size / 2) + chunk_size * (j / static_cast<float>(chunk_division))));
+			if (height == WATER_LEVEL)
 			{
 				_terrain.addColor(COLOR_TABLE[0]);
 			}
@@ -82,24 +82,24 @@ void Chunk::setup(float chunk_size, int chunk_division, const Vector3D& grid_coo
 			{
 				char color_index = 1;
 
-				color += (rand() % 30 - 15);
-				if (color > STONE_LEVEL)
+				height += (rand() % 30 - 15);
+				if (height > STONE_LEVEL)
 				{
 					color_index++;
-					if (color > SNOW_LEVEL)
+					if (height > SNOW_LEVEL)
 					{
 						color_index++;
 					}
 				}
 				else
 				{
-					Vector3D bush_pos = _terrain.getVertex(_terrain.getNumVertices() - 1);
-					bush_pos.x += rand() % 20 - 10;
-					bush_pos.z += rand() % 20 - 10;
-					float bush_noise = ofNoise(seed + (noise_offset_x + i) * NOISE_SCALE * 2 + 1, seed + (noise_offset_y + j) * NOISE_SCALE * 2 + 1);
-					if (bush_noise > 0.8)
+					Vector3D tree_pos = _terrain.getVertex(_terrain.getNumVertices() - 1);
+					tree_pos.x += rand() % 20 - 10;
+					tree_pos.z += rand() % 20 - 10;
+					float tree_noise = ofNoise(seed + (noise_offset_x + i) * NOISE_SCALE * 2 + 1, seed + (noise_offset_y + j) * NOISE_SCALE * 2 + 1);
+					if (tree_noise > 0.8)
 					{
-						_bushes.push_back(bush_pos);
+						_trees_positions.push_back(tree_pos);
 					}
 				}
 				_terrain.addColor(COLOR_TABLE[color_index]);
@@ -107,8 +107,7 @@ void Chunk::setup(float chunk_size, int chunk_division, const Vector3D& grid_coo
 		}
 	}
 
-	auto vertices = _terrain.getVertices();
-
+	const auto& vertices = _terrain.getVertices();
 	for (int i = 0; i < chunk_division - 1; i++)
 	{
 		for (int j = 0; j < chunk_division - 1; j++)
@@ -180,48 +179,47 @@ void Chunk::draw()
 
 void Chunk::update(float player_distance)
 {
+	// The old buffer deletion is done here because it need a valid Opengl context
 	if (_delete_old_buffer)
 	{
 		_delete_old_buffer = false;
 		delete _trees_buffer[1 - _used_tree_buffer];
 	}
 	bool generate_trees = false;
-	int primitice_index = 0;
+	int primitive_index = 0;
 	if (player_distance < 160 * 160 * 4)
 	{
-		if(_distance_range != 100)
+		if(_lod != ChunkLod::HIGH)
 		{
-			_distance_range = 100;
+			_lod = ChunkLod::HIGH;
 			generate_trees = true;
-			primitice_index = 2;
+			primitive_index = 2;
 		}
 	}
 	else
 	{
 		if (player_distance < (5 * 160) * (5 * 160))
 		{
-			if(_distance_range != 1000)
+			if(_lod != ChunkLod::MEDUIM)
 			{
-				_distance_range = 1000;
+				_lod = ChunkLod::MEDUIM;
 				generate_trees = true;
-				primitice_index = 1;
+				primitive_index = 1;
 			}
 		}
 		else
 		{
-			if (_distance_range != 2000)
+			if (_lod != ChunkLod::LOW)
 			{
-				_distance_range = 2000;
+				_lod = ChunkLod::LOW;
 				generate_trees = true;
-				primitice_index = 0;
+				primitive_index = 0;
 			}
 		}
 	}
 	if (generate_trees)
 	{
-		_tree_loading_queue.push_back(primitice_index);
-		//generateTrees(section_count, this);
-		
+		_tree_loading_queue.push_back(primitive_index);		
 	}
 	if (_tree_loading_queue.size() != 0)
 	{
@@ -247,7 +245,7 @@ float Chunk::terrainNoise(float x, float y, int octaves, float persistence, floa
 	float total = 0.0f;
 	float amplitude = 1.0f;
 	float frequency = 1.0f;
-	float max_value = 0.0f;  // Used to normalize the result to the range [0, 1]
+	float max_value = 0.0f;
 
 	for (int i = 0; i < octaves; i++)
 	{
@@ -255,20 +253,18 @@ float Chunk::terrainNoise(float x, float y, int octaves, float persistence, floa
 
 		max_value += amplitude;
 
-		amplitude *= persistence;  // Decrease amplitude
-		frequency *= lacunarity;   // Increase frequency
+		amplitude *= persistence;
+		frequency *= lacunarity; 
 	}
 
-	return total / max_value;  // Normalize the result
+	return total / max_value;
 }
 
 void Chunk::generateTrees(int primitive_index, Chunk* chunk)
 {
-	//delete chunk->_trees_buffer[1 - chunk->_used_tree_buffer];
-	//chunk->_trees_buffer[1 - chunk->_used_tree_buffer] = new ofVboMesh();
 	chunk->_trees_buffer[1 - chunk->_used_tree_buffer] = new ofVboMesh();
 
-	for (const auto& tree : chunk->_bushes)
+	for (const auto& tree : chunk->_trees_positions)
 	{
 		for (const auto& v : _trees_primitive[primitive_index].getMesh().getVertices())
 		{
@@ -291,5 +287,4 @@ void Chunk::generateTrees(int primitive_index, Chunk* chunk)
 	chunk->_used_tree_buffer = 1 - chunk->_used_tree_buffer;
 	chunk->_can_edit_tree = true;
 	chunk->_delete_old_buffer = true;
-	//delete chunk->_trees_buffer[1 - chunk->_used_tree_buffer];
 }

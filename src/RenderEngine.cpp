@@ -16,6 +16,7 @@ RenderEngine::RenderEngine()
 
 	_light_source.setDirectional();
 	_light_source.rotate(45, 1, 0, 0);
+
 	_light_source_weapon.setDirectional();
 	_light_source_weapon.rotate(-45, 1, 0, 0);
 
@@ -39,8 +40,6 @@ RenderEngine::RenderEngine()
 #ifndef DEBUG_CAMERA
 	// Enable fog
 	glEnable(GL_FOG);
-
-	// Set fog mode (GL_LINEAR for smooth linear fog)
 	glFogi(GL_FOG_MODE, GL_LINEAR);
 
 	// Set fog color
@@ -48,36 +47,17 @@ RenderEngine::RenderEngine()
 	glFogfv(GL_FOG_COLOR, fogColor);
 
 	// Set start and end distances for fog
-	glFogf(GL_FOG_START, RENDER_DISTANCE * 0.9);  // Start applying fog at 200 units
-	glFogf(GL_FOG_END, RENDER_DISTANCE);    // Fully apply fog at 600 units
+	glFogf(GL_FOG_START, RENDER_DISTANCE * 0.9);
+	glFogf(GL_FOG_END, RENDER_DISTANCE);
 
-	// Optional: Set fog density (if using GL_EXP or GL_EXP2)
-	// glFogf(GL_FOG_DENSITY, 0.35);
 #endif
-
-	_test.addVertex(Vector3D(0, 1000, 0));
-	_test.addVertex(Vector3D(10, 1000, 10));
-	_test.addVertex(Vector3D(-10, 1000, 10));
-	_test.addVertex(Vector3D(10, 1000, -10));
-	_test.addVertex(Vector3D(-10, 1000, -10));
-
-	_test.addIndex(0);
-	_test.addIndex(1);
-	_test.addIndex(2);
-	_test.addIndex(3);
-	_test.addIndex(4);
-
-	_test.setMode(OF_PRIMITIVE_POINTS);
 
 	_cannon.set(1, 20, 20, 2);
 	_cannon.rotateDeg(90, 1, 0, 0);
 
-
 	_cannon.setPosition(ofGetWidth() * 0.9, ofGetHeight() * 0.9, 0);
 	_cannon.setScale(100);
 	_cannon_color = ofColor(65, 104, 74);
-	//_cannon.col(ofColor::black);
-	//_cannon.setPosition(20, 0, 0);
 }
 
 RenderEngine::~RenderEngine()
@@ -109,7 +89,6 @@ void RenderEngine::mouseMoved(ofMouseEventArgs& mouse)
 	{
 		_mouse_y = mouse.y;
 	}
-
 }
 
 void RenderEngine::mouseDragged(ofMouseEventArgs& mouse)
@@ -125,12 +104,11 @@ void RenderEngine::update(float delta_t)
 {
 	Vector3D side_dir(_camera.getSideDir());
 	Vector3D look_at_dir(_camera.getLookAtDir());
-	bool update_cannon_position = false;
 
+	// Update camera rotation
 	if (_old_mouse_x != _mouse_x)
 	{
 		_camera.rotate((_old_mouse_x - _mouse_x) / _MOUSE_SENSIBILITY, 0.f, 1.f, 0.f);
-		update_cannon_position = true;
 		_camera.lookAt(_camera.getPosition() + _camera.getLookAtDir(), Vector3D(0, 1, 0));
 		_old_mouse_x = _mouse_x;
 	}
@@ -140,11 +118,10 @@ void RenderEngine::update(float delta_t)
 		{
 			_camera.rotate((_old_mouse_y - _mouse_y) / _MOUSE_SENSIBILITY, side_dir);
 			_camera.lookAt(_camera.getPosition() + _camera.getLookAtDir(), Vector3D(0, 1, 0));
-			update_cannon_position = true;
 		}
 		_old_mouse_y = _mouse_y;
 	}
-
+	// Update camera position
 	const float SPEED = _CAMERA_SPEED * delta_t;
 	Vector3D movement;
 	if (_camera_movement.at(_FORWARD_KEY))
@@ -169,7 +146,6 @@ void RenderEngine::update(float delta_t)
 	{
 		movement -= side_dir;
 	}
-	//Normalizing movement here would make the speed constant in all directions
 	if (_camera_movement.at(_UP_KEY))
 	{
 		movement += Vector3D(0.f, 1.f, 0.f);;
@@ -180,18 +156,12 @@ void RenderEngine::update(float delta_t)
 	}
 	if (movement != constants::EMPTY_VECTOR3D)
 	{
-		//movement.normalize();
 		if (_camera_movement.at(_SRINT_KEY))
 		{
 			movement *= 5;
 		}
 		movement *= SPEED;
 		_camera.move(movement);
-		update_cannon_position = true;
-	}
-	if(update_cannon_position)
-	{
-		//_cannon.setPosition(_camera.getPosition() + side_dir * 6 + down_dir * 7 + look_at_dir * 5);
 	}
 }
 
@@ -199,7 +169,6 @@ void RenderEngine::render()
 {
 	ofBackgroundGradient(ofColor(0, 200, 255), ofColor(0, 150, 205));
 
-	//ofBackground(ofColor(0, 200, 255));
 #ifdef DEBUG_CAMERA
 	_debug_camera.begin();
 	ofSetColor(ofColor::purple);
@@ -210,10 +179,6 @@ void RenderEngine::render()
 
 	ofEnableDepthTest();
 	ofEnableAlphaBlending();
-
-	//ofSetColor(ofColor::red);
-	//glPointSize(10);
-	//_test.draw();
 	
 	for (Drawable* render_target : _render_targets_no_light)
 	{
@@ -231,7 +196,6 @@ void RenderEngine::render()
 			render_target->draw();
 		}
 	}	
-	
 	
 #ifdef DEBUG_CAMERA
 	_debug_camera.end();
@@ -256,9 +220,8 @@ void RenderEngine::render()
 void RenderEngine::keyPressed(ofKeyEventArgs& key)
 {
 	int k = removeModifier(key);
-
 	auto found = _camera_movement.find(k);
-	//printf("key pressed");
+
 	if (found != _camera_movement.end())
 	{
 		_camera_movement.at(k) = true;
@@ -268,8 +231,8 @@ void RenderEngine::keyPressed(ofKeyEventArgs& key)
 void RenderEngine::keyReleased(ofKeyEventArgs& key)
 {
 	int k = removeModifier(key);
-
 	auto found = _camera_movement.find(k);
+
 	if (found != _camera_movement.end())
 	{
 		_camera_movement.at(k) = false;
@@ -314,12 +277,7 @@ void RenderEngine::addRenderTarget(Drawable* render_target, bool use_light)
 void RenderEngine::setCameraPosition(const Vector3D& new_position)
 {
 	_camera.setPosition(new_position);
-	Vector3D side_dir(_camera.getSideDir());
-	Vector3D look_at_dir(_camera.getLookAtDir());
-	Vector3D down_dir(Vector3D::crossProduct(look_at_dir, side_dir));
-	//_cannon.setPosition(_camera.getPosition() + side_dir * 6 + down_dir * 7 + look_at_dir * 5);
 }
-
 
 bool RenderEngine::willRender(Vector3D target_position) const
 {
