@@ -211,10 +211,9 @@ void RenderEngine::render()
 	ofEnableDepthTest();
 	ofEnableAlphaBlending();
 
-	ofSetColor(ofColor::red);
-	
-	glPointSize(10);
-	_test.draw();
+	//ofSetColor(ofColor::red);
+	//glPointSize(10);
+	//_test.draw();
 	
 	for (Drawable* render_target : _render_targets_no_light)
 	{
@@ -232,7 +231,6 @@ void RenderEngine::render()
 			render_target->draw();
 		}
 	}	
-	
 	
 	
 #ifdef DEBUG_CAMERA
@@ -327,10 +325,7 @@ bool RenderEngine::willRender(Vector3D target_position) const
 {
 	Vector3D look_at_dir(_camera.getLookAtDir());
 	Vector3D camera_target_vector(target_position - _camera.getPosition());
-	//look_at_dir.y = 0;
-	//camera_target_vector.y = 0;
 	camera_target_vector.normalize();
-	//std::cout << std::abs(Vector3D::dotProduct(look_at_dir, camera_target_vector)) << std::endl;
 	if (Vector3D::dotProduct(look_at_dir, camera_target_vector) > 0.25)
 	{
 		return true;

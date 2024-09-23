@@ -17,6 +17,32 @@ constexpr float LACUNARITY = 2.0;   // How much frequency increases each octave
 
 constexpr float BUSH_RADIUS = 20;
 
+Chunk::Chunk()
+{
+	_used_tree_buffer = 0;
+	_can_edit_tree = true;
+	//_trees_buffer[0]->disableTextures();
+	//_trees_buffer[0]->disableColors();
+	//				
+	//_trees_buffer[1]->disableTextures();
+	//_trees_buffer[1]->disableColors();
+
+	_trees_buffer[0] = nullptr;
+	_trees_buffer[1] = nullptr;
+
+	_terrain.disableTextures();
+
+	_delete_old_buffer = false;
+
+	if(!_primitive_initialized)
+	{
+		_primitive_initialized = true;
+		_trees_primitive[0].set(BUSH_RADIUS, -BUSH_RADIUS * 3, 3, 1, 2, OF_PRIMITIVE_TRIANGLES);
+		_trees_primitive[1].set(BUSH_RADIUS, -BUSH_RADIUS * 3, 10, 1, 2, OF_PRIMITIVE_TRIANGLES);
+		_trees_primitive[2].set(BUSH_RADIUS, -BUSH_RADIUS * 3, 20, 1, 2, OF_PRIMITIVE_TRIANGLES);
+	}
+}
+
 void Chunk::setup(float chunk_size, int chunk_division, const Vector3D& grid_coordinate, int seed)
 {
 	_distance_range = 0;
@@ -28,7 +54,7 @@ void Chunk::setup(float chunk_size, int chunk_division, const Vector3D& grid_coo
 	_spatial_coordinate.x = chunk_size * grid_coordinate.x * ((chunk_division - 3) / static_cast<float>(chunk_division));
 	_spatial_coordinate.y = 0;
 	_spatial_coordinate.z = chunk_size * grid_coordinate.z * ((chunk_division - 3) / static_cast<float>(chunk_division));
-
+	
 	int noise_offset_x = grid_coordinate.x * (chunk_division - 3);
 	int noise_offset_y = grid_coordinate.z * (chunk_division - 3);
 
@@ -80,6 +106,7 @@ void Chunk::setup(float chunk_size, int chunk_division, const Vector3D& grid_coo
 			}
 		}
 	}
+
 	auto vertices = _terrain.getVertices();
 
 	for (int i = 0; i < chunk_division - 1; i++)
@@ -138,36 +165,36 @@ void Chunk::setup(float chunk_size, int chunk_division, const Vector3D& grid_coo
 
 void Chunk::draw()
 {
-	
 	_terrain.draw();
 	ofSetColor(ofColor(65, 104, 74));
-	//if (_tree_loader.valid())
-	//{
-	//	_tree_loader.wait();
-	//}
-	_trees.draw();
-	//for (size_t i = 0; i < _bushes.size(); i++)
-	//{
-	//	ofDrawCone(_bushes[i], BUSH_RADIUS, -BUSH_RADIUS * 3);
-	//}
-	//ofSetColor(ofColor(255, 0, 255, 50));
-	//ofNoFill();
-	//ofDrawBox(_spatial_coordinate.x, 500, _spatial_coordinate.z, 640, 5000, 640);
+	if(_can_edit_tree)
+	{
+		_can_edit_tree = false;
+		if(_trees_buffer[_used_tree_buffer] != nullptr)
+		{
+			_trees_buffer[_used_tree_buffer]->draw();
+		}
+		_can_edit_tree = true;
+	}
 }
 
 void Chunk::update(float player_distance)
 {
+	if (_delete_old_buffer)
+	{
+		_delete_old_buffer = false;
+		delete _trees_buffer[1 - _used_tree_buffer];
+	}
 	bool generate_trees = false;
-	int section_count = 0;
-	if (player_distance < 160 * 160)
+	int primitice_index = 0;
+	if (player_distance < 160 * 160 * 4)
 	{
 		if(_distance_range != 100)
 		{
 			_distance_range = 100;
 			generate_trees = true;
-			section_count = 20;
+			primitice_index = 2;
 		}
-
 	}
 	else
 	{
@@ -177,9 +204,8 @@ void Chunk::update(float player_distance)
 			{
 				_distance_range = 1000;
 				generate_trees = true;
-				section_count = 10;
+				primitice_index = 1;
 			}
-
 		}
 		else
 		{
@@ -187,13 +213,13 @@ void Chunk::update(float player_distance)
 			{
 				_distance_range = 2000;
 				generate_trees = true;
-				section_count = 3;
+				primitice_index = 0;
 			}
 		}
 	}
 	if (generate_trees)
 	{
-		_tree_loading_queue.push_back(section_count);
+		_tree_loading_queue.push_back(primitice_index);
 		//generateTrees(section_count, this);
 		
 	}
@@ -210,13 +236,11 @@ void Chunk::update(float player_distance)
 			{
 				_tree_loader.wait();
 			}
-			_trees.clear();
 			_tree_loader = std::async(std::launch::async, &Chunk::generateTrees, _tree_loading_queue.front(), this);
 			_tree_loading_queue.erase(_tree_loading_queue.begin());
 		}
 	}
 }
-
 
 float Chunk::terrainNoise(float x, float y, int octaves, float persistence, float lacunarity)
 {
@@ -238,28 +262,34 @@ float Chunk::terrainNoise(float x, float y, int octaves, float persistence, floa
 	return total / max_value;  // Normalize the result
 }
 
-void Chunk::generateTrees(int section_point, Chunk* chunk)
+void Chunk::generateTrees(int primitive_index, Chunk* chunk)
 {
+	//delete chunk->_trees_buffer[1 - chunk->_used_tree_buffer];
+	//chunk->_trees_buffer[1 - chunk->_used_tree_buffer] = new ofVboMesh();
+	chunk->_trees_buffer[1 - chunk->_used_tree_buffer] = new ofVboMesh();
+
 	for (const auto& tree : chunk->_bushes)
 	{
-		ofConePrimitive c(BUSH_RADIUS, -BUSH_RADIUS * 3, section_point, 1, 2, OF_PRIMITIVE_TRIANGLES);
-		for (const auto& v : c.getMesh().getVertices())
+		for (const auto& v : _trees_primitive[primitive_index].getMesh().getVertices())
 		{
-			chunk->_trees.addVertex(v + tree);
+			chunk->_trees_buffer[1 - chunk->_used_tree_buffer]->addVertex(v + tree);
 		}
 
-		for (const auto& n : c.getMesh().getNormals())
+		for (const auto& n : _trees_primitive[primitive_index].getMesh().getNormals())
 		{
-			chunk->_trees.addNormal(-n);
+			chunk->_trees_buffer[1 - chunk->_used_tree_buffer]->addNormal(-n);
 		}
 
-		int base_index = chunk->_trees.getNumVertices();
-		for (const auto& ind : c.getMesh().getIndices())
+		int base_index = chunk->_trees_buffer[1 - chunk->_used_tree_buffer]->getNumVertices();
+		for (const auto& ind : _trees_primitive[primitive_index].getMesh().getIndices())
 		{
-			chunk->_trees.addIndex(ind + base_index);
+			chunk->_trees_buffer[1 - chunk->_used_tree_buffer]->addIndex(ind + base_index);
 		}
 	}
-
+	while (!chunk->_can_edit_tree);
+	chunk->_can_edit_tree = false;
+	chunk->_used_tree_buffer = 1 - chunk->_used_tree_buffer;
+	chunk->_can_edit_tree = true;
+	chunk->_delete_old_buffer = true;
+	//delete chunk->_trees_buffer[1 - chunk->_used_tree_buffer];
 }
-
-

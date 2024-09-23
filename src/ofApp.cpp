@@ -79,7 +79,7 @@ void ofApp::draw()
 {
 	_render_engine.render();
 
-	gui_.draw();
+	//gui_.draw();
 }
 
 void ofApp::exit()

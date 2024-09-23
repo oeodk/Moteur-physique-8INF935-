@@ -16,14 +16,14 @@ private :
 	Vector3D player_previous_chunk;
 	bool _z_update;
 
+	std::array<std::future<void>, 10> _chunk_generators;
+	std::array<Chunk*, 10> _block_chunk_movement;
+	std::list<Chunk*> _chunk_to_move;
+
 
 	static void generateChunk(int x, int z, Chunk* chunk_to_edit = nullptr);
 	void refreshChunk();
 	std::tuple<int, int> getInGridCoordinate(float x, float z) const;
-
-	std::array<std::future<void>, 10> _chunk_generators;
-	std::array<Chunk*, 10> _block_chunk_movement;
-	std::list<Chunk*> _chunk_to_move;
 public :
 	Terrain();
 	~Terrain();

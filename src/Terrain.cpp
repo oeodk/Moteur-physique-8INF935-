@@ -70,7 +70,6 @@ void Terrain::generateChunk(int x, int z, Chunk* chunk_to_edit)
 		chunk = new Chunk();
 		_chunks.push_back(chunk);
 	}
-	//(CHUNK_DIVISION - 1) * _terrain_size * (z / static_cast<float>(_terrain_division)
 	chunk->setup(_chunk_size, CHUNK_DIVISION, Vector3D(x, 0, z), _seed);
 }
 
@@ -134,18 +133,18 @@ void Terrain::update(const Vector3D& player_position)
 			{
 				if (chunk_grid_coordinate.z > _generation_distance + player_chunk_z + 0.5 || chunk_grid_coordinate.z < player_chunk_z - (_generation_distance + 0.5))
 				{
-					_chunks[i]->setGridCoordinate(Vector3D(chunk_grid_coordinate.x, 0, 2 * player_chunk_z - chunk_grid_coordinate.z + (player_previous_chunk.z - player_chunk_z)));
+					//_chunks[i]->setGridCoordinate(Vector3D(chunk_grid_coordinate.x, 0, 2 * player_chunk_z - chunk_grid_coordinate.z + (player_previous_chunk.z - player_chunk_z)));
+					_chunks[i]->setGridCoordinate(Vector3D(chunk_grid_coordinate.x, 0, chunk_grid_coordinate.z + (_generation_distance * 2 + 1) * ((player_chunk_z - chunk_grid_coordinate.z) / std::abs(player_chunk_z - chunk_grid_coordinate.z))));
 					_chunk_to_move.push_back(_chunks[i]);
-					//_chunk_generators.push_back(std::async(std::launch::async, &Terrain::generateChunk, chunk_grid_coordinate.x, 2 * player_chunk_z - chunk_grid_coordinate.z + (player_previous_chunk.z - player_chunk_z), _chunks[i]));
 				}
 			}
 			else
 			{
 				if (chunk_grid_coordinate.x > _generation_distance + player_chunk_x + 0.5 || chunk_grid_coordinate.x < player_chunk_x - (_generation_distance + 0.5))
 				{
-					_chunks[i]->setGridCoordinate(Vector3D(2 * player_chunk_x - chunk_grid_coordinate.x + (player_previous_chunk.x - player_chunk_x), 0, chunk_grid_coordinate.z));
+					//_chunks[i]->setGridCoordinate(Vector3D(2 * player_chunk_x - chunk_grid_coordinate.x + (player_previous_chunk.x - player_chunk_x), 0, chunk_grid_coordinate.z));
+					_chunks[i]->setGridCoordinate(Vector3D(chunk_grid_coordinate.x + (_generation_distance * 2 + 1) * ((player_chunk_x - chunk_grid_coordinate.x) / std::abs(player_chunk_x - chunk_grid_coordinate.x)), 0, chunk_grid_coordinate.z));
 					_chunk_to_move.push_back(_chunks[i]);
-					//_chunk_generators.push_back(std::async(std::launch::async, &Terrain::generateChunk, 2 * player_chunk_x - chunk_grid_coordinate.x + (player_previous_chunk.x - player_chunk_x), chunk_grid_coordinate.z, _chunks[i]));
 				}
 			}
 		}
@@ -196,7 +195,7 @@ void Terrain::sedRenderDistance(float value)
 {
 	int rendered_chunk = (value ) / _chunk_size;
 	_render_distance = (rendered_chunk + 4) * _chunk_size;
-	_generation_distance = (rendered_chunk + 5);
+	_generation_distance = (rendered_chunk + 6);
 }
 
 void Terrain::keyPressed(ofKeyEventArgs& key)
