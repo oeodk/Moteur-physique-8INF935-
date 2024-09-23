@@ -184,7 +184,7 @@ void RenderEngine::render()
 	{
 		if(willRender(*render_target->getPosition()))
 		{
-			render_target->draw();
+			render_target->drawNoLight();
 		}
 	}
 
