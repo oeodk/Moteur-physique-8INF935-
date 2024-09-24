@@ -17,7 +17,7 @@ private:
 	float _alpha;
 
 	ofVboMesh _trail;
-	const float _TRAIL_POINT_DELAY = 0.25;
+	static constexpr float _TRAIL_POINT_DELAY = 0.25;
 	float _time_counter;
 
 public:
@@ -26,6 +26,8 @@ public:
 	Particle();
 	Particle(const Vector3D& init_pos, const Vector3D& init_vel, const Vector3D& init_acc, float mass, float radius, const Vector3D& color, float alpha);
 	~Particle() = default;
+
+	float getInverseMass() const { return _inverse_mass; }
 
 	void integrate(float dt, IntegrationMethods method);
 
