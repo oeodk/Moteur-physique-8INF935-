@@ -4,8 +4,7 @@
 #include "ofImage.h"
 #include "../GlobalConstants.h"
 
-class GUIManager
-{
+class GUIManager {
 protected:
 
 	static const int SLOT_SIZE = 60;

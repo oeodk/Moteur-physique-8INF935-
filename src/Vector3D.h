@@ -1,12 +1,11 @@
 #pragma once
 #include <glm/vec3.hpp>
 
-struct Vector3D
-{
-public :
+struct Vector3D {
+public:
 	float x, y, z;
 
-	Vector3D(float v = 0.f) : Vector3D(v, v, v){}
+	Vector3D(float v = 0.f) : Vector3D(v, v, v) {}
 	Vector3D(float px, float py, float pz);
 	Vector3D(const glm::vec3& v) : Vector3D(v.x, v.y, v.z) {}
 	Vector3D(const Vector3D&) = default;  // Default copy constructor
@@ -47,7 +46,6 @@ bool operator!=(const Vector3D& v1, const Vector3D& v2);
 
 
 
-namespace constants
-{
+namespace constants {
 	inline static const Vector3D EMPTY_VECTOR3D = Vector3D();
 }

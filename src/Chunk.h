@@ -9,9 +9,8 @@
 // Part of the terrain
 
 class Chunk :
-    public Drawable
-{
-private :
+	public Drawable {
+private:
 	ofVboMesh _terrain;
 	int _chunk_division;
 	Vector3D _grid_coordinate;
@@ -20,6 +19,7 @@ private :
 	ofVboMesh* _trees_buffer[2];
 	char _used_tree_buffer;
 	std::atomic<bool> _can_edit_tree;
+	std::atomic<bool> _is_doing_setup;
 	std::vector<Vector3D> _trees_positions;
 	// Level of detail of the trees
 	ChunkLod _lod;
@@ -35,7 +35,7 @@ private :
 
 	float terrainNoise(float x, float y, int octaves, float persistence, float lacunarity);
 	static void generateTrees(int primitive_index, Chunk* chunk);
-public :
+public:
 	Chunk();
 	Chunk(const Chunk&) = delete;
 	void setup(float chunk_size, int chunk_division, const Vector3D& grid_coordinate, int seed);
@@ -43,7 +43,7 @@ public :
 
 	void update(float player_distance);
 
-	const Vector3D& getGridCoordinate() const {return _grid_coordinate;}
+	const Vector3D& getGridCoordinate() const { return _grid_coordinate; }
 	const Vector3D& getSpatialCoordinate() const { return _spatial_coordinate; }
 	void setGridCoordinate(const Vector3D& grid_coordinate) { _grid_coordinate.set(grid_coordinate); }
 	float getHeight(float x, float z) const;

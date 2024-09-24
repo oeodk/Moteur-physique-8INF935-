@@ -2,8 +2,7 @@
 #include "Particle.h"
 
 
-class FireballParticle : public Particle
-{
+class FireballParticle : public Particle {
 public:
 	FireballParticle() {};
 	~FireballParticle() = default;

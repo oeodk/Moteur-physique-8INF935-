@@ -11,8 +11,7 @@ constexpr int SPEED_RANGE = 100;
 constexpr float TRAJECTORY_POINT_NUMBER = 100;
 
 //--------------------------------------------------------------
-void ofApp::setup()
-{
+void ofApp::setup() {
 	time(NULL);
 	_elapsed_time = 0;
 	_selected_particle = 0;
@@ -21,26 +20,23 @@ void ofApp::setup()
 
 	_terrain.sedRenderDistance(_render_engine.getFarPlane());
 	_terrain.setup();
-	_render_engine.setCameraPosition(Vector3D(0,1300, 0));
+	_render_engine.setCameraPosition(Vector3D(0, 1300, 0));
 
 	Vector3D::testVector3D();
 	Particle::testParticle();
 }
 
 //--------------------------------------------------------------
-void ofApp::update()
-{
+void ofApp::update() {
 	_dt = ofGetLastFrameTime();
 	_elapsed_time += _dt;
 
 	_physics_engine.updateParticles(_dt, _particles);
 	_terrain.update(_render_engine.getCameraPosition());
 
-	for (size_t i = 0; i < _particles.size(); i++)
-	{
+	for (size_t i = 0; i < _particles.size(); i++) {
 		const Vector3D* particle_pos = _particles[i]->getPosition();
-		if (particle_pos->y > 5000 || particle_pos->y < _terrain.getHeight(particle_pos->x, particle_pos->z))
-		{
+		if (particle_pos->y > 5000 || particle_pos->y < _terrain.getHeight(particle_pos->x, particle_pos->z)) {
 			_particles.erase(_particles.begin() + i);
 			i--;
 		}
@@ -50,8 +46,7 @@ void ofApp::update()
 }
 
 //--------------------------------------------------------------
-void ofApp::draw()
-{
+void ofApp::draw() {
 	_render_engine.update(_dt);
 	const auto& terrain_rendered_chunk = _terrain.getRenderedChunk();
 	for (const auto& chunk : terrain_rendered_chunk) {
@@ -66,51 +61,48 @@ void ofApp::draw()
 	_gui_manager.draw();
 }
 
-void ofApp::exit()
-{
-	for (size_t i = 0; i < _particles.size(); i++)
-	{
+void ofApp::exit() {
+	for (size_t i = 0; i < _particles.size(); i++) {
 		delete _particles[i];
 	}
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){
-	if (key == ofKey::OF_KEY_RETURN)
-	{
+void ofApp::keyPressed(int key) {
+	if (key == ofKey::OF_KEY_RETURN) {
 		_physics_engine.changeIntegrationMethod();
 	}
 }
 
 //--------------------------------------------------------------
-void ofApp::keyReleased(int key){
-	
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ){
+void ofApp::keyReleased(int key) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button){
+void ofApp::mouseMoved(int x, int y) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button){
+void ofApp::mouseDragged(int x, int y, int button) {
+
+}
+
+//--------------------------------------------------------------
+void ofApp::mousePressed(int x, int y, int button) {
 	switch (button) {
-		case OF_MOUSE_BUTTON_LEFT:
-			spawnParticle(_particle_types[_selected_particle]);
-			break;
-		default:
-			break;
+	case OF_MOUSE_BUTTON_LEFT:
+		spawnParticle(_particle_types[_selected_particle]);
+		break;
+	default:
+		break;
 	}
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button){
+void ofApp::mouseReleased(int x, int y, int button) {
 
 }
 
@@ -123,27 +115,27 @@ void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY) {
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y){
-	
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseExited(int x, int y){
+void ofApp::mouseEntered(int x, int y) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::windowResized(int w, int h){
+void ofApp::mouseExited(int x, int y) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg){
+void ofApp::windowResized(int w, int h) {
+	_render_engine.windowResized(w, h);
+}
+
+//--------------------------------------------------------------
+void ofApp::gotMessage(ofMessage msg) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
+void ofApp::dragEvent(ofDragInfo dragInfo) {
 
 }
 
@@ -160,8 +152,7 @@ void ofApp::spawnParticle(BulletType type) {
 	static int dep = 0;
 	dep++;
 	current_position += (side_dir * 6 + look_at_dir * 24 + up_dir * (-4));
-	switch (type)
-	{
+	switch (type) {
 	case BULLET:
 		newParticle = new BulletParticle(current_position, look_at_dir, G_ACC);
 		_particles.push_back(newParticle);
@@ -181,5 +172,5 @@ void ofApp::spawnParticle(BulletType type) {
 	default:
 		break;
 	}
-	
+
 }

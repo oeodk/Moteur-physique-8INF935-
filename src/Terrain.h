@@ -4,9 +4,8 @@
 
 // Environment
 
-class Terrain
-{
-private :
+class Terrain {
+private:
 	inline static std::vector<Chunk*> _chunks;
 	std::vector<Chunk*> _rendered_chunks;
 
@@ -34,11 +33,11 @@ private :
 	void refreshChunk();
 	// Convert coordinate from world coordinate to chunk grid coordinate
 	std::tuple<int, int> getInGridCoordinate(float x, float z) const;
-public :
+public:
 	Terrain();
 	~Terrain();
 	void setup();
-	
+
 	void update(const Vector3D& player_position);
 	const std::vector<Chunk*>& getRenderedChunk() const { return _rendered_chunks; }
 	void sedRenderDistance(float value);

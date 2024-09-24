@@ -16,16 +16,15 @@ void GUIManager::update(float const dt, unsigned char const selected_particle) {
 void GUIManager::draw() {
 	ofSetColor(255);
 	ofEnableAlphaBlending();
-	
+
 	drawFps();
 	drawSlots();
-	
+
 	ofDisableAlphaBlending();
 }
 
 std::string GUIManager::getDisplayName(BulletType bullet_type) {
-	switch (bullet_type)
-	{
+	switch (bullet_type) {
 	case BULLET: return "Balle de fusil";
 	case CANNONBALL: return "Boulet de canon";
 	case FIREBALL: return "Boule de feu";
@@ -35,8 +34,7 @@ std::string GUIManager::getDisplayName(BulletType bullet_type) {
 }
 
 std::string GUIManager::getIconPath(BulletType bullet_type) {
-	switch (bullet_type)
-	{
+	switch (bullet_type) {
 	case BULLET: return "particle_bullet.png";
 	case CANNONBALL: return "particle_cannonball.png";
 	case FIREBALL: return "particle_fireball.png";

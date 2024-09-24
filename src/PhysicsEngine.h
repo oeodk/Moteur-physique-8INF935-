@@ -1,13 +1,10 @@
 #pragma once
 
 #include <vector>
-using namespace std;
-
 #include "Particle.h"
 
-class PhysicsEngine
-{
-private :
+class PhysicsEngine {
+private:
 	Particle::IntegrationMethods _integration_method = Particle::IntegrationMethods::VERLET;
 public:
 	void updateParticles(float dt, const std::vector<class Particle*>& particles);

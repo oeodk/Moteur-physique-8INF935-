@@ -2,8 +2,7 @@
 #include "Particle.h"
 
 
-class BubbleParticle : public Particle
-{
+class BubbleParticle : public Particle {
 public:
 	BubbleParticle() {};
 	~BubbleParticle() = default;

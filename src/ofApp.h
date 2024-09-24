@@ -7,9 +7,8 @@
 #include "GlobalConstants.h"
 #include <vector>
 
-class ofApp : public ofBaseApp
-{
-private :
+class ofApp : public ofBaseApp {
+private:
 	std::vector<class Particle*> _particles;
 	std::vector<BulletType> _particle_types = {
 		BulletType::BULLET,
@@ -37,7 +36,7 @@ public:
 
 	void keyPressed(int key);
 	void keyReleased(int key);
-	void mouseMoved(int x, int y );
+	void mouseMoved(int x, int y);
 	void mouseDragged(int x, int y, int button);
 	void mousePressed(int x, int y, int button);
 	void mouseReleased(int x, int y, int button);

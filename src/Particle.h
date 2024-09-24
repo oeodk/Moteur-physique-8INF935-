@@ -2,11 +2,9 @@
 #include "Vector3D.h"
 #include "Drawable.h"
 #include "ofVboMesh.h"
+#include "GlobalConstants.h"
 
-constexpr float g = 9.81;
-
-class Particle : public Drawable
-{
+class Particle : public Drawable {
 private:
 	Vector3D _position;
 	Vector3D _previous_position;
