@@ -83,3 +83,13 @@ void GUIManager::drawFps() {
 
 	ofDrawBitmapString(fspStringStream.str(), 20, 20);
 }
+
+void GUIManager::onMouseScrolled(const float scroll) {
+	if (scroll > 0)
+		_currentSlot = _currentSlot == 0 ? NB_OF_SLOTS - 1 : _currentSlot - 1;
+	else if (scroll < 0)
+		_currentSlot = _currentSlot == NB_OF_SLOTS - 1 ? 0 : _currentSlot + 1;
+}
+
+int GUIManager::getSelectedSlot() { return _currentSlot; }
+void GUIManager::setSelectedSlot(const int slot) { _currentSlot = slot; }
