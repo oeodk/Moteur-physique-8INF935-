@@ -4,7 +4,7 @@
 #include "Vector3D.h"
 #include "Drawable.h"
 
-constexpr int RENDER_DISTANCE = 2000;
+constexpr int RENDER_DISTANCE = 5000;
 
 RenderEngine::RenderEngine()
 {
@@ -12,18 +12,24 @@ RenderEngine::RenderEngine()
 	ofAddListener(ofEvents().mouseDragged, this, &RenderEngine::mouseDragged);
 	ofAddListener(ofEvents().keyPressed, this, &RenderEngine::keyPressed);
 	ofAddListener(ofEvents().keyReleased, this, &RenderEngine::keyReleased);
+	ofAddListener(ofEvents().windowResized, this, &RenderEngine::windowResized);
 
 	_light_source.setDirectional();
 	_light_source.rotate(45, 1, 0, 0);
+
+	_light_source_weapon.setDirectional();
+	_light_source_weapon.rotate(-45, 1, 0, 0);
 
 	_camera.setFov(70);
 	_camera.setFarClip(RENDER_DISTANCE);
 	_camera.setPosition(0, 225, 100);
 
 	_camera_movement.insert({ _FORWARD_KEY   , false });
+	_camera_movement.insert({ _FORWARD_KEY_ALT   , false });
 	_camera_movement.insert({ _BACKWARD_KEY , false });
 	_camera_movement.insert({ _RIGHT_KEY, false });
 	_camera_movement.insert({ _LEFT_KEY , false });
+	_camera_movement.insert({ _LEFT_KEY_ALT , false });
 	_camera_movement.insert({ _UP_KEY , false });
 	_camera_movement.insert({ _DOWN_KEY , false });
 	_camera_movement.insert({ _SRINT_KEY , false });
@@ -36,8 +42,6 @@ RenderEngine::RenderEngine()
 #ifndef DEBUG_CAMERA
 	// Enable fog
 	glEnable(GL_FOG);
-
-	// Set fog mode (GL_LINEAR for smooth linear fog)
 	glFogi(GL_FOG_MODE, GL_LINEAR);
 
 	// Set fog color
@@ -45,31 +49,17 @@ RenderEngine::RenderEngine()
 	glFogfv(GL_FOG_COLOR, fogColor);
 
 	// Set start and end distances for fog
-	glFogf(GL_FOG_START, RENDER_DISTANCE * 0.9);  // Start applying fog at 200 units
-	glFogf(GL_FOG_END, RENDER_DISTANCE);    // Fully apply fog at 600 units
+	glFogf(GL_FOG_START, RENDER_DISTANCE * 0.9);
+	glFogf(GL_FOG_END, RENDER_DISTANCE);
 
-	// Optional: Set fog density (if using GL_EXP or GL_EXP2)
-	// glFogf(GL_FOG_DENSITY, 0.35);
 #endif
 
-	_test.addVertex(Vector3D(0, 1000, 0));
-	_test.addVertex(Vector3D(10, 1000, 10));
-	_test.addVertex(Vector3D(-10, 1000, 10));
-	_test.addVertex(Vector3D(10, 1000, -10));
-	_test.addVertex(Vector3D(-10, 1000, -10));
-
-	_test.addIndex(0);
-	_test.addIndex(1);
-	_test.addIndex(2);
-	_test.addIndex(3);
-	_test.addIndex(4);
-
-	_test.setMode(OF_PRIMITIVE_POINTS);
-
 	_cannon.set(1, 20, 20, 2);
-	_cannon.rotateDeg(100, 1, 0, 0);
-	//_cannon.col(ofColor::black);
-	//_cannon.setPosition(20, 0, 0);
+	_cannon.rotateDeg(90, 1, 0, 0);
+
+	_cannon.setPosition(ofGetWidth() * 0.9, ofGetHeight() * 0.9, 0);
+	_cannon.setScale(100);
+	_cannon_color = ofColor(65, 104, 74);
 }
 
 RenderEngine::~RenderEngine()
@@ -101,7 +91,6 @@ void RenderEngine::mouseMoved(ofMouseEventArgs& mouse)
 	{
 		_mouse_y = mouse.y;
 	}
-
 }
 
 void RenderEngine::mouseDragged(ofMouseEventArgs& mouse)
@@ -117,27 +106,27 @@ void RenderEngine::update(float delta_t)
 {
 	Vector3D side_dir(_camera.getSideDir());
 	Vector3D look_at_dir(_camera.getLookAtDir());
-	Vector3D down_dir(Vector3D::crossProduct(look_at_dir, side_dir));
-	bool update_cannon_position = false;
 
+	// Update camera rotation
 	if (_old_mouse_x != _mouse_x)
 	{
 		_camera.rotate((_old_mouse_x - _mouse_x) / _MOUSE_SENSIBILITY, 0.f, 1.f, 0.f);
-		_cannon.rotate((_old_mouse_x - _mouse_x) / _MOUSE_SENSIBILITY, 0.f, 1.f, 0.f);
-		update_cannon_position = true;
+		_camera.lookAt(_camera.getPosition() + _camera.getLookAtDir(), Vector3D(0, 1, 0));
 		_old_mouse_x = _mouse_x;
 	}
 	if (_old_mouse_y != _mouse_y)
 	{
-		_camera.rotate((_old_mouse_y - _mouse_y) / _MOUSE_SENSIBILITY, side_dir);
-		_cannon.rotate((_old_mouse_y - _mouse_y) / _MOUSE_SENSIBILITY, side_dir);
-		update_cannon_position = true;
+		if((Vector3D::dotProduct(_camera.getLookAtDir(), Vector3D(0, 1, 0)) > -0.9 || (_old_mouse_y - _mouse_y) > 0) && (Vector3D::dotProduct(_camera.getLookAtDir(), Vector3D(0, 1, 0)) < 0.9 || (_old_mouse_y - _mouse_y) < 0))
+		{
+			_camera.rotate((_old_mouse_y - _mouse_y) / _MOUSE_SENSIBILITY, side_dir);
+			_camera.lookAt(_camera.getPosition() + _camera.getLookAtDir(), Vector3D(0, 1, 0));
+		}
 		_old_mouse_y = _mouse_y;
 	}
-
+	// Update camera position
 	const float SPEED = _CAMERA_SPEED * delta_t;
 	Vector3D movement;
-	if (_camera_movement.at(_FORWARD_KEY))
+	if (_camera_movement.at(_FORWARD_KEY) || _camera_movement.at(_FORWARD_KEY_ALT))
 	{
 		Vector3D camera_direction(look_at_dir);
 		camera_direction.y = 0;
@@ -155,11 +144,10 @@ void RenderEngine::update(float delta_t)
 	{
 		movement += side_dir;
 	}
-	if (_camera_movement.at(_LEFT_KEY))
+	if (_camera_movement.at(_LEFT_KEY) || _camera_movement.at(_LEFT_KEY_ALT))
 	{
 		movement -= side_dir;
 	}
-	//Normalizing movement here would make the speed constant in all directions
 	if (_camera_movement.at(_UP_KEY))
 	{
 		movement += Vector3D(0.f, 1.f, 0.f);;
@@ -170,25 +158,19 @@ void RenderEngine::update(float delta_t)
 	}
 	if (movement != constants::EMPTY_VECTOR3D)
 	{
-		//movement.normalize();
 		if (_camera_movement.at(_SRINT_KEY))
 		{
 			movement *= 5;
 		}
 		movement *= SPEED;
 		_camera.move(movement);
-		update_cannon_position = true;
-	}
-	if(update_cannon_position)
-	{
-		_cannon.setPosition(_camera.getPosition() + side_dir * 6 + down_dir * 7 + look_at_dir * 5);
 	}
 }
 
 void RenderEngine::render()
 {
 	ofBackgroundGradient(ofColor(0, 200, 255), ofColor(0, 150, 205));
-	//ofBackground(ofColor(0, 200, 255));
+
 #ifdef DEBUG_CAMERA
 	_debug_camera.begin();
 	ofSetColor(ofColor::purple);
@@ -199,17 +181,12 @@ void RenderEngine::render()
 
 	ofEnableDepthTest();
 	ofEnableAlphaBlending();
-
-	ofSetColor(ofColor::red);
-	
-	glPointSize(10);
-	_test.draw();
 	
 	for (Drawable* render_target : _render_targets_no_light)
 	{
 		if(willRender(*render_target->getPosition()))
 		{
-			render_target->draw();
+			render_target->drawNoLight();
 		}
 	}
 
@@ -219,18 +196,24 @@ void RenderEngine::render()
 		if (willRender(*render_target->getPosition()))
 		{
 			render_target->draw();
-
 		}
-	}
-	//_cannon.draw();
+	}	
+	
+
+
 #ifdef DEBUG_CAMERA
 	_debug_camera.end();
 #else
 	_camera.end();
 #endif // DEBUG_CAMERA
-	ofDisableDepthTest();
-
 	_light_source.disable();
+
+	_light_source_weapon.enable();
+	ofSetColor(_cannon_color);
+	_cannon.draw();
+	_light_source_weapon.disable();
+	
+	ofDisableDepthTest();
 	ofDisableLighting();
 	ofDisableAlphaBlending();
 
@@ -241,9 +224,8 @@ void RenderEngine::render()
 void RenderEngine::keyPressed(ofKeyEventArgs& key)
 {
 	int k = removeModifier(key);
-
 	auto found = _camera_movement.find(k);
-	//printf("key pressed");
+
 	if (found != _camera_movement.end())
 	{
 		_camera_movement.at(k) = true;
@@ -253,12 +235,17 @@ void RenderEngine::keyPressed(ofKeyEventArgs& key)
 void RenderEngine::keyReleased(ofKeyEventArgs& key)
 {
 	int k = removeModifier(key);
-
 	auto found = _camera_movement.find(k);
+
 	if (found != _camera_movement.end())
 	{
 		_camera_movement.at(k) = false;
 	}
+}
+
+void RenderEngine::windowResized(ofResizeEventArgs& event)
+{
+	_cannon.setPosition(ofGetWidth() * 0.9, ofGetHeight() * 0.9, 0);
 }
 
 int RenderEngine::removeModifier(ofKeyEventArgs& key)
@@ -296,15 +283,11 @@ void RenderEngine::setCameraPosition(const Vector3D& new_position)
 	_camera.setPosition(new_position);
 }
 
-
-bool RenderEngine::willRender(const Vector3D& target_position) const
+bool RenderEngine::willRender(Vector3D target_position) const
 {
 	Vector3D look_at_dir(_camera.getLookAtDir());
 	Vector3D camera_target_vector(target_position - _camera.getPosition());
-	//look_at_dir.y = 0;
-	//camera_target_vector.y = 0;
 	camera_target_vector.normalize();
-	//std::cout << std::abs(Vector3D::dotProduct(look_at_dir, camera_target_vector)) << std::endl;
 	if (Vector3D::dotProduct(look_at_dir, camera_target_vector) > 0.25)
 	{
 		return true;
