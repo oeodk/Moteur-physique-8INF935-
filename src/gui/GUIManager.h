@@ -10,14 +10,18 @@ protected:
 	static const int SLOT_SIZE = 60;
 	static const int SLOT_PADDING = 6;
 
-	int currentSlot = 0;
+	int _currentSlot = 0;
 
-	ofImage slot_images[NB_OF_SLOTS];
-	ofImage slot_icon_images[NB_OF_SLOTS];
-	ofImage slot_select;
+	ofImage _slot_images[NB_OF_SLOTS];
+	ofImage _slot_icon_images[NB_OF_SLOTS];
+	ofImage _slot_select;
+
+	float _fps;
+	float _dt;
 
 public:
 	void setup();
+	void update(float const dt);
 	void draw();
 
 	void setupSlots();
