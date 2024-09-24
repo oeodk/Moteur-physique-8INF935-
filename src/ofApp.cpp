@@ -34,6 +34,8 @@ void ofApp::update() {
 	_physics_engine.updateParticles(_dt, _particles);
 	_terrain.update(_render_engine.getCameraPosition());
 
+
+	// Delete a particle if it is too high or too low
 	for (size_t i = 0; i < _particles.size(); i++) {
 		const Vector3D* particle_pos = _particles[i]->getPosition();
 		if (particle_pos->y > 5000 || particle_pos->y < _terrain.getHeight(particle_pos->x, particle_pos->z)) {
@@ -49,6 +51,8 @@ void ofApp::update() {
 void ofApp::draw() {
 	_render_engine.update(_dt);
 	const auto& terrain_rendered_chunk = _terrain.getRenderedChunk();
+	
+	// Add terrain and particles to the render
 	for (const auto& chunk : terrain_rendered_chunk) {
 		_render_engine.addRenderTarget(chunk);
 	}

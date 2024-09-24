@@ -25,6 +25,8 @@ void Particle::integrate(float dt, IntegrationMethods method) {
 		integrateEuler(dt); break;
 	}
 
+
+	// Generate the trail effect
 	_time_counter += dt;
 	if (_time_counter > _TRAIL_POINT_DELAY) {
 		_trail.addVertex(_position);

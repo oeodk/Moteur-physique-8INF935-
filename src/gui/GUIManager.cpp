@@ -23,6 +23,7 @@ void GUIManager::draw() {
 	ofDisableAlphaBlending();
 }
 
+// Get a name to display based on the selected bullet type
 std::string GUIManager::getDisplayName(BulletType bullet_type) {
 	switch (bullet_type) {
 	case BULLET: return "Balle de fusil";
@@ -33,6 +34,7 @@ std::string GUIManager::getDisplayName(BulletType bullet_type) {
 	}
 }
 
+// Get an icon to display based on the selected bullet type
 std::string GUIManager::getIconPath(BulletType bullet_type) {
 	switch (bullet_type) {
 	case BULLET: return "particle_bullet.png";
@@ -46,6 +48,7 @@ std::string GUIManager::getIconPath(BulletType bullet_type) {
 void GUIManager::setupSlots() {
 	_slot_images.reserve(_nb_of_slots);
 	_slot_icon_images.reserve(_nb_of_slots);
+
 	for (int i = 0; i < _nb_of_slots; i++) {
 		_slot_images.push_back(ofImage());
 		_slot_images[i].load("ui_slot.png");
@@ -59,7 +62,9 @@ void GUIManager::setupSlots() {
 void GUIManager::drawSlots() {
 	const int screenHeight = ofGetHeight();
 
+	// Compute the height at which to draw to first slot
 	int drawHeight = (screenHeight - _nb_of_slots * (SLOT_SIZE + SLOT_PADDING)) / 2;
+	
 	for (int i = 0; i < _nb_of_slots; i++) {
 		_slot_images[i].draw(20, drawHeight, SLOT_SIZE, SLOT_SIZE);
 		_slot_icon_images[i].draw(30, drawHeight + 10, SLOT_SIZE - 20, SLOT_SIZE - 20);
