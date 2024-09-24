@@ -10,7 +10,7 @@ protected:
 	static const int SLOT_SIZE = 60;
 	static const int SLOT_PADDING = 6;
 
-	int _currentSlot = 0;
+	unsigned char _currentSlot = 0;
 
 	ofImage _slot_images[NB_OF_SLOTS];
 	ofImage _slot_icon_images[NB_OF_SLOTS];
@@ -21,7 +21,7 @@ protected:
 
 public:
 	void setup();
-	void update(float const dt);
+	void update(float const dt, unsigned char const selected_particle);
 	void draw();
 
 	void setupSlots();

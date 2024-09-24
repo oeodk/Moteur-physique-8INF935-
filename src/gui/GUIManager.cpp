@@ -4,8 +4,11 @@ void GUIManager::setup() {
 	setupSlots();
 }
 
-void upadte(float const dt) {
+void GUIManager::update(float const dt, unsigned char const selected_particle) {
+	_dt = dt;
+	_fps = ofGetFrameRate();
 
+	//setSelectedSlot(selected_particle);
 }
 
 void GUIManager::draw() {
@@ -29,7 +32,7 @@ void GUIManager::setupSlots() {
 void GUIManager::drawSlots() {
 	int screenHeight = ofGetHeight();
 
-	int drawHeight = screenHeight / 2 - 2 * (SLOT_SIZE + SLOT_PADDING);
+	int drawHeight = (screenHeight - NB_OF_SLOTS * (SLOT_SIZE + SLOT_PADDING)) / 2;
 	for (int i = 0; i < NB_OF_SLOTS; i++) {
 		_slot_images[i].draw(20, drawHeight, SLOT_SIZE, SLOT_SIZE);
 		_slot_icon_images[i].draw(30, drawHeight + 10, SLOT_SIZE - 20, SLOT_SIZE - 20);
@@ -46,8 +49,8 @@ void GUIManager::drawSlots() {
 void GUIManager::drawFps() {
 	stringstream fspStringStream;
 	fspStringStream << std::fixed << std::setprecision(1)
-		<< ofGetFrameRate() << "fps "
-		<< std::setprecision(3) << "(" << ofGetLastFrameTime() << "s)";
+		<< _fps << "fps "
+		<< std::setprecision(3) << "(" << _dt << "s)";
 
 	ofDrawBitmapString(fspStringStream.str(), 20, 20);
 }

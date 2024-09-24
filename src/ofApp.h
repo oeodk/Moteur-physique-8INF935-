@@ -18,15 +18,7 @@ private :
 	double _elapsed_time;
 	double _dt;
 
-	ofxPanel gui_;
-	ofxLabel label_dt_;
-	ofxLabel label_fps_;
-	ofxGuiGroup frame_information_, particles_selection_group_, shoot_group_;
-	std::array<ofxToggle, 4> particles_selection_toggle_buttons_;
-	std::array<ofParameter<bool>, 4> particles_selection_parameters_;
-	unsigned char selected_particle_;
-	std::array< ofParameter<int>, 2> shoot_angles_;
-	ofxButton shoot_button_;
+	unsigned char _selected_particle;
 
 	Terrain _terrain;
 
@@ -35,9 +27,6 @@ public:
 	void update();
 	void draw();
 	void exit();
-
-	void shootProjectile();
-	void updateSelectedParticle(bool& state);
 
 	void keyPressed(int key);
 	void keyReleased(int key);
