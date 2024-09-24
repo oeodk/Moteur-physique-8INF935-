@@ -20,7 +20,7 @@ constexpr float PERSISTANCE = 0.4;
 // How much frequency increases each octave
 constexpr float LACUNARITY = 2.0;   
 
-constexpr float BUSH_RADIUS = 20;
+constexpr float TREE_RADIUS = 20;
 
 Chunk::Chunk()
 {
@@ -37,9 +37,9 @@ Chunk::Chunk()
 	if(!_primitive_initialized)
 	{
 		_primitive_initialized = true;
-		_trees_primitive[0].set(BUSH_RADIUS, -BUSH_RADIUS * 3, 3, 1, 2, OF_PRIMITIVE_TRIANGLES);
-		_trees_primitive[1].set(BUSH_RADIUS, -BUSH_RADIUS * 3, 10, 1, 2, OF_PRIMITIVE_TRIANGLES);
-		_trees_primitive[2].set(BUSH_RADIUS, -BUSH_RADIUS * 3, 20, 1, 2, OF_PRIMITIVE_TRIANGLES);
+		_trees_primitive[0].set(TREE_RADIUS, -TREE_RADIUS * 3, 3, 1, 2, OF_PRIMITIVE_TRIANGLES);
+		_trees_primitive[1].set(TREE_RADIUS, -TREE_RADIUS * 3, 10, 1, 2, OF_PRIMITIVE_TRIANGLES);
+		_trees_primitive[2].set(TREE_RADIUS, -TREE_RADIUS * 3, 20, 1, 2, OF_PRIMITIVE_TRIANGLES);
 	}
 }
 
@@ -98,6 +98,7 @@ void Chunk::setup(float chunk_size, int chunk_division, const Vector3D& grid_coo
 					Vector3D tree_pos = _terrain.getVertex(_terrain.getNumVertices() - 1);
 					tree_pos.x += rand() % 20 - 10;
 					tree_pos.z += rand() % 20 - 10;
+					tree_pos.y += TREE_RADIUS;
 					float tree_noise = ofNoise(seed + (noise_offset_x + i) * NOISE_SCALE * 2 + 1, seed + (noise_offset_y + j) * NOISE_SCALE * 2 + 1);
 					if (tree_noise > 0.8)
 					{

@@ -1,5 +1,6 @@
 #include "RenderEngine.h"
 #include <of3dGraphics.h>
+#include <ofGraphics.h>
 
 #include "Vector3D.h"
 #include "Drawable.h"
@@ -60,6 +61,8 @@ RenderEngine::RenderEngine()
 	_cannon.setPosition(ofGetWidth() * 0.9, ofGetHeight() * 0.9, 0);
 	_cannon.setScale(100);
 	_cannon_color = ofColor(65, 104, 74);
+
+	glPointSize(5);
 }
 
 RenderEngine::~RenderEngine()
@@ -170,6 +173,8 @@ void RenderEngine::update(float delta_t)
 void RenderEngine::render()
 {
 	ofBackgroundGradient(ofColor(0, 200, 255), ofColor(0, 150, 205));
+	ofEnableDepthTest();
+	ofEnableAlphaBlending();
 
 #ifdef DEBUG_CAMERA
 	_debug_camera.begin();
@@ -179,9 +184,6 @@ void RenderEngine::render()
 	_camera.begin();
 #endif // DEBUG_CAMERA
 
-	ofEnableDepthTest();
-	ofEnableAlphaBlending();
-	
 	for (Drawable* render_target : _render_targets_no_light)
 	{
 		if(willRender(*render_target->getPosition()))

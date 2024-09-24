@@ -8,7 +8,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <ofxGui.h>
 #include <ofParameter.h>
 #include <ofCamera.h>
 #include <ofLight.h>
@@ -82,6 +81,8 @@ public :
 
 	void setCameraPosition(const Vector3D& new_position);
 	Vector3D getCameraPosition() const { return Vector3D(_camera.getPosition()); }
+	const ofCamera& getCamera() const { return _camera; }
+
 	float getFarPlane() const { return _camera.getFarClip(); }
 
 	void setWeaponColor(const ofColor& new_color) { _cannon_color = new_color; }

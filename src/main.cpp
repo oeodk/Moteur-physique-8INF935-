@@ -15,7 +15,7 @@ int main( ){
 
 	//ofRunApp(window, make_shared<ofApp>());
 	//ofRunMainLoop();
-	ofSetupOpenGL(1024, 1024, OF_WINDOW);// OF_FULLSCREEN);			// <-------- setup the GL context
+	ofSetupOpenGL(WINDOW_BASE_WIDTH, WINDOW_BASE_HEIGHT, OF_WINDOW);// OF_FULLSCREEN);			// <-------- setup the GL context
 
 	// this kicks off the running of my app
 	// can be OF_WINDOW or OF_FULLSCREEN

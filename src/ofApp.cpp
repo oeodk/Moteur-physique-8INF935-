@@ -1,5 +1,9 @@
 #define _USE_MATH_DEFINES
 #include "ofApp.h"
+#include "BulletParticle.h"
+#include "CannonballParticle.h"
+#include "FireballParticle.h"
+#include "BubbleParticle.h"
 #include <execution>
 #include <cmath>
 
@@ -11,45 +15,16 @@ void ofApp::setup()
 {
 	time(NULL);
 	_elapsed_time = 0;
+	_selected_particle = 0;
 
-	constexpr unsigned int GUI_WIDTH = 250;
-
-	// A mettre dans le GUI
-	gui_.setup();
-	gui_.setWidthElements(GUI_WIDTH);
-	gui_.add(frame_information_.setup("Frames informations"));
-
-	frame_information_.add(label_dt_.setup("label", "THIS IS A LABEL"));
-	frame_information_.add(label_fps_.setup("label", "THIS IS A LABEL"));
-	
-	label_dt_.setDefaultWidth(GUI_WIDTH - 4);
-	label_fps_.setDefaultWidth(GUI_WIDTH - 4);
-
-	gui_.add(particles_selection_group_.setup("Particles"));
-
-	constexpr const char* PROJECTILE_NAME[4] = { "Bullet", "Laser", "Fire Ball", "Rubber Ball" };
-	for (size_t i = 0; i < particles_selection_toggle_buttons_.size(); i++)
-	{
-		particles_selection_group_.add(particles_selection_toggle_buttons_[i].setup(particles_selection_parameters_[i].set(PROJECTILE_NAME[i], false)));
-		particles_selection_toggle_buttons_[i].addListener(this, &ofApp::updateSelectedParticle);
-	}
-
-	gui_.add(shoot_group_.setup("Shoot data"));
-
-	shoot_group_.add(shoot_angles_[0].set("Theta", 0.f, 0, 180));
-	shoot_group_.add(shoot_angles_[1].set("Phi", 0.f, 0, 360));
-	shoot_group_.add(shoot_button_.setup("Shoot"));
-	shoot_button_.addListener(this, &ofApp::shootProjectile);
-
-	gui_.enableHeader();
-
-	selected_particle_ = 0;
-
-	particles_selection_parameters_[selected_particle_].set(true);
+	_gui_manager.setup(_particle_types);
 
 	_terrain.sedRenderDistance(_render_engine.getFarPlane());
 	_terrain.setup();
 	_render_engine.setCameraPosition(Vector3D(0,1300, 0));
+
+	Vector3D::testVector3D();
+	Particle::testParticle();
 }
 
 //--------------------------------------------------------------
@@ -61,25 +36,34 @@ void ofApp::update()
 	_physics_engine.updateParticles(_dt, _particles);
 	_terrain.update(_render_engine.getCameraPosition());
 
-	_render_engine.update(_dt);
-	const auto& terrain_rendered_chunk = _terrain.getRenderedChunk();
-	for (const auto& chunk : terrain_rendered_chunk)
+	for (size_t i = 0; i < _particles.size(); i++)
 	{
-		_render_engine.addRenderTarget(chunk);
+		const Vector3D* particle_pos = _particles[i]->getPosition();
+		if (particle_pos->y > 5000 || particle_pos->y < _terrain.getHeight(particle_pos->x, particle_pos->z))
+		{
+			_particles.erase(_particles.begin() + i);
+			i--;
+		}
 	}
 
-	// A mettre dans le GUI
-	label_dt_.setup("Frame duration", std::to_string(_dt) + "s");
-	label_fps_.setup("Frame duration", std::to_string(1.0 / _dt) + "fps");
-
+	_gui_manager.update(_dt, _selected_particle);
 }
 
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-	_render_engine.render();
+	_render_engine.update(_dt);
+	const auto& terrain_rendered_chunk = _terrain.getRenderedChunk();
+	for (const auto& chunk : terrain_rendered_chunk) {
+		_render_engine.addRenderTarget(chunk);
+	}
+	for (const auto& particle : _particles) {
+		_render_engine.addRenderTarget(particle);
+		_render_engine.addRenderTarget(particle, false);
+	}
 
-	//gui_.draw();
+	_render_engine.render();
+	_gui_manager.draw();
 }
 
 void ofApp::exit()
@@ -88,35 +72,14 @@ void ofApp::exit()
 	{
 		delete _particles[i];
 	}
-	shoot_button_.removeListener(this, &ofApp::shootProjectile);
-}
-
-void ofApp::shootProjectile()
-{
-}
-
-// A mettre dans le GUI
-void ofApp::updateSelectedParticle(bool& state)
-{
-	bool success = false;
-	for (unsigned char i = 0; i < particles_selection_toggle_buttons_.size(); i++)
-	{
-		if (particles_selection_parameters_[i].get() && i != selected_particle_)
-		{
-			particles_selection_parameters_[selected_particle_].set(false);
-			selected_particle_ = i;
-			success = true;
-		}
-	}
-	if (!success)
-	{
-		particles_selection_parameters_[selected_particle_].set(true);
-	}
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-
+	if (key == ofKey::OF_KEY_RETURN)
+	{
+		_physics_engine.changeIntegrationMethod();
+	}
 }
 
 //--------------------------------------------------------------
@@ -136,6 +99,13 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
+	switch (button) {
+		case OF_MOUSE_BUTTON_LEFT:
+			spawnParticle(_particle_types[_selected_particle]);
+			break;
+		default:
+			break;
+	}
 
 }
 
@@ -145,8 +115,16 @@ void ofApp::mouseReleased(int x, int y, int button){
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y){
+void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY) {
+	if (scrollY > 0)
+		_selected_particle = _selected_particle == 0 ? _particle_types.size() - 1 : _selected_particle - 1;
+	else if (scrollY < 0)
+		_selected_particle = _selected_particle == _particle_types.size() - 1 ? 0 : _selected_particle + 1;
+}
 
+//--------------------------------------------------------------
+void ofApp::mouseEntered(int x, int y){
+	
 }
 
 //--------------------------------------------------------------
@@ -167,4 +145,41 @@ void ofApp::gotMessage(ofMessage msg){
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
+}
+
+void ofApp::spawnParticle(BulletType type) {
+	const ofCamera& camera = _render_engine.getCamera();
+	Vector3D current_position = camera.getPosition();
+	const Vector3D& look_at_dir = camera.getLookAtDir();
+	const Vector3D& side_dir = camera.getSideDir();
+	const Vector3D up_dir = Vector3D::crossProduct(side_dir, look_at_dir);
+	Particle* newParticle;
+
+	Vector3D cannon_offset;
+
+	static int dep = 0;
+	dep++;
+	current_position += (side_dir * 6 + look_at_dir * 24 + up_dir * (-4));
+	switch (type)
+	{
+	case BULLET:
+		newParticle = new BulletParticle(current_position, look_at_dir, G_ACC);
+		_particles.push_back(newParticle);
+		break;
+	case CANNONBALL:
+		newParticle = new CannonballParticle(current_position, look_at_dir, G_ACC);
+		_particles.push_back(newParticle);
+		break;
+	case FIREBALL:
+		newParticle = new FireballParticle(current_position, look_at_dir, G_ACC);
+		_particles.push_back(newParticle);
+		break;
+	case BUBBLE:
+		newParticle = new BubbleParticle(current_position, look_at_dir, G_ACC);
+		_particles.push_back(newParticle);
+		break;
+	default:
+		break;
+	}
+	
 }
