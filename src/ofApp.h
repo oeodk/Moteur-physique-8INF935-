@@ -2,6 +2,7 @@
 #include "ofMain.h"
 #include "RenderEngine.h"
 #include "PhysicsEngine.h"
+#include "gui/GUIManager.h"
 #include "Terrain.h"
 #include <vector>
 
@@ -13,6 +14,7 @@ private :
 
 	PhysicsEngine _physics_engine;
 	RenderEngine _render_engine;
+	GUIManager _gui_manager;
 
 	double _elapsed_time;
 	double _dt;
@@ -44,6 +46,7 @@ public:
 	void mouseDragged(int x, int y, int button);
 	void mousePressed(int x, int y, int button);
 	void mouseReleased(int x, int y, int button);
+	void mouseScrolled(int x, int y, float scrollX, float scrollY);
 	void mouseEntered(int x, int y);
 	void mouseExited(int x, int y);
 	void windowResized(int w, int h);

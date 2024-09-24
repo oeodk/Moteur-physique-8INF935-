@@ -15,6 +15,7 @@ void ofApp::setup()
 	constexpr unsigned int GUI_WIDTH = 250;
 
 	// A mettre dans le GUI
+	_gui_manager.setup();
 	gui_.setup();
 	gui_.setWidthElements(GUI_WIDTH);
 	gui_.add(frame_information_.setup("Frames informations"));
@@ -78,7 +79,8 @@ void ofApp::update()
 void ofApp::draw()
 {
 	_render_engine.render();
-	gui_.draw();
+	//gui_.draw();
+	_gui_manager.draw();
 }
 
 void ofApp::exit()
@@ -135,12 +137,17 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-
+	
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
 
+}
+
+//--------------------------------------------------------------
+void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY) {
+	_gui_manager.onMouseScrolled(scrollY);
 }
 
 //--------------------------------------------------------------
