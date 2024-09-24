@@ -58,7 +58,7 @@ RenderEngine::RenderEngine() {
 
 	_cannon.setPosition(ofGetWidth() * 0.9, ofGetHeight() * 0.9, 0);
 	_cannon.setScale(100);
-	_cannon_color = ofColor(65, 104, 74);
+	_cannon_color = ofColor(204, 153, 0);
 
 	glPointSize(5);
 	glLineWidth(5);
@@ -245,6 +245,25 @@ void RenderEngine::addRenderTarget(Drawable* render_target, bool use_light) {
 
 void RenderEngine::setCameraPosition(const Vector3D& new_position) {
 	_camera.setPosition(new_position);
+}
+
+void RenderEngine::updateSelectedParticle(BulletType bullet) {
+	switch (bullet) {
+	case BULLET:
+		_cannon_color.set(204, 153, 0);
+		break;
+	case CANNONBALL:
+		_cannon_color.set(60);
+		break;
+	case FIREBALL:
+		_cannon_color.set(240, 60, 0);
+		break;
+	case BUBBLE:
+		_cannon_color.set(30, 255, 255);
+		break;
+	default:
+		break;
+	}
 }
 
 bool RenderEngine::willRender(Vector3D target_position) const {

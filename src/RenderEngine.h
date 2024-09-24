@@ -13,6 +13,7 @@
 #include <ofLight.h>
 #include <of3dPrimitives.h>
 
+#include "GlobalConstants.h"
 #include "Vector3D.h"
 
 
@@ -85,4 +86,6 @@ public:
 	float getFarPlane() const { return _camera.getFarClip(); }
 
 	void setWeaponColor(const ofColor& new_color) { _cannon_color = new_color; }
+
+	void updateSelectedParticle(BulletType bullet);
 };

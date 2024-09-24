@@ -98,7 +98,6 @@ void ofApp::mousePressed(int x, int y, int button) {
 	default:
 		break;
 	}
-
 }
 
 //--------------------------------------------------------------
@@ -112,6 +111,8 @@ void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY) {
 		_selected_particle = _selected_particle == 0 ? _particle_types.size() - 1 : _selected_particle - 1;
 	else if (scrollY < 0)
 		_selected_particle = _selected_particle == _particle_types.size() - 1 ? 0 : _selected_particle + 1;
+
+	_render_engine.updateSelectedParticle(_particle_types[_selected_particle]);
 }
 
 //--------------------------------------------------------------
