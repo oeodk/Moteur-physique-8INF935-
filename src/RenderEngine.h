@@ -1,20 +1,20 @@
 #pragma once
 //#define DEBUG_CAMERA
 
-
 #ifdef DEBUG_CAMERA
 #include <ofEasyCam.h>
 #endif
+
+#include <unordered_map>
+#include <vector>
 
 #include <ofxGui.h>
 #include <ofParameter.h>
 #include <ofCamera.h>
 #include <ofLight.h>
 #include <of3dPrimitives.h>
-#include "Vector3D.h"
 
-#include <unordered_map>
-#include <vector>
+#include "Vector3D.h"
 
 
 class Drawable;
@@ -23,7 +23,7 @@ class RenderEngine
 {
 private : 
 	ofCamera _camera;
-	ofLight _light_source;
+	ofLight _light_source, _light_source_weapon;
 
 	std::unordered_map<int, bool> _camera_movement;
 
@@ -33,25 +33,30 @@ private :
 	static constexpr float _CAMERA_SPEED = 200.f;
 	static constexpr float _MOUSE_SENSIBILITY = 5.f;
 
-	static constexpr int _FORWARD_KEY    = 'z';// ofKey::OF_KEY_UP;
-	static constexpr int _BACKWARD_KEY   = 's';//ofKey::OF_KEY_DOWN;
-	static constexpr int _RIGHT_KEY		 = 'd';//ofKey::OF_KEY_RIGHT;
-	static constexpr int _LEFT_KEY		 = 'q';//ofKey::OF_KEY_LEFT;
-	static constexpr int _UP_KEY		 = ' ';//ofKey::OF_KEY_LEFT;
-	static constexpr int _DOWN_KEY		 = ofKey::OF_KEY_LEFT_SHIFT;
-	static constexpr int _SRINT_KEY		 = ofKey::OF_KEY_LEFT_CONTROL;
+	static constexpr int _FORWARD_KEY     = 'z';
+	static constexpr int _FORWARD_KEY_ALT = 'w';
+	static constexpr int _BACKWARD_KEY    = 's';
+	static constexpr int _RIGHT_KEY		  = 'd';
+	static constexpr int _LEFT_KEY		  = 'q';
+	static constexpr int _LEFT_KEY_ALT	  = 'a';
+	static constexpr int _UP_KEY		  = ' ';
+	static constexpr int _DOWN_KEY		  = ofKey::OF_KEY_LEFT_SHIFT;
+	static constexpr int _SRINT_KEY		  = ofKey::OF_KEY_LEFT_CONTROL;
 
 	int _old_mouse_x, _old_mouse_y, _mouse_x, _mouse_y;
 
-	bool willRender(const Vector3D& target_position) const;
+	// Test if a render target is in front of the camera
+	bool willRender(Vector3D target_position) const;
 
 #ifdef DEBUG_CAMERA
 	ofEasyCam _debug_camera;
 #endif
-	ofVboMesh _test;
+	ofCylinderPrimitive _cannon;
+	ofColor _cannon_color;
+
+	// Remove the key modifier (ex : Ctrl + Z => Z)
 	int removeModifier(ofKeyEventArgs& key);
 
-	ofCylinderPrimitive _cannon;
 public : 
 	RenderEngine();
 	RenderEngine(const RenderEngine&) = delete;
@@ -59,6 +64,11 @@ public :
 	~RenderEngine();
 
 	void mouseMoved(ofMouseEventArgs& mouse);
+
+	/*
+		The event mouseDragged is triggered when the mouse button is pressed and the mouse is moving
+		With this event the user is able move his mouse on the screen without moving the camera
+	*/
 	void mouseDragged(ofMouseEventArgs& mouse);
 
 	void update(float delta_t);
@@ -66,6 +76,7 @@ public :
 
 	void keyPressed(ofKeyEventArgs& key);
 	void keyReleased(ofKeyEventArgs& key);
+	void windowResized(ofResizeEventArgs& event);
 
 	void addRenderTarget(Drawable * render_target, bool use_light = true);
 
@@ -74,4 +85,6 @@ public :
 	ofCamera getCamera() const { return _camera; }
 
 	float getFarPlane() const { return _camera.getFarClip(); }
+
+	void setWeaponColor(const ofColor& new_color) { _cannon_color = new_color; }
 };

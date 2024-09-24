@@ -2,31 +2,30 @@
 #include "ofMain.h"
 #include "RenderEngine.h"
 #include "PhysicsEngine.h"
+#include "gui/GUIManager.h"
 #include "Terrain.h"
 #include "GlobalConstants.h"
 #include <vector>
-
 
 class ofApp : public ofBaseApp
 {
 private :
 	std::vector<class Particle*> _particles;
+	std::vector<BulletType> _particle_types = {
+		BulletType::BULLET,
+		BulletType::CANNONBALL,
+		BulletType::FIREBALL,
+		BulletType::BUBBLE
+	};
 
 	PhysicsEngine _physics_engine;
 	RenderEngine _render_engine;
+	GUIManager _gui_manager;
 
 	double _elapsed_time;
 	double _dt;
 
-	ofxPanel gui_;
-	ofxLabel label_dt_;
-	ofxLabel label_fps_;
-	ofxGuiGroup frame_information_, particles_selection_group_, shoot_group_;
-	std::array<ofxToggle, 4> particles_selection_toggle_buttons_;
-	std::array<ofParameter<bool>, 4> particles_selection_parameters_;
-	unsigned char selected_particle_;
-	std::array< ofParameter<int>, 2> shoot_angles_;
-	ofxButton shoot_button_;
+	unsigned char _selected_particle;
 
 	Terrain _terrain;
 
@@ -36,15 +35,13 @@ public:
 	void draw();
 	void exit();
 
-	void shootProjectile();
-	void updateSelectedParticle(bool& state);
-
 	void keyPressed(int key);
 	void keyReleased(int key);
 	void mouseMoved(int x, int y );
 	void mouseDragged(int x, int y, int button);
 	void mousePressed(int x, int y, int button);
 	void mouseReleased(int x, int y, int button);
+	void mouseScrolled(int x, int y, float scrollX, float scrollY);
 	void mouseEntered(int x, int y);
 	void mouseExited(int x, int y);
 	void windowResized(int w, int h);

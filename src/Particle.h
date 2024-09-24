@@ -16,8 +16,6 @@ private:
 
 	Vector3D _color;
 	float _alpha;
-	
-
 
 public:
 	enum IntegrationMethods { EULER, VERLET };
@@ -43,5 +41,5 @@ public:
 
 	void draw();
 
-
+	void testParticle();
 };
