@@ -3,7 +3,7 @@
 #include <ofGraphics.h>
 #include <stdexcept>
 
-Particle::Particle() :_position(), _previous_position(), _velocity(), _acceleration(0, -g, 0), _inverse_mass(0), _radius(), _color(), _alpha(), _time_counter(0) {
+Particle::Particle() :_position(), _previous_position(), _velocity(), _acceleration(0, -g, 0), _inverse_mass(0), _mass(FLT_MAX), _radius(), _color(), _alpha(), _time_counter(0) {
 	_world_position = &_position;
 	_trail.setMode(OF_PRIMITIVE_POINTS);
 	_trail.addVertex(_position);
@@ -11,10 +11,19 @@ Particle::Particle() :_position(), _previous_position(), _velocity(), _accelerat
 
 Particle::Particle(const Vector3D& init_pos, const Vector3D& init_vel, const Vector3D& init_acc, float mass, float radius, const Vector3D& color, float alpha)
 	: _position(init_pos), _velocity(init_vel), _acceleration(init_acc), _radius(radius), _color(color), _alpha(alpha), _time_counter(0) {
-	_inverse_mass = mass == 0 ? 0 : 1 / mass;
+	_mass = mass;
+	_inverse_mass = mass == 0 ? FLT_MAX : 1 / mass;
 	_world_position = &_position;
 	_trail.setMode(OF_PRIMITIVE_POINTS);
 	_trail.addVertex(_position);
+}
+
+void Particle::addForce(const Vector3D& force) {
+	_accum_force += force;
+}
+
+void Particle::clearAccum() {
+	_accum_force = 0;
 }
 
 void Particle::integrate(float dt, IntegrationMethods method) {

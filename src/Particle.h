@@ -9,7 +9,11 @@ private:
 	Vector3D _position;
 	Vector3D _previous_position;
 	Vector3D _velocity;
+
 	Vector3D _acceleration;
+	Vector3D _accum_force;
+	
+	float _mass;
 	float _inverse_mass;
 	float _radius;
 
@@ -27,6 +31,10 @@ public:
 	Particle(const Vector3D& init_pos, const Vector3D& init_vel, const Vector3D& init_acc, float mass, float radius, const Vector3D& color, float alpha);
 	~Particle() = default;
 
+	void addForce(const Vector3D& force);
+	void clearAccum();
+
+	float getMass() const { return _mass; }
 	float getInverseMass() const { return _inverse_mass; }
 
 	void integrate(float dt, IntegrationMethods method);
