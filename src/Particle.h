@@ -1,30 +1,41 @@
 #pragma once
 #include "Vector3D.h"
 #include "Drawable.h"
+#include "ofVboMesh.h"
+#include "GlobalConstants.h"
 
-constexpr float g = 9.81;
-
-class Particle : public Drawable
-{
+class Particle : public Drawable {
 private:
 	Vector3D _position;
 	Vector3D _previous_position;
 	Vector3D _velocity;
+
 	Vector3D _acceleration;
+	Vector3D _accum_force;
+	
+	float _mass;
 	float _inverse_mass;
 	float _radius;
 
 	Vector3D _color;
 	float _alpha;
-	
 
+	ofVboMesh _trail;
+	static constexpr float _TRAIL_POINT_DELAY = 0.25;
+	float _time_counter;
 
 public:
 	enum IntegrationMethods { EULER, VERLET };
 
-	Particle() : _position(), _previous_position(), _velocity(), _acceleration(0, -g, 0), _inverse_mass(0), _radius(), _color(), _alpha() {};
-	Particle(Vector3D init_pos, Vector3D init_vel, Vector3D init_acc, float mass, float radius, Vector3D color, float alpha);
+	Particle();
+	Particle(const Vector3D& init_pos, const Vector3D& init_vel, const Vector3D& init_acc, float mass, float radius, const Vector3D& color, float alpha);
 	~Particle() = default;
+
+	void addForce(const Vector3D& force);
+	void clearAccum();
+
+	float getMass() const { return _mass; }
+	float getInverseMass() const { return _inverse_mass; }
 
 	void integrate(float dt, IntegrationMethods method);
 
@@ -41,7 +52,8 @@ public:
 
 	void integrateVerlet(float dt);
 
-	void draw();
+	void draw() override;
+	void drawNoLight() override;
 
-
+	static void testParticle();
 };

@@ -2,13 +2,12 @@
 #include "Particle.h"
 
 
-class BulletParticle: public Particle
-{
+class BulletParticle : public Particle {
 public:
 	BulletParticle() {};
-	~BulletParticle () = default;
+	~BulletParticle() = default;
 
-	BulletParticle(Vector3D init_pos, Vector3D init_dir, Vector3D init_acc);
+	BulletParticle(const Vector3D& init_pos, const Vector3D& init_dir, const Vector3D& init_acc);
 
 private:
 

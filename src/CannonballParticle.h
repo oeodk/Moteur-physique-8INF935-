@@ -2,13 +2,12 @@
 #include "Particle.h"
 
 
-class CannonballParticle : public Particle
-{
+class CannonballParticle : public Particle {
 public:
 	CannonballParticle() {};
 	~CannonballParticle() = default;
 
-	CannonballParticle(Vector3D init_pos, Vector3D init_dir, Vector3D init_acc);
+	CannonballParticle(const Vector3D& init_pos, const Vector3D& init_dir, const Vector3D& init_acc);
 
 private:
 

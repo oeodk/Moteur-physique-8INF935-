@@ -2,13 +2,12 @@
 #include "Particle.h"
 
 
-class BubbleParticle : public Particle
-{
+class BubbleParticle : public Particle {
 public:
 	BubbleParticle() {};
 	~BubbleParticle() = default;
 
-	BubbleParticle(Vector3D init_pos, Vector3D init_dir, Vector3D init_acc);
+	BubbleParticle(const Vector3D& init_pos, const Vector3D& init_dir, const Vector3D& init_acc);
 
 private:
 

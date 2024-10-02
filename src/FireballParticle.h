@@ -2,13 +2,12 @@
 #include "Particle.h"
 
 
-class FireballParticle : public Particle
-{
+class FireballParticle : public Particle {
 public:
 	FireballParticle() {};
 	~FireballParticle() = default;
 
-	FireballParticle(Vector3D init_pos, Vector3D init_dir, Vector3D init_acc);
+	FireballParticle(const Vector3D& init_pos, const Vector3D& init_dir, const Vector3D& init_acc);
 
 private:
 
