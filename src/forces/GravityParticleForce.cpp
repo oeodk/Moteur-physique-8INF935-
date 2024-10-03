@@ -5,5 +5,5 @@ void GravityParticleForce::updateForce(Particle* particle, float dt) const {
 
 	if (mass == 0) return;
 
-	particle->addForce(gravity * mass);
+	particle->addForce(_gravity * mass);
 }
