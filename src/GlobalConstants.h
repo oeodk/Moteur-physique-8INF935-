@@ -5,7 +5,8 @@ enum BulletType {
 	BULLET,
 	CANNONBALL,
 	FIREBALL,
-	BUBBLE
+	BUBBLE,
+	E_END
 };
 
 constexpr float g = 9.81;

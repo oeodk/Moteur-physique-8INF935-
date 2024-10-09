@@ -15,6 +15,7 @@
 
 #include "GlobalConstants.h"
 #include "Vector3D.h"
+#include <ofVboMesh.h>
 
 
 class Drawable;
@@ -22,14 +23,15 @@ class Drawable;
 class RenderEngine {
 private:
 	ofCamera _camera;
-	ofLight _light_source, _light_source_weapon;
+	ofLight _light_source, _light_source_weapon, _night_light_source;
 
 	std::unordered_map<int, bool> _camera_movement;
 
 	std::vector<Drawable*> _render_targets;
 	std::vector<Drawable*> _render_targets_no_light;
 
-	static constexpr float _CAMERA_SPEED = 200.f;
+	static constexpr float _CAMERA_SPEED = 100;//100
+	static constexpr float _CAMERA_SPRINT_VALUE = 5;//5
 	static constexpr float _MOUSE_SENSIBILITY = 5.f;
 
 	static constexpr int _FORWARD_KEY = 'z';
@@ -44,6 +46,8 @@ private:
 
 	int _old_mouse_x, _old_mouse_y, _mouse_x, _mouse_y;
 
+	ofColor _background_color;
+	float _simulation_total_time;
 	// Test if a render target is in front of the camera
 	bool willRender(Vector3D target_position) const;
 
@@ -63,6 +67,8 @@ public:
 	~RenderEngine();
 
 	void mouseMoved(ofMouseEventArgs& mouse);
+
+	ofVboMesh point;
 
 	/*
 		The event mouseDragged is triggered when the mouse button is pressed and the mouse is moving

@@ -7,13 +7,14 @@ Particle::Particle() :_position(), _previous_position(), _velocity(), _accelerat
 	_world_position = &_position;
 	_trail.setMode(OF_PRIMITIVE_POINTS);
 	_trail.addVertex(_position);
+	_trail.addVertex(_position);
 }
 
 Particle::Particle(const Vector3D& init_pos, const Vector3D& init_vel, const Vector3D& init_acc, float mass, float radius, const Vector3D& color, float alpha)
 	: _position(init_pos), _velocity(init_vel), _acceleration(init_acc), _radius(radius), _color(color), _alpha(alpha), _time_counter(0) {
 	_inverse_mass = mass == 0 ? 0 : 1 / mass;
 	_world_position = &_position;
-	_trail.setMode(OF_PRIMITIVE_POINTS);
+	_trail.setMode(OF_PRIMITIVE_LINES);
 	_trail.addVertex(_position);
 }
 
@@ -32,6 +33,7 @@ void Particle::integrate(float dt, IntegrationMethods method) {
 		_trail.addVertex(_position);
 		_time_counter -= _TRAIL_POINT_DELAY;
 	}
+	_trail.getVertices().back() = _position;
 }
 
 Vector3D Particle::eulerUpdateVelocity(float dt) {
