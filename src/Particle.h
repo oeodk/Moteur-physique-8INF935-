@@ -56,7 +56,7 @@ public:
 	void draw() override;
 	void drawNoLight() override;
 
-	void checkCollision(Particle* otherParticle);
+	void checkCollision(Particle* otherParticle, float dt);
 
 	void solveCollision(Particle* otherParticle, Vector3D contactNormal, Vector3D contactPoint);
 
