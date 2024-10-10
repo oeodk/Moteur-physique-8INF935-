@@ -6,6 +6,8 @@
 #include <future>
 #include <of3dPrimitives.h>
 
+static constexpr int CHUNK_DIV_OFFSET = 4;
+
 // Part of the terrain
 
 class Chunk :
@@ -35,12 +37,12 @@ private:
 
 	float terrainNoise(float x, float y, int octaves, float persistence, float lacunarity);
 	static void generateTrees(int primitive_index, Chunk* chunk);
+	static float interpolateHeight4p(const Vector3D& point_to_interpolate, const Vector3D & top_left, const Vector3D & top_right, const Vector3D & bottom_right, const Vector3D & bottom_left);
 public:
 	Chunk();
 	Chunk(const Chunk&) = delete;
 	void setup(float chunk_size, int chunk_division, const Vector3D& grid_coordinate, int seed);
 	void draw() override;
-
 	void update(float player_distance);
 
 	const Vector3D& getGridCoordinate() const { return _grid_coordinate; }

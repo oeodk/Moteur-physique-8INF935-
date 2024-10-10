@@ -3,7 +3,11 @@
 
 struct Vector3D {
 public:
-	float x, y, z;
+	union
+	{
+		struct { float x, y, z; };
+		struct { float r, g, b; };
+	};
 
 	Vector3D(float v = 0.f) : Vector3D(v, v, v) {}
 	Vector3D(float px, float py, float pz);

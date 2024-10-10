@@ -29,10 +29,11 @@ private:
 	std::list<Chunk*> _chunk_to_move;
 
 
+	std::tuple<int, int> getInGridCoordinate(float x, float z) const;
 	static void generateChunk(int x, int z, Chunk* chunk_to_edit = nullptr);
 	void refreshChunk();
 	// Convert coordinate from world coordinate to chunk grid coordinate
-	std::tuple<int, int> getInGridCoordinate(float x, float z) const;
+
 public:
 	Terrain();
 	~Terrain();

@@ -10,7 +10,7 @@ constexpr bool RANDOM_SEED = true;
 
 Terrain::Terrain() {
 	ofAddListener(ofEvents().keyPressed, this, &Terrain::keyPressed);
-	_chunk_size = 320;
+	_chunk_size = CHUNK_DIVISION * 10;
 	for (size_t i = 0; i < _block_chunk_movement.size(); i++) {
 		_block_chunk_movement[i] = nullptr;
 	}
@@ -65,10 +65,11 @@ void Terrain::refreshChunk() {
 }
 
 std::tuple<int, int> Terrain::getInGridCoordinate(float x, float z) const {
-	return { (x) * static_cast<float>(CHUNK_DIVISION + 2) / ((CHUNK_DIVISION - 1) * _chunk_size), (z) * static_cast<float>(CHUNK_DIVISION + 2) / ((CHUNK_DIVISION - 1) * _chunk_size) };
+	return { std::floor((x) / _chunk_size), std::floor((z) / _chunk_size) };
 }
 
 void Terrain::update(const Vector3D& player_position) {
+
 	for (const std::future<void>& generator : _chunk_generators) {
 		if (generator.valid()) {
 			generator.wait();

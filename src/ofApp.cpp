@@ -21,7 +21,7 @@ void ofApp::setup() {
 
 	_terrain.sedRenderDistance(_render_engine.getFarPlane());
 	_terrain.setup();
-	_render_engine.setCameraPosition(Vector3D(0, 1300, 0));
+	_render_engine.setCameraPosition(Vector3D(0, 100 + _terrain.getHeight(0, 0), 0));
 
 	Vector3D::testVector3D();
 	Particle::testParticle();
@@ -52,18 +52,19 @@ void ofApp::update() {
 			i--;
 		}
 	}
+	_render_engine.update(_dt);
 
 	_gui_manager.update(_dt, _selected_particle);
 }
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-	_render_engine.update(_dt);
 	const auto& terrain_rendered_chunk = _terrain.getRenderedChunk();
 	
 	// Add terrain and particles to the render
 	for (const auto& chunk : terrain_rendered_chunk) {
 		_render_engine.addRenderTarget(chunk);
+		_render_engine.addRenderTarget(chunk, false);
 	}
 	for (const auto& particle : _particles) {
 		_render_engine.addRenderTarget(particle);
@@ -72,6 +73,14 @@ void ofApp::draw() {
 
 	_render_engine.render();
 	_gui_manager.draw();
+
+	auto player_position = _render_engine.getCameraPosition();
+	auto& p = _render_engine.point.getVertices()[0];
+	//std::cout << _terrain.getHeight(player_position.x, player_position.z) << std::endl;
+	p.x = player_position.x;//(Vector3D(player_position.x, 10 + _terrain.getHeight(player_position.x, player_position.z), player_position.z));
+	p.y = 10 + _terrain.getHeight(player_position.x, player_position.z);//(Vector3D(player_position.x, 10 + _terrain.getHeight(player_position.x, player_position.z), player_position.z));
+	p.z = player_position.z;//(Vector3D(player_position.x, 10 + _terrain.getHeight(player_position.x, player_position.z), player_position.z));
+
 }
 
 void ofApp::exit() {
@@ -84,6 +93,9 @@ void ofApp::exit() {
 void ofApp::keyPressed(int key) {
 	if (key == ofKey::OF_KEY_RETURN) {
 		_physics_engine.changeIntegrationMethod();
+	}
+	if (key == ofKey::OF_KEY_RIGHT_SHIFT) {
+		spawnParticle(BulletType::E_END);
 	}
 }
 
@@ -184,7 +196,57 @@ void ofApp::spawnParticle(BulletType type) {
 		_particles.push_back(newParticle);
 		break;
 	default:
+		for (int i = 0; i < 250; i++)
+		{
+			switch (_particle_types[_selected_particle])
+			{
+			case BULLET:
+				newParticle = new BulletParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 200.f), G_ACC);
+				break;
+			case CANNONBALL:
+				newParticle = new CannonballParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 25.f, (rand() % 100 - 50) / 25.f), G_ACC);
+				break;
+			case FIREBALL:
+				newParticle = new FireballParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 100.f, (rand() % 100 - 50) / 100.f), G_ACC);
+				break;
+			case BUBBLE:
+				newParticle = new BubbleParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 50.f, (rand() % 100 - 50) / 50.f), G_ACC);
+				break;
+			default:
+				break;
+			}
+			_particles.push_back(newParticle);
+		}
 		break;
 	}
 
+}
+
+void ofApp::spawnParticle(BulletType type) {
+	ofCamera camera = _render_engine.getCamera();
+	Vector3D currentPosition = camera.getPosition();
+	Vector3D currentDirection = camera.getLookAtDir();
+	Particle* newParticle;
+	switch (type)
+	{
+	case BULLET:
+		newParticle = new BulletParticle(currentPosition, currentDirection, g_acc);
+		_particles.push_back(newParticle);
+		break;
+	case CANNONBALL:
+		newParticle = new CannonballParticle(currentPosition, currentDirection, g_acc);
+		_particles.push_back(newParticle);
+		break;
+	case FIREBALL:
+		newParticle = new FireballParticle(currentPosition, currentDirection, g_acc);
+		_particles.push_back(newParticle);
+		break;
+	case BUBBLE:
+		newParticle = new BubbleParticle(currentPosition, currentDirection, g_acc);
+		_particles.push_back(newParticle);
+		break;
+	default:
+		break;
+	}
+	
 }

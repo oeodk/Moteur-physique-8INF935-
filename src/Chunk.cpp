@@ -8,11 +8,11 @@ using namespace std::chrono_literals;
 constexpr float HEIGH_FACTOR = 5;
 constexpr unsigned char WATER_LEVEL = 80;
 constexpr unsigned char STONE_LEVEL = 130;
-constexpr unsigned char SNOW_LEVEL = 180;
+constexpr unsigned char SNOW_LEVEL = 190;
 
 // Constants for the terrain noise
 // Base scale for noise
-constexpr float NOISE_SCALE = 0.004;
+constexpr float NOISE_SCALE = 0.002;//0.004
 // Number of noise layers to combine
 constexpr int OCTAVES = 10;
 // How much amplitude decreases each octave
@@ -53,17 +53,17 @@ void Chunk::setup(float chunk_size, int chunk_division, const Vector3D& grid_coo
 	srand(seed);
 	_world_position = &_spatial_coordinate;
 	_grid_coordinate = grid_coordinate;
-	_spatial_coordinate.x = chunk_size * grid_coordinate.x * ((chunk_division - 3) / static_cast<float>(chunk_division));
+	_spatial_coordinate.x = chunk_size * grid_coordinate.x;// *((chunk_division - CHUNK_DIV_OFFSET) / static_cast<float>(chunk_division));
 	_spatial_coordinate.y = 0;
-	_spatial_coordinate.z = chunk_size * grid_coordinate.z * ((chunk_division - 3) / static_cast<float>(chunk_division));
+	_spatial_coordinate.z = chunk_size * grid_coordinate.z;// *((chunk_division - CHUNK_DIV_OFFSET) / static_cast<float>(chunk_division));
 
-	int noise_offset_x = grid_coordinate.x * (chunk_division - 3);
-	int noise_offset_y = grid_coordinate.z * (chunk_division - 3);
+	int noise_offset_x = grid_coordinate.x * (_chunk_division);// - CHUNK_DIV_OFFSET);
+	int noise_offset_y = grid_coordinate.z * (_chunk_division);// -CHUNK_DIV_OFFSET);
 
 	const ofColor COLOR_TABLE[4] = { ofColor(42, 104, 134), ofColor(63, 155, 11), ofColor(137, 125, 107), ofColor(255, 200, 200) };
-
-	for (int i = 0; i < chunk_division; i++) {
-		for (int j = 0; j < chunk_division; j++) {
+	_chunk_division += 1;
+	for (int i = 0; i < _chunk_division; i++) {
+		for (int j = 0; j < _chunk_division; j++) {
 			float height = terrainNoise(seed + (noise_offset_x + i) * NOISE_SCALE, seed + (noise_offset_y + j) * NOISE_SCALE, OCTAVES, PERSISTANCE, LACUNARITY);
 			float height_squared = (height + 0.5) * (height + 0.5);
 
@@ -71,7 +71,7 @@ void Chunk::setup(float chunk_size, int chunk_division, const Vector3D& grid_coo
 			if (height < WATER_LEVEL) {
 				height = WATER_LEVEL;
 			}
-			_terrain.addVertex(Vector3D(_spatial_coordinate.x - (chunk_size / 2) + chunk_size * (i / static_cast<float>(chunk_division)), height * height / 50.f, _spatial_coordinate.z - (chunk_size / 2) + chunk_size * (j / static_cast<float>(chunk_division))));
+			_terrain.addVertex(Vector3D(_spatial_coordinate.x + chunk_size * (i / static_cast<float>(_chunk_division - 1)), height * height * height / 5000.f /*height * height / 50.f*/, _spatial_coordinate.z + chunk_size * (j / static_cast<float>(_chunk_division - 1))));
 			if (height == WATER_LEVEL) {
 				_terrain.addColor(COLOR_TABLE[0]);
 			}
@@ -101,10 +101,10 @@ void Chunk::setup(float chunk_size, int chunk_division, const Vector3D& grid_coo
 	}
 
 	const auto& vertices = _terrain.getVertices();
-	for (int i = 0; i < chunk_division - 1; i++) {
-		for (int j = 0; j < chunk_division - 1; j++) {
-			int current = i * (chunk_division)+j;
-			int next = current + (chunk_division);
+	for (int i = 0; i < _chunk_division - 1; i++) {
+		for (int j = 0; j < _chunk_division - 1; j++) {
+			int current = i * (_chunk_division)+j;
+			int next = current + (_chunk_division);
 
 			_terrain.addIndex(current);
 			_terrain.addIndex(next);
@@ -218,14 +218,27 @@ float Chunk::getHeight(float x, float z) const {
 	}
 	const auto& vertices = _terrain.getVertices();
 	int i = 0;
-	while (i < _chunk_division && vertices[i].z < z) {
+	while (i < _chunk_division && vertices[i].z <= z) {
 		i++;
 	}
-	while (i < _chunk_division * _chunk_division && vertices[i].x < x) {
+	i--;
+	if (i < 0)
+	{
+		i = 0;
+	}
+	while (i < _chunk_division * _chunk_division && vertices[i].x <= x) {
 		i += _chunk_division;
 	}
-	if (i < _chunk_division * _chunk_division) {
-		return vertices[i].y;
+	i -= _chunk_division;
+	if (i < 0)
+	{
+		i = 0;
+	}
+
+	if (i < _chunk_division * (_chunk_division - 1) - 1)
+	{
+		Vector3D point_to_interpolate(x, 0, z);
+		return interpolateHeight4p(point_to_interpolate, vertices[i], vertices[i + _chunk_division], vertices[i + _chunk_division + 1], vertices[i + 1]);
 	}
 	return 0.0f;
 }
@@ -270,4 +283,15 @@ void Chunk::generateTrees(int primitive_index, Chunk* chunk) {
 	chunk->_used_tree_buffer = 1 - chunk->_used_tree_buffer;
 	chunk->_can_edit_tree = true;
 	chunk->_delete_old_buffer = true;
+}
+
+float Chunk::interpolateHeight4p(const Vector3D& point_to_interpolate, const Vector3D & top_left, const Vector3D & top_right, const Vector3D & bottom_right, const Vector3D & bottom_left)
+{
+	const float border_size = (top_right.x - top_left.x);
+	const float inverse_border_size_squared = 1 / (border_size * border_size);
+	const float top_left_part     = (border_size - abs(point_to_interpolate.x - top_left.x)    ) * (border_size - abs(point_to_interpolate.z - top_left.z)) * inverse_border_size_squared ;
+	const float top_right_part    = (border_size - abs(top_right.x - point_to_interpolate.x)   ) * (border_size - abs(point_to_interpolate.z - top_right.z)) * inverse_border_size_squared ;
+	const float bottom_right_part = (border_size - abs(bottom_right.x - point_to_interpolate.x)) * (border_size - abs(bottom_right.z - point_to_interpolate.z)) * inverse_border_size_squared;
+	const float bottom_left_part  = (border_size - abs(point_to_interpolate.x - bottom_left.x) ) * (border_size - abs(bottom_left.z - point_to_interpolate.z)) * inverse_border_size_squared;
+	return top_left_part * top_left.y + top_right_part * top_right.y + bottom_right_part * bottom_right.y + bottom_left_part * bottom_left.y;
 }

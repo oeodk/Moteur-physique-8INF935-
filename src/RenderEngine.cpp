@@ -1,20 +1,32 @@
+#define _USE_MATH_DEFINES 
 #include "RenderEngine.h"
 #include <of3dGraphics.h>
 #include <ofGraphics.h>
 
 #include "Vector3D.h"
 #include "Drawable.h"
+#include "Terrain.h"
 
 constexpr int RENDER_DISTANCE = 5000;
+constexpr int NOON_COLOR = 190;
+constexpr int DELTA_NIGHT_COLOR = 50;
 
 RenderEngine::RenderEngine() {
+	point.addVertex(Vector3D());
+	point.addIndex(0);
+
 	ofAddListener(ofEvents().mouseMoved, this, &RenderEngine::mouseMoved);
 	ofAddListener(ofEvents().mouseDragged, this, &RenderEngine::mouseDragged);
 	ofAddListener(ofEvents().keyPressed, this, &RenderEngine::keyPressed);
 	ofAddListener(ofEvents().keyReleased, this, &RenderEngine::keyReleased);
 
 	_light_source.setDirectional();
-	_light_source.rotate(45, 1, 0, 0);
+	_light_source.rotate(90, 1, 0, 0);
+	_night_light_source.setDirectional();
+	_night_light_source.rotate(-90, 1, 0, 0);
+	_night_light_source.setDiffuseColor(ofFloatColor(0, 110 / 255.f, 210 / 255.f, 0.5));
+	//_light_source.setAmbientColor(ofFloatColor(0.2, 0.2, 0.2));
+
 
 	_light_source_weapon.setDirectional();
 	_light_source_weapon.rotate(-45, 1, 0, 0);
@@ -62,6 +74,9 @@ RenderEngine::RenderEngine() {
 
 	glPointSize(5);
 	glLineWidth(5);
+
+	_simulation_total_time = 0;
+	_background_color = ofColor::fromHsb((255 / 360.f) * 190, 255, 255);
 }
 
 RenderEngine::~RenderEngine() {
@@ -143,15 +158,32 @@ void RenderEngine::update(float delta_t) {
 	}
 	if (movement != constants::EMPTY_VECTOR3D) {
 		if (_camera_movement.at(_SRINT_KEY)) {
-			movement *= 5;
+			movement *= _CAMERA_SPRINT_VALUE;
 		}
 		movement *= SPEED;
 		_camera.move(movement);
 	}
+
+	constexpr float TIME_FACTOR = 0;//2;
+	_light_source.rotate(delta_t * TIME_FACTOR, 1, 0, 0);// day night cycle of 1 min
+	_night_light_source.rotate(delta_t * TIME_FACTOR, 1, 0, 0);// day night cycle of 1 min
+
+	_simulation_total_time += delta_t;
+
+	float interpolation = (0.5 - 0.5 * std::cos(_simulation_total_time * TIME_FACTOR * (M_PI) / 180)); // interpolation from 0 to 1 to 0 with cos
+	float hue = (255 / 360.f) * (190 + 50 * interpolation);
+	_background_color = ofColor::fromHsb(hue, 255, 255 - interpolation * 155);
+
+	// Set fog color
+	GLfloat fogColor[] = { _background_color.r / 255.f, _background_color.g / 255.f, _background_color.b / 255.f, 1.0 };
+	glFogfv(GL_FOG_COLOR, fogColor);
 }
 
 void RenderEngine::render() {
-	ofBackgroundGradient(ofColor(0, 200, 255), ofColor(0, 150, 205));
+	Vector3D color;
+	_background_color.getHsb(color.x, color.y, color.z);
+	color.z -= 50;
+	ofBackgroundGradient(ofColor::fromHsb(color.x, color.y, color.z), _background_color, ofGradientMode::OF_GRADIENT_LINEAR);
 	ofEnableDepthTest();
 	ofEnableAlphaBlending();
 
@@ -169,13 +201,20 @@ void RenderEngine::render() {
 		}
 	}
 
-	_light_source.enable();
+	ofSetColor(ofColor::red);
+	point.setMode(OF_PRIMITIVE_POINTS);
+	point.draw();
+
+	//if(_light_source.getOrientationEuler().x > -90)
+		_light_source.enable();
+	//if(_night_light_source.getOrientationEuler().x > -90)
+		_night_light_source.enable();
+	
 	for (Drawable* render_target : _render_targets) {
 		if (willRender(*render_target->getPosition())) {
 			render_target->draw();
 		}
 	}
-
 
 
 #ifdef DEBUG_CAMERA
@@ -184,6 +223,7 @@ void RenderEngine::render() {
 	_camera.end();
 #endif // DEBUG_CAMERA
 	_light_source.disable();
+	_night_light_source.disable();
 
 	_light_source_weapon.enable();
 	ofSetColor(_cannon_color);
