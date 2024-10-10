@@ -1,5 +1,6 @@
 #pragma once
 #include "ofMain.h"
+#include "forces/ParticleForceRegistry.h"
 #include "RenderEngine.h"
 #include "PhysicsEngine.h"
 #include "gui/GUIManager.h"
@@ -17,6 +18,7 @@ private:
 		BulletType::BUBBLE
 	};
 
+	ParticleForceRegistry _forces_registry;
 	PhysicsEngine _physics_engine;
 	RenderEngine _render_engine;
 	GUIManager _gui_manager;

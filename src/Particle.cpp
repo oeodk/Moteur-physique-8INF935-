@@ -9,8 +9,8 @@ Particle::Particle() :_position(), _previous_position(), _velocity(), _accelerat
 	_trail.addVertex(_position);
 }
 
-Particle::Particle(const Vector3D& init_pos, const Vector3D& init_vel, const Vector3D& init_acc, float mass, float radius, const Vector3D& color, float alpha)
-	: _position(init_pos), _velocity(init_vel), _acceleration(init_acc), _radius(radius), _color(color), _alpha(alpha), _time_counter(0) {
+Particle::Particle(const Vector3D& init_pos, const Vector3D& init_vel, float mass, float radius, const Vector3D& color, float alpha)
+	: _position(init_pos), _velocity(init_vel), _acceleration(0), _accum_force(0), _radius(radius), _color(color), _alpha(alpha), _time_counter(0) {
 	_mass = mass;
 	_inverse_mass = mass == 0 ? FLT_MAX : 1 / mass;
 	_world_position = &_position;
@@ -24,6 +24,12 @@ void Particle::addForce(const Vector3D& force) {
 
 void Particle::clearAccum() {
 	_accum_force = 0;
+}
+
+
+void Particle::computeForces() {
+	std::cout << _accum_force.y << " x " << _inverse_mass << "\n";
+	_acceleration = _accum_force * _inverse_mass;
 }
 
 void Particle::integrate(float dt, IntegrationMethods method) {
@@ -90,20 +96,20 @@ void Particle::testParticle() {
 	Vector3D init_position(1, 2, 3);
 	Vector3D init_velocity(0, 0, 0);
 	Vector3D init_acceleration(0, -g, 0);
-	Particle particle2(init_position, init_velocity, init_acceleration, 1., 1., Vector3D(1), 1.);
+	Particle particle2(init_position, init_velocity, 1., 1., Vector3D(1), 1.);
 	_ASSERT(particle2._position == init_position);
 	_ASSERT(particle2._velocity == init_velocity);
-	_ASSERT(particle2._acceleration == init_acceleration);
+	_ASSERT(particle2._acceleration == 0);
 	_ASSERT(particle2._inverse_mass == 1.0f);
 
 	particle2.integrate(1.0f, Particle::EULER);
-	_ASSERT(particle2._velocity == Vector3D(0, -g, 0));
-	_ASSERT(particle2._position == Vector3D(1, 2 - g, 3));
+	_ASSERT(particle2._velocity == Vector3D(0, 0, 0));
+	_ASSERT(particle2._position == Vector3D(1, 2, 3));
 
-	Particle particle4(Vector3D(1.0f, 1.0f, 1.0f), Vector3D(0.0f, 0.0f, 0.0f), Vector3D(0.0f, -g, 0.0f), 1., 1., Vector3D(1), 1.);
+	Particle particle4(Vector3D(1.0f, 1.0f, 1.0f), Vector3D(0.0f, 0.0f, 0.0f), 1., 1., Vector3D(1), 1.);
 
 	// 1 st integration used to initialized p-1 with euler integration
 	particle4.integrate(1.0f, Particle::VERLET);
 	particle4.integrate(1.0f, Particle::VERLET);
-	_ASSERT(particle4._position == Vector3D(1, 1 - 3 * g, 1));
+	_ASSERT(particle4._position == Vector3D(1, 1, 1));
 }

@@ -28,15 +28,17 @@ public:
 	enum IntegrationMethods { EULER, VERLET };
 
 	Particle();
-	Particle(const Vector3D& init_pos, const Vector3D& init_vel, const Vector3D& init_acc, float mass, float radius, const Vector3D& color, float alpha);
+	Particle(const Vector3D& init_pos, const Vector3D& init_vel, float mass, float radius, const Vector3D& color, float alpha);
 	~Particle() = default;
 
 	void addForce(const Vector3D& force);
 	void clearAccum();
 
+	Vector3D getAcceleration() const { return _acceleration; }
 	float getMass() const { return _mass; }
 	float getInverseMass() const { return _inverse_mass; }
 
+	void computeForces();
 	void integrate(float dt, IntegrationMethods method);
 
 	Vector3D eulerUpdateVelocity(float dt);

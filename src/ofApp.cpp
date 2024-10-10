@@ -4,6 +4,7 @@
 #include "CannonballParticle.h"
 #include "FireballParticle.h"
 #include "BubbleParticle.h"
+#include "forces/GravityParticleForce.h"
 #include <execution>
 #include <cmath>
 
@@ -31,6 +32,14 @@ void ofApp::update() {
 	_dt = ofGetLastFrameTime();
 	_elapsed_time += _dt;
 
+	GravityParticleForce gravity_force(Vector3D(0, -9.8f, 0));
+
+	// Apply forces to the particles
+	for (Particle *particle : _particles) {
+		_forces_registry.add(particle, &gravity_force);
+	}
+
+	_forces_registry.updateForces(_dt);
 	_physics_engine.updateParticles(_dt, _particles);
 	_terrain.update(_render_engine.getCameraPosition());
 
