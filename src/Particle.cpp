@@ -87,6 +87,21 @@ void Particle::drawNoLight() {
 	_trail.draw();
 }
 
+void Particle::checkCollision(Particle* otherParticle, float dt) {
+	const float distance = Vector3D::squareNorm(otherParticle->getPosition() - _position);
+	const Vector3D contactNormal = Vector3D::getNorm(otherParticle->getPosition() - _position);
+	const Vector3D contactPoint = _position + _radius * contactNormal;
+
+	if (Vector3D::squareNorm(Vector3D::dotProduct(G_ACC * dt, contactNormal)) > Vector3D::squareNorm(_velocity)) {
+		addForce(-G_ACC);
+		return;
+	}
+	if (distance <= _radius + otherParticle->getRadius()) {
+		solveCollision(otherParticle, contactNormal, contactPoint);
+	}
+}
+
+
 void Particle::testParticle() {
 	Particle particle1;
 

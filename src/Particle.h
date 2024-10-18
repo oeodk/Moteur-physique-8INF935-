@@ -37,6 +37,7 @@ public:
 	Vector3D getAcceleration() const { return _acceleration; }
 	float getMass() const { return _mass; }
 	float getInverseMass() const { return _inverse_mass; }
+	float getRadius() const { return _radius; }
 
 	void computeForces();
 	void integrate(float dt, IntegrationMethods method);
@@ -56,6 +57,10 @@ public:
 
 	void draw() override;
 	void drawNoLight() override;
+
+	void checkCollision(Particle* otherParticle, float dt);
+
+	void solveCollision(Particle* otherParticle, Vector3D contactNormal, Vector3D contactPoint);
 
 	static void testParticle();
 };
