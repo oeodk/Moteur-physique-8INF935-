@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Particle.h"
+#include "particles/Particle.h"
 #include "ParticleForceGenerator.h"
 
 
@@ -14,6 +14,7 @@ public:
 	{
 		Particle* particle;
 		ParticleForceGenerator* force_generator;
+		ParticleForceRegistration(Particle* p, ParticleForceGenerator* generator) : particle(p), force_generator(generator){}
 	};
 
 	typedef std::vector<ParticleForceRegistration> Registry;

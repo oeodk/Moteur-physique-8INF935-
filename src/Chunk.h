@@ -38,6 +38,7 @@ private:
 	float terrainNoise(float x, float y, int octaves, float persistence, float lacunarity);
 	static void generateTrees(int primitive_index, Chunk* chunk);
 	static float interpolateHeight4p(const Vector3D& point_to_interpolate, const Vector3D & top_left, const Vector3D & top_right, const Vector3D & bottom_right, const Vector3D & bottom_left);
+	Vector3D interpolateNormal4p(const Vector3D& point_to_interpolate, float top_left_index, float top_right_index, float bottom_right_index, float bottom_left_index) const;
 public:
 	Chunk();
 	Chunk(const Chunk&) = delete;
@@ -49,5 +50,6 @@ public:
 	const Vector3D& getSpatialCoordinate() const { return _spatial_coordinate; }
 	void setGridCoordinate(const Vector3D& grid_coordinate) { _grid_coordinate.set(grid_coordinate); }
 	float getHeight(float x, float z) const;
+	Vector3D getNormal(float x, float z) const;
 };
 

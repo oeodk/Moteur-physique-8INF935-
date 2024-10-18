@@ -5,7 +5,7 @@
 #include "GlobalConstants.h"
 
 class Particle : public Drawable {
-private:
+protected:
 	Vector3D _position;
 	Vector3D _previous_position;
 	Vector3D _velocity;
@@ -39,11 +39,13 @@ public:
 	float getInverseMass() const { return _inverse_mass; }
 	float getRadius() const { return _radius; }
 
-	void computeForces();
+	virtual void computeForces();
 	void integrate(float dt, IntegrationMethods method);
 
 	Vector3D eulerUpdateVelocity(float dt);
 	Vector3D eulerUpdatePosition(float dt);
+
+	const Vector3D& getParticlePosition() { return _position; }
 
 	/* Compute the next position and velocity using the Euler integration formula.
 	   Takes the frame length (in milliseconds) as parameter. */

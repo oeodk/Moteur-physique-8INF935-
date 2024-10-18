@@ -6,7 +6,7 @@ protected:
 	Vector3D _gravity;
 
 public:
-	GravityParticleForce(Vector3D& gravity);
+	GravityParticleForce(const Vector3D & gravity);
 	void updateForce(Particle* particle, float dt) const override;
 };
 
