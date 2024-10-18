@@ -221,32 +221,3 @@ void ofApp::spawnParticle(BulletType type) {
 	}
 
 }
-
-void ofApp::spawnParticle(BulletType type) {
-	ofCamera camera = _render_engine.getCamera();
-	Vector3D currentPosition = camera.getPosition();
-	Vector3D currentDirection = camera.getLookAtDir();
-	Particle* newParticle;
-	switch (type)
-	{
-	case BULLET:
-		newParticle = new BulletParticle(currentPosition, currentDirection, g_acc);
-		_particles.push_back(newParticle);
-		break;
-	case CANNONBALL:
-		newParticle = new CannonballParticle(currentPosition, currentDirection, g_acc);
-		_particles.push_back(newParticle);
-		break;
-	case FIREBALL:
-		newParticle = new FireballParticle(currentPosition, currentDirection, g_acc);
-		_particles.push_back(newParticle);
-		break;
-	case BUBBLE:
-		newParticle = new BubbleParticle(currentPosition, currentDirection, g_acc);
-		_particles.push_back(newParticle);
-		break;
-	default:
-		break;
-	}
-	
-}
