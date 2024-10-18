@@ -7,7 +7,7 @@ public:
 	BulletParticle() {};
 	~BulletParticle() = default;
 
-	BulletParticle(const Vector3D& init_pos, const Vector3D& init_dir, const Vector3D& init_acc);
+	BulletParticle(const Vector3D& init_pos, const Vector3D& init_dir);
 
 private:
 

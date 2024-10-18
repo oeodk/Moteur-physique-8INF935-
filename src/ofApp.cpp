@@ -1,9 +1,9 @@
 #define _USE_MATH_DEFINES
 #include "ofApp.h"
-#include "BulletParticle.h"
-#include "CannonballParticle.h"
-#include "FireballParticle.h"
-#include "BubbleParticle.h"
+#include "particles/BulletParticle.h"
+#include "particles/CannonballParticle.h"
+#include "particles/FireballParticle.h"
+#include "particles/BubbleParticle.h"
 #include "forces/GravityParticleForce.h"
 #include <execution>
 #include <cmath>
@@ -39,15 +39,25 @@ void ofApp::update() {
 		_forces_registry.add(particle, &gravity_force);
 	}
 
+	if(_the_blob)
+	{
+		_the_blob->updateBlob();
+	}
+
 	_forces_registry.updateForces(_dt);
 	_physics_engine.updateParticles(_dt, _particles);
 	_terrain.update(_render_engine.getCameraPosition());
-
+	_forces_registry.clear();
 
 	// Delete a particle if it is too high or too low
 	for (size_t i = 0; i < _particles.size(); i++) {
 		const Vector3D* particle_pos = _particles[i]->getPosition();
 		if (particle_pos->y > 5000 || particle_pos->y < _terrain.getHeight(particle_pos->x, particle_pos->z)) {
+			if (_particles[i] == _the_blob)
+			{
+				_the_blob = nullptr;
+			}
+			//delete _particles[i];
 			_particles.erase(_particles.begin() + i);
 			i--;
 		}
@@ -96,6 +106,19 @@ void ofApp::keyPressed(int key) {
 	}
 	if (key == ofKey::OF_KEY_RIGHT_SHIFT) {
 		spawnParticle(BulletType::E_END);
+	}
+	if (key == '0')
+	{
+		spawnParticle(BulletType::BLOB);
+	}
+	if (key == ofKey::OF_KEY_RETURN)
+	{
+		_the_blob = nullptr;
+		for (size_t i = 0; i < _particles.size(); i++)
+		{
+			delete _particles[i];
+		}
+		_particles.clear();
 	}
 }
 
@@ -180,19 +203,24 @@ void ofApp::spawnParticle(BulletType type) {
 	current_position += (side_dir * 6 + look_at_dir * 24 + up_dir * (-4));
 	switch (type) {
 	case BULLET:
-		newParticle = new BulletParticle(current_position, look_at_dir, G_ACC);
+		newParticle = new BulletParticle(current_position, look_at_dir);
 		_particles.push_back(newParticle);
 		break;
 	case CANNONBALL:
-		newParticle = new CannonballParticle(current_position, look_at_dir, G_ACC);
+		newParticle = new CannonballParticle(current_position, look_at_dir);
 		_particles.push_back(newParticle);
 		break;
 	case FIREBALL:
-		newParticle = new FireballParticle(current_position, look_at_dir, G_ACC);
+		newParticle = new FireballParticle(current_position, look_at_dir);
 		_particles.push_back(newParticle);
 		break;
 	case BUBBLE:
-		newParticle = new BubbleParticle(current_position, look_at_dir, G_ACC);
+		newParticle = new BubbleParticle(current_position, look_at_dir);
+		_particles.push_back(newParticle);
+		break;
+	case BLOB:
+		newParticle = new Blob(&_particles, &_forces_registry, current_position, look_at_dir);
+		_the_blob = dynamic_cast<Blob*>(newParticle);
 		_particles.push_back(newParticle);
 		break;
 	default:
@@ -201,16 +229,16 @@ void ofApp::spawnParticle(BulletType type) {
 			switch (_particle_types[_selected_particle])
 			{
 			case BULLET:
-				newParticle = new BulletParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 200.f), G_ACC);
+				newParticle = new BulletParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 200.f));
 				break;
 			case CANNONBALL:
-				newParticle = new CannonballParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 25.f, (rand() % 100 - 50) / 25.f), G_ACC);
+				newParticle = new CannonballParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 25.f, (rand() % 100 - 50) / 25.f));
 				break;
 			case FIREBALL:
-				newParticle = new FireballParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 100.f, (rand() % 100 - 50) / 100.f), G_ACC);
+				newParticle = new FireballParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 100.f, (rand() % 100 - 50) / 100.f));
 				break;
 			case BUBBLE:
-				newParticle = new BubbleParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 50.f, (rand() % 100 - 50) / 50.f), G_ACC);
+				newParticle = new BubbleParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 50.f, (rand() % 100 - 50) / 50.f));
 				break;
 			default:
 				break;

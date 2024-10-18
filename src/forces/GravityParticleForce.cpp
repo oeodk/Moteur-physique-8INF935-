@@ -1,6 +1,6 @@
 #include "GravityParticleForce.h"
 
-GravityParticleForce::GravityParticleForce(Vector3D& gravity) : _gravity(gravity) {}
+GravityParticleForce::GravityParticleForce(const Vector3D & gravity) : _gravity(gravity) {}
 
 void GravityParticleForce::updateForce(Particle* particle, float dt) const {
 	const float mass = particle->getMass();

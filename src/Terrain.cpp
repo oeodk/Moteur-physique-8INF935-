@@ -178,3 +178,26 @@ float Terrain::getHeight(float x, float z) const {
 	return 0.0f;
 }
 
+Vector3D Terrain::getNormal(float x, float z) const
+{
+	auto [chunk_x, chunk_z] = getInGridCoordinate(x, z);
+	Chunk* relevant_chunk = nullptr;
+	const size_t chunk_number = _chunks.size();
+	size_t i = 0;
+	do
+	{
+		const Vector3D& chunk_coord = _chunks[i]->getGridCoordinate();
+		if (chunk_x == chunk_coord.x && chunk_z == chunk_coord.z)
+		{
+			relevant_chunk = _chunks[i];
+		}
+		i++;
+
+	} while (relevant_chunk == nullptr && i < chunk_number);
+	if (relevant_chunk != nullptr)
+	{
+		return relevant_chunk->getNormal(x, z);
+	}
+	return 0.0f;
+}
+

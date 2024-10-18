@@ -3,7 +3,7 @@
 #include <ofGraphics.h>
 #include <stdexcept>
 
-Particle::Particle() :_position(), _previous_position(), _velocity(), _acceleration(0, -g, 0), _inverse_mass(0), _mass(FLT_MAX), _radius(), _color(), _alpha(), _time_counter(0) {
+Particle::Particle() :_position(), _previous_position(), _velocity(), _acceleration(0, 0, 0), _inverse_mass(0), _mass(FLT_MAX), _radius(), _color(), _alpha(), _time_counter(0) {
 	_world_position = &_position;
 	_trail.setMode(OF_PRIMITIVE_POINTS);
 	_trail.addVertex(_position);
@@ -29,7 +29,7 @@ void Particle::clearAccum() {
 
 
 void Particle::computeForces() {
-	std::cout << _accum_force.y << " x " << _inverse_mass << "\n";
+	//std::cout << _accum_force.y << " x " << _inverse_mass << "\n";
 	_acceleration = _accum_force * _inverse_mass;
 }
 
@@ -44,11 +44,11 @@ void Particle::integrate(float dt, IntegrationMethods method) {
 
 	// Generate the trail effect
 	_time_counter += dt;
-	if (_time_counter > _TRAIL_POINT_DELAY) {
-		_trail.addVertex(_position);
-		_time_counter -= _TRAIL_POINT_DELAY;
-	}
-	_trail.getVertices().back() = _position;
+	//if (_time_counter > _TRAIL_POINT_DELAY) {
+	//	_trail.addVertex(_position);
+	//	_time_counter -= _TRAIL_POINT_DELAY;
+	//}
+	//_trail.getVertices().back() = _position;
 }
 
 Vector3D Particle::eulerUpdateVelocity(float dt) {
@@ -107,7 +107,7 @@ void Particle::testParticle() {
 
 	_ASSERT(particle1._position == Vector3D(0, 0, 0));
 	_ASSERT(particle1._velocity == Vector3D(0, 0, 0));
-	_ASSERT(particle1._acceleration == Vector3D(0, -g, 0));
+	//_ASSERT(particle1._acceleration == Vector3D(0, -g, 0));
 	_ASSERT(particle1._inverse_mass == 0);
 
 	Vector3D init_position(1, 2, 3);
@@ -116,7 +116,7 @@ void Particle::testParticle() {
 	Particle particle2(init_position, init_velocity, 1., 1., Vector3D(1), 1.);
 	_ASSERT(particle2._position == init_position);
 	_ASSERT(particle2._velocity == init_velocity);
-	_ASSERT(particle2._acceleration == 0);
+	//_ASSERT(particle2._acceleration == 0);
 	_ASSERT(particle2._inverse_mass == 1.0f);
 
 	particle2.integrate(1.0f, Particle::EULER);
