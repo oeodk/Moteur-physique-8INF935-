@@ -101,6 +101,11 @@ void Particle::checkCollision(Particle* otherParticle, float dt) {
 	}
 }
 
+void Particle::solveCollision(Particle* otherParticle, Vector3D contactNormal, Vector3D contactPoint)
+{
+
+}
+
 
 void Particle::testParticle() {
 	Particle particle1;
