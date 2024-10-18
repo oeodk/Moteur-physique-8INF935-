@@ -3,10 +3,7 @@
 ParticleForceRegistry::ParticleForceRegistry() {}
 
 void ParticleForceRegistry::add(Particle *particle, ParticleForceGenerator *force_generator) {
-	ParticleForceRegistration pfr;
-	pfr.particle = particle;
-	pfr.force_generator = force_generator;
-	_registry.push_back(pfr);
+	_registry.emplace_back(particle, force_generator);
 }
 
 void ParticleForceRegistry::remove(Particle* particle, ParticleForceGenerator* force_generator) {
@@ -22,6 +19,6 @@ void ParticleForceRegistry::clear() {
 }
 
 void ParticleForceRegistry::updateForces(float dt) {
-	for (ParticleForceRegistration pfr : _registry)
+	for (ParticleForceRegistration& pfr : _registry)
 		pfr.force_generator->updateForce(pfr.particle, dt);
 }

@@ -243,6 +243,41 @@ float Chunk::getHeight(float x, float z) const {
 	return 0.0f;
 }
 
+Vector3D Chunk::getNormal(float x, float z) const
+{
+	if (_is_doing_setup)
+	{
+		return 0.f;
+	}
+	const auto& vertices = _terrain.getVertices();
+	int i = 0;
+	while (i < _chunk_division && vertices[i].z <= z)
+	{
+		i++;
+	}
+	i--;
+	if (i < 0)
+	{
+		i = 0;
+	}
+	while (i < _chunk_division * _chunk_division && vertices[i].x <= x)
+	{
+		i += _chunk_division;
+	}
+	i -= _chunk_division;
+	if (i < 0)
+	{
+		i = 0;
+	}
+
+	if (i < _chunk_division * (_chunk_division - 1) - 1)
+	{
+		Vector3D point_to_interpolate(x, 0, z);
+		return interpolateNormal4p(point_to_interpolate, i, i + _chunk_division, i + _chunk_division + 1, i + 1);
+	}
+	return 0.0f;
+}
+
 float Chunk::terrainNoise(float x, float y, int octaves, float persistence, float lacunarity) {
 	float total = 0.0f;
 	float amplitude = 1.0f;
@@ -295,3 +330,18 @@ float Chunk::interpolateHeight4p(const Vector3D& point_to_interpolate, const Vec
 	const float bottom_left_part  = (border_size - abs(point_to_interpolate.x - bottom_left.x) ) * (border_size - abs(bottom_left.z - point_to_interpolate.z)) * inverse_border_size_squared;
 	return top_left_part * top_left.y + top_right_part * top_right.y + bottom_right_part * bottom_right.y + bottom_left_part * bottom_left.y;
 }
+
+Vector3D Chunk::interpolateNormal4p(const Vector3D& point_to_interpolate, float top_left_index, float top_right_index, float bottom_right_index, float bottom_left_index) const
+{
+	const auto& vertices = _terrain.getVertices();
+	const auto& normales = _terrain.getNormals();
+
+	const float border_size = (vertices[top_right_index].x - vertices[top_left_index].x);
+	const float inverse_border_size_squared = 1 / (border_size * border_size);
+	const float top_left_part     = (border_size - abs(point_to_interpolate.x - vertices[top_left_index].x)) * (border_size - abs(point_to_interpolate.z - vertices[top_left_index].z)) * inverse_border_size_squared;
+	const float top_right_part    = (border_size - abs(vertices[top_right_index].x - point_to_interpolate.x)) * (border_size - abs(point_to_interpolate.z - vertices[top_right_index].z)) * inverse_border_size_squared;
+	const float bottom_right_part = (border_size - abs(vertices[bottom_right_index].x - point_to_interpolate.x)) * (border_size - abs(vertices[bottom_right_index].z - point_to_interpolate.z)) * inverse_border_size_squared;
+	const float bottom_left_part  = (border_size - abs(point_to_interpolate.x - vertices[bottom_left_index].x)) * (border_size - abs(vertices[bottom_left_index].z - point_to_interpolate.z)) * inverse_border_size_squared;
+	return top_left_part * normales[top_left_index] + top_right_part * normales[top_right_index] + bottom_right_part * normales[bottom_right_index] + bottom_left_part * normales[bottom_left_index];
+}
+

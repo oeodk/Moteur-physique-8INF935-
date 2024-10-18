@@ -45,5 +45,6 @@ public:
 	void keyPressed(ofKeyEventArgs& key);
 
 	float getHeight(float x, float z) const;
+	Vector3D getNormal(float x, float z) const;
 };
 

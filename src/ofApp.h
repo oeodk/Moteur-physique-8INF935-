@@ -6,6 +6,8 @@
 #include "gui/GUIManager.h"
 #include "Terrain.h"
 #include "GlobalConstants.h"
+#include "particles/Blob.h"
+
 #include <vector>
 
 class ofApp : public ofBaseApp {
@@ -30,6 +32,7 @@ private:
 
 	Terrain _terrain;
 
+	Blob* _the_blob = nullptr;
 public:
 	void setup();
 	void update();

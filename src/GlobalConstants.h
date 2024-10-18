@@ -6,6 +6,7 @@ enum BulletType {
 	CANNONBALL,
 	FIREBALL,
 	BUBBLE,
+	BLOB,
 	E_END
 };
 
