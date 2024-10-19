@@ -90,13 +90,9 @@ void Particle::drawNoLight() {
 void Particle::checkCollision(Particle* otherParticle, float dt) {
 	const float distance = (*otherParticle->getPosition() - _position).squareNorm();
 	const Vector3D contactNormal = (*otherParticle->getPosition() - _position).squareNorm();
-	const Vector3D contactPoint = _position + _radius * contactNormal;
-	const float jesaipas = (Vector3D::dotProduct(G_ACC * dt, contactNormal));
-	if (jesaipas*jesaipas > (_velocity).squareNorm()) {
-		addForce(G_ACC*-1);
-		return;
-	}
-	if (distance <= _radius + otherParticle->getRadius()) {
+	const Vector3D contactPoint = _position + _radius * contactNormal; 
+	const float DIST_BETWEEN_PARTICLES = _radius + otherParticle->getRadius();
+	if (distance <= DIST_BETWEEN_PARTICLES * DIST_BETWEEN_PARTICLES){
 		solveCollision(otherParticle, contactNormal, contactPoint);
 	}
 }
