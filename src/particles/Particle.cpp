@@ -103,7 +103,10 @@ void Particle::checkCollision(Particle* otherParticle, float dt) {
 
 void Particle::solveCollision(Particle* otherParticle, Vector3D contactNormal, Vector3D contactPoint)
 {
-
+	float K;
+	float e = 0.5f; //elasticity
+	K = (Vector3D::dotProduct((e + 1) * _velocity, contactNormal)) / (Vector3D::dotProduct((_inverse_mass + otherParticle->_inverse_mass) * contactNormal, contactNormal));
+	_velocity = K * contactNormal;
 }
 
 
