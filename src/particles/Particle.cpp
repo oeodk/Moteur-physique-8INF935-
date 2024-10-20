@@ -88,25 +88,28 @@ void Particle::drawNoLight() {
 }
 
 void Particle::checkCollision(Particle* otherParticle, float dt) {
+	const Vector3D colisionVector = *otherParticle->getPosition() - _position;
 	const float distance = (*otherParticle->getPosition() - _position).squareNorm();
 	const Vector3D contactNormal = (*otherParticle->getPosition() - _position).squareNorm();
-	const Vector3D contactPoint = _position + _radius * contactNormal;
-	const float jesaipas = (Vector3D::dotProduct(G_ACC * dt, contactNormal));
-	if (jesaipas*jesaipas > (_velocity).squareNorm()) {
-		addForce(G_ACC*-1);
-		return;
-	}
-	if (distance <= _radius + otherParticle->getRadius()) {
-		solveCollision(otherParticle, contactNormal, contactPoint);
+	const float SUM_OF_RADIUS = _radius + otherParticle->getRadius();
+	if (distance <= SUM_OF_RADIUS * SUM_OF_RADIUS){
+		const float chevauchement = SUM_OF_RADIUS - distance;
+		const Vector3D separationDirection = colisionVector / distance;
+		solveCollision(otherParticle, contactNormal, distance, chevauchement, separationDirection);
 	}
 }
 
-void Particle::solveCollision(Particle* otherParticle, Vector3D contactNormal, Vector3D contactPoint)
+void Particle::solveCollision(Particle* otherParticle, Vector3D contactNormal, float distance, float chevauchement, Vector3D separationDirection)
 {
 	float K;
-	float e = 0.5f; //elasticity
+	const float e = 0.5f; //elasticity
 	K = (Vector3D::dotProduct((e + 1) * _velocity, contactNormal)) / (Vector3D::dotProduct((_inverse_mass + otherParticle->_inverse_mass) * contactNormal, contactNormal));
+	const float deplacement1 = (chevauchement * otherParticle->_mass) / (_mass + otherParticle->_mass);
+	const float deplacement2 = (chevauchement * _mass) / (_mass + otherParticle->_mass);
+	_position = _position - separationDirection * deplacement1;
+	otherParticle->_position = otherParticle->_position + separationDirection * deplacement2;
 	_velocity = K * contactNormal;
+	otherParticle->_velocity = -K * contactNormal;
 }
 
 
