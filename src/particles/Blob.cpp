@@ -5,7 +5,7 @@
 #include "forces/SpringParticleForce.h"
 
 Blob::Blob(std::vector<Particle*>* world_particles, ParticleForceRegistry* force_registry, const Vector3D& init_pos, const Vector3D& init_vel)
-	:Particle(init_pos, init_vel, 10, 10, Vector3D(255, 255, 255), 255),
+	:Particle(init_pos, init_vel, 10000, 10, Vector3D(255, 255, 255), 255),
 	_gravity_nullification(Vector3D(G_ACC * -1)),
 	_world_particles(world_particles), _world_force_registry(force_registry)
 {

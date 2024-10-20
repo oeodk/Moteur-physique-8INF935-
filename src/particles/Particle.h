@@ -9,6 +9,9 @@ protected:
 	Vector3D _position;
 	Vector3D _previous_position;
 	Vector3D _velocity;
+	Vector3D _velocity_increment_delay;
+
+	float _drag = 0.7;
 
 	Vector3D _acceleration;
 	Vector3D _accum_force;
@@ -26,6 +29,7 @@ protected:
 
 public:
 	enum IntegrationMethods { EULER, VERLET };
+	inline static bool _draw_trail = true;
 
 	Particle();
 	Particle(const Vector3D& init_pos, const Vector3D& init_vel, float mass, float radius, const Vector3D& color, float alpha);
@@ -57,12 +61,19 @@ public:
 
 	void integrateVerlet(float dt);
 
+	void incrementVelocityWithDelay(const Vector3D& increment) { _velocity_increment_delay += increment; }
+
 	void draw() override;
 	void drawNoLight() override;
 
 	void checkCollision(Particle* otherParticle, float dt);
 
-	void solveCollision(Particle* otherParticle, Vector3D contactNormal, float distance, float chevauchement, Vector3D separationDirection);
+	void solveCollision(Particle* otherParticle, const Vector3D& v_relative, float chevauchement, const Vector3D& contact_normal);
+
+	void checkCollisionTerrain(class Terrain* terrain, float dt);
+
+	void solveCollisionTerrain(const Vector3D& v_relative, float chevauchement, const Vector3D& contact_normal);
+
 
 	static void testParticle();
 };

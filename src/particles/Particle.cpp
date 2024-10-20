@@ -2,6 +2,7 @@
 #include <of3dGraphics.h>
 #include <ofGraphics.h>
 #include <stdexcept>
+#include "Terrain.h"
 
 Particle::Particle() :_position(), _previous_position(), _velocity(), _acceleration(0, 0, 0), _inverse_mass(0), _mass(FLT_MAX), _radius(), _color(), _alpha(), _time_counter(0) {
 	_world_position = &_position;
@@ -15,7 +16,7 @@ Particle::Particle(const Vector3D& init_pos, const Vector3D& init_vel, float mas
 	_mass = mass;
 	_inverse_mass = mass == 0 ? FLT_MAX : 1 / mass;
 	_world_position = &_position;
-	_trail.setMode(OF_PRIMITIVE_LINES);
+	_trail.setMode(OF_PRIMITIVE_LINE_STRIP);
 	_trail.addVertex(_position);
 }
 
@@ -44,15 +45,17 @@ void Particle::integrate(float dt, IntegrationMethods method) {
 
 	// Generate the trail effect
 	_time_counter += dt;
-	//if (_time_counter > _TRAIL_POINT_DELAY) {
-	//	_trail.addVertex(_position);
-	//	_time_counter -= _TRAIL_POINT_DELAY;
-	//}
-	//_trail.getVertices().back() = _position;
+	if (_time_counter > _TRAIL_POINT_DELAY) {
+		_trail.addVertex(_position);
+		_time_counter -= _TRAIL_POINT_DELAY;
+	}
+	_trail.getVertices().back() = _position;
 }
 
 Vector3D Particle::eulerUpdateVelocity(float dt) {
-	return _velocity + dt * _acceleration;
+	Vector3D v =  std::pow(_drag, dt) * _velocity + dt * _acceleration + _velocity_increment_delay;
+	_velocity_increment_delay.set(0);
+	return v;
 }
 
 Vector3D Particle::eulerUpdatePosition(float dt) {
@@ -83,33 +86,56 @@ void Particle::draw() {
 }
 
 void Particle::drawNoLight() {
-	ofSetColor(_color.x, _color.y, _color.z, 255);
-	_trail.draw();
-}
-
-void Particle::checkCollision(Particle* otherParticle, float dt) {
-	const Vector3D colisionVector = *otherParticle->getPosition() - _position;
-	const float distance = (*otherParticle->getPosition() - _position).squareNorm();
-	const Vector3D contactNormal = (*otherParticle->getPosition() - _position).squareNorm();
-	const float SUM_OF_RADIUS = _radius + otherParticle->getRadius();
-	if (distance <= SUM_OF_RADIUS * SUM_OF_RADIUS){
-		const float chevauchement = SUM_OF_RADIUS - distance;
-		const Vector3D separationDirection = colisionVector / distance;
-		solveCollision(otherParticle, contactNormal, distance, chevauchement, separationDirection);
+	if(_draw_trail)
+	{
+		ofSetColor(_color.x, _color.y, _color.z, 255);
+		_trail.draw();
 	}
 }
 
-void Particle::solveCollision(Particle* otherParticle, Vector3D contactNormal, float distance, float chevauchement, Vector3D separationDirection)
+void Particle::checkCollision(Particle* otherParticle, float dt) {
+	const Vector3D v_relative(_velocity - otherParticle->_velocity);
+	const float distance = (otherParticle->_position - _position).squareNorm();
+	Vector3D contactNormal = (otherParticle->_position - _position);
+	contactNormal.normalize();
+	const float SUM_OF_RADIUS = _radius + otherParticle->_radius;
+	if (distance <= SUM_OF_RADIUS * SUM_OF_RADIUS){
+		const float chevauchement = SUM_OF_RADIUS - sqrt(distance);
+		solveCollision(otherParticle, v_relative, chevauchement, contactNormal);
+	}
+}
+
+void Particle::solveCollision(Particle* otherParticle, const Vector3D& v_relative, float chevauchement, const Vector3D& contact_normal)
 {
 	float K;
-	const float e = 0.5f; //elasticity
-	K = (Vector3D::dotProduct((e + 1) * _velocity, contactNormal)) / (Vector3D::dotProduct((_inverse_mass + otherParticle->_inverse_mass) * contactNormal, contactNormal));
-	const float deplacement1 = (chevauchement * otherParticle->_mass) / (_mass + otherParticle->_mass);
-	const float deplacement2 = (chevauchement * _mass) / (_mass + otherParticle->_mass);
-	_position = _position - separationDirection * deplacement1;
-	otherParticle->_position = otherParticle->_position + separationDirection * deplacement2;
-	_velocity = K * contactNormal;
-	otherParticle->_velocity = -K * contactNormal;
+	const float e = 0.5; //elasticity
+	K = ((e + 1) * Vector3D::dotProduct(contact_normal, v_relative)) / (_inverse_mass + otherParticle->_inverse_mass);
+	const float dep_1 = (chevauchement * otherParticle->_mass) / (_mass + otherParticle->_mass);
+	const float dep_2 = (chevauchement * _mass) / (_mass + otherParticle->_mass);
+	_position = _position + dep_1 * contact_normal;
+	otherParticle->_position = otherParticle->_position - dep_2 * contact_normal;
+
+	incrementVelocityWithDelay( contact_normal * -K * _inverse_mass);
+	otherParticle->incrementVelocityWithDelay( contact_normal * K * otherParticle->_inverse_mass);
+
+}
+
+void Particle::checkCollisionTerrain(Terrain* terrain, float dt)
+{
+	const float terrain_height = terrain->getHeight(_position.x, _position.z);
+	if (terrain_height > _position.y - _radius)
+	{
+		solveCollisionTerrain(_velocity, terrain_height - (_position.y - _radius), terrain->getNormal(_position.x, _position.z));
+	}
+}
+
+void Particle::solveCollisionTerrain(const Vector3D& v_relative, float chevauchement, const Vector3D& contact_normal)
+{
+	float K;
+	const float e = 0.5; //elasticity
+	K = ((e + 1) * Vector3D::dotProduct(contact_normal, v_relative)) / _inverse_mass;
+	_position = _position + chevauchement * contact_normal;
+	incrementVelocityWithDelay(contact_normal * -K * _inverse_mass);
 }
 
 

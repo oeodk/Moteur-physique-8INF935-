@@ -45,23 +45,23 @@ void ofApp::update() {
 	}
 
 	_forces_registry.updateForces(_dt);
-	_physics_engine.updateParticles(_dt, _particles);
+	_physics_engine.updateParticles(_dt, _particles, &_terrain);
 	_terrain.update(_render_engine.getCameraPosition());
 	_forces_registry.clear();
 
 	// Delete a particle if it is too high or too low
-	for (size_t i = 0; i < _particles.size(); i++) {
-		const Vector3D* particle_pos = _particles[i]->getPosition();
-		if (particle_pos->y > 5000 || particle_pos->y < _terrain.getHeight(particle_pos->x, particle_pos->z)) {
-			if (_particles[i] == _the_blob)
-			{
-				_the_blob = nullptr;
-			}
-			//delete _particles[i];
-			_particles.erase(_particles.begin() + i);
-			i--;
-		}
-	}
+	//for (size_t i = 0; i < _particles.size(); i++) {
+	//	const Vector3D* particle_pos = _particles[i]->getPosition();
+	//	if (particle_pos->y > 5000 || particle_pos->y < _terrain.getHeight(particle_pos->x, particle_pos->z)) {
+	//		if (_particles[i] == _the_blob)
+	//		{
+	//			_the_blob = nullptr;
+	//		}
+	//		//delete _particles[i];
+	//		_particles.erase(_particles.begin() + i);
+	//		i--;
+	//	}
+	//}
 	_render_engine.update(_dt);
 
 	_gui_manager.update(_dt, _selected_particle);
@@ -105,7 +105,7 @@ void ofApp::keyPressed(int key) {
 		_physics_engine.changeIntegrationMethod();
 	}
 	if (key == ofKey::OF_KEY_RIGHT_SHIFT) {
-		spawnParticle(BulletType::E_END);
+		Particle::_draw_trail = !Particle::_draw_trail;
 	}
 	if (key == '0')
 	{
@@ -224,27 +224,27 @@ void ofApp::spawnParticle(BulletType type) {
 		_particles.push_back(newParticle);
 		break;
 	default:
-		for (int i = 0; i < 250; i++)
-		{
-			switch (_particle_types[_selected_particle])
-			{
-			case BULLET:
-				newParticle = new BulletParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 200.f));
-				break;
-			case CANNONBALL:
-				newParticle = new CannonballParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 25.f, (rand() % 100 - 50) / 25.f));
-				break;
-			case FIREBALL:
-				newParticle = new FireballParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 100.f, (rand() % 100 - 50) / 100.f));
-				break;
-			case BUBBLE:
-				newParticle = new BubbleParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 50.f, (rand() % 100 - 50) / 50.f));
-				break;
-			default:
-				break;
-			}
-			_particles.push_back(newParticle);
-		}
+		//for (int i = 0; i < 250; i++)
+		//{
+		//	switch (_particle_types[_selected_particle])
+		//	{
+		//	case BULLET:
+		//		newParticle = new BulletParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 200.f));
+		//		break;
+		//	case CANNONBALL:
+		//		newParticle = new CannonballParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 25.f, (rand() % 100 - 50) / 25.f));
+		//		break;
+		//	case FIREBALL:
+		//		newParticle = new FireballParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 100.f, (rand() % 100 - 50) / 100.f));
+		//		break;
+		//	case BUBBLE:
+		//		newParticle = new BubbleParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 50.f, (rand() % 100 - 50) / 50.f));
+		//		break;
+		//	default:
+		//		break;
+		//	}
+		//	_particles.push_back(newParticle);
+		//}
 		break;
 	}
 
