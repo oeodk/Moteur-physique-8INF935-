@@ -62,7 +62,7 @@ public:
 
 	void checkCollision(Particle* otherParticle, float dt);
 
-	void solveCollision(Particle* otherParticle, Vector3D contactNormal, Vector3D contactPoint);
+	void solveCollision(Particle* otherParticle, Vector3D contactNormal, float distance, float chevauchement, Vector3D separationDirection);
 
 	static void testParticle();
 };
