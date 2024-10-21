@@ -20,6 +20,8 @@ protected:
 	float _inverse_mass;
 	float _radius;
 
+	float _friction_k1, _friction_k2;
+
 	Vector3D _color;
 	float _alpha;
 
@@ -38,10 +40,14 @@ public:
 	void addForce(const Vector3D& force);
 	void clearAccum();
 
-	Vector3D getAcceleration() const { return _acceleration; }
+	const Vector3D& getAcceleration() const { return _acceleration; }
 	float getMass() const { return _mass; }
 	float getInverseMass() const { return _inverse_mass; }
 	float getRadius() const { return _radius; }
+	const Vector3D& getParticlePosition() const { return _position; }
+	const Vector3D& getVelocity() const { return _velocity; }
+	float getFrictionK1() const { return _friction_k1; }
+	float getFrictionK2() const { return _friction_k2; }
 
 	virtual void computeForces();
 	void integrate(float dt, IntegrationMethods method);
@@ -49,7 +55,6 @@ public:
 	Vector3D eulerUpdateVelocity(float dt);
 	Vector3D eulerUpdatePosition(float dt);
 
-	const Vector3D& getParticlePosition() { return _position; }
 
 	/* Compute the next position and velocity using the Euler integration formula.
 	   Takes the frame length (in milliseconds) as parameter. */

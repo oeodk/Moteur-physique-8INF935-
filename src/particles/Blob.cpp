@@ -14,7 +14,7 @@ Blob::Blob(std::vector<Particle*>* world_particles, ParticleForceRegistry* force
 
 void Blob::updateBlob()
 {
-	constexpr float SPRING_K = 1;
+	constexpr float SPRING_K = 5;
 	constexpr float SPRING_LENGTH = 200;
 	for (Particle* particle : *_world_particles)
 	{
@@ -75,41 +75,49 @@ void Blob::updateBlob()
 		}
 	}
 
-	_world_force_registry->add(this, &_gravity_nullification);
+	//_world_force_registry->add(this, &_gravity_nullification);
+	/**/
 	for (size_t j = 0; j < _particles_links.size(); j++)
 	{
-		Vector3D dist(_particles_links[j].p2->getParticlePosition() - _particles_links[j].p1->getParticlePosition());
-		if (dist.squareNorm() > _LOSE_RANGE * _LOSE_RANGE)
+		Vector3D dist(_particles_links[j].p1->getParticlePosition() - _particles_links[j].p2->getParticlePosition());
+		if (dist.squareNorm() > _CABLE_RANGE * _CABLE_RANGE)
 		{
-			std::vector<Particle*> particles;
-			std::vector<Particle*> particles_link;
-
-			particles.reserve(2);
-			particles_link.reserve(2);
-
-			particles.push_back(_particles_links[j].p2);
-			particles_link.push_back(_particles_links[j].p1);
-
+			const float DELTA_DIST = dist.getNorm() - _CABLE_RANGE;
+			dist.normalize();
+			_particles_links[j].p2->solveCollision(_particles_links[j].p1, _particles_links[j].p2->getVelocity() - _particles_links[j].p1->getVelocity(), DELTA_DIST, dist);
 			if (_particles_links[j].p1 != this)
 			{
-				particles.push_back(_particles_links[j].p1);
-				particles_link.push_back(_particles_links[j].p2);
+				_particles_links[j].p1->solveCollision(_particles_links[j].p2, _particles_links[j].p1->getVelocity() - _particles_links[j].p2->getVelocity(), DELTA_DIST, dist * -1);
 			}
-
-			for (size_t i = 0; i < particles.size(); i++)
-			{
-				for (size_t k = 0; k < _forces.at(particles[i]).size(); k++)
-				{
-					if (_forces.at(particles[i])[k].source == particles_link[i])
-					{
-						delete _forces.at(particles[i])[k].generator;
-						_forces.at(particles[i]).erase(_forces.at(particles[i]).begin() + k);
-						k--;
-						break;
-					}
-				}
-			}
-			_particles_links.erase(_particles_links.begin() + j);
+			//std::vector<Particle*> particles;
+			//std::vector<Particle*> particles_link;
+			//
+			//particles.reserve(2);
+			//particles_link.reserve(2);
+			//
+			//particles.push_back(_particles_links[j].p2);
+			//particles_link.push_back(_particles_links[j].p1);
+			//
+			//if (_particles_links[j].p1 != this)
+			//{
+			//	particles.push_back(_particles_links[j].p1);
+			//	particles_link.push_back(_particles_links[j].p2);
+			//}
+			//
+			//for (size_t i = 0; i < particles.size(); i++)
+			//{
+			//	for (size_t k = 0; k < _forces.at(particles[i]).size(); k++)
+			//	{
+			//		if (_forces.at(particles[i])[k].source == particles_link[i])
+			//		{
+			//			delete _forces.at(particles[i])[k].generator;
+			//			_forces.at(particles[i]).erase(_forces.at(particles[i]).begin() + k);
+			//			k--;
+			//			break;
+			//		}
+			//	}
+			//}
+			//_particles_links.erase(_particles_links.begin() + j);
 		}
 	}
 	for (size_t i = 0; i < _blob_particles.size(); i++)
@@ -131,4 +139,25 @@ void Blob::drawNoLight()
 {
 	ofSetColor(_color.x, _color.y, _color.z, 255);
 	_joins.draw();
+}
+
+void Blob::split()
+{
+	for (size_t i = 0; i < _particles_links.size(); i++)
+	{
+		if (_particles_links[i].p1 == this)
+		{
+			for (size_t k = 0; k < _forces.at(_particles_links[i].p2).size(); k++)
+			{
+				if (_forces.at(_particles_links[i].p2)[k].source == _particles_links[i].p1)
+				{
+					delete _forces.at(_particles_links[i].p2)[k].generator;
+					_forces.at(_particles_links[i].p2).erase(_forces.at(_particles_links[i].p2).begin() + k);
+					k--;
+					break;
+				}
+			}
+			_particles_links.erase(_particles_links.begin() + i);
+		}
+	}
 }

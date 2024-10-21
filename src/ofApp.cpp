@@ -5,6 +5,7 @@
 #include "particles/FireballParticle.h"
 #include "particles/BubbleParticle.h"
 #include "forces/GravityParticleForce.h"
+#include "forces/FrictionForceGenerator.h"
 #include <execution>
 #include <cmath>
 
@@ -33,10 +34,12 @@ void ofApp::update() {
 	_elapsed_time += _dt;
 
 	GravityParticleForce gravity_force(Vector3D(0, -9.8f, 0));
+	FrictionForceGenerator friction_force;
 
 	// Apply forces to the particles
 	for (Particle *particle : _particles) {
 		_forces_registry.add(particle, &gravity_force);
+		_forces_registry.add(particle, &friction_force);
 	}
 
 	if(_the_blob)
@@ -49,19 +52,19 @@ void ofApp::update() {
 	_terrain.update(_render_engine.getCameraPosition());
 	_forces_registry.clear();
 
-	// Delete a particle if it is too high or too low
-	//for (size_t i = 0; i < _particles.size(); i++) {
-	//	const Vector3D* particle_pos = _particles[i]->getPosition();
-	//	if (particle_pos->y > 5000 || particle_pos->y < _terrain.getHeight(particle_pos->x, particle_pos->z)) {
-	//		if (_particles[i] == _the_blob)
-	//		{
-	//			_the_blob = nullptr;
-	//		}
-	//		//delete _particles[i];
-	//		_particles.erase(_particles.begin() + i);
-	//		i--;
-	//	}
-	//}
+	//Delete a particle if it is too high or too low
+	for (size_t i = 0; i < _particles.size(); i++) {
+		Vector3D particle_dist(_particles[i]->getParticlePosition() - _render_engine.getCameraPosition());
+		if (particle_dist.squareNorm() > std::pow(_render_engine.getFarPlane(), 2)) {
+			if (_particles[i] == _the_blob)
+			{
+				_the_blob = nullptr;
+			}
+			delete _particles[i];
+			_particles.erase(_particles.begin() + i);
+			i--;
+		}
+	}
 	_render_engine.update(_dt);
 
 	_gui_manager.update(_dt, _selected_particle);
@@ -101,11 +104,15 @@ void ofApp::exit() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
-	if (key == ofKey::OF_KEY_RETURN) {
-		_physics_engine.changeIntegrationMethod();
-	}
 	if (key == ofKey::OF_KEY_RIGHT_SHIFT) {
 		Particle::_draw_trail = !Particle::_draw_trail;
+	}
+	if (key == ofKey::OF_KEY_RIGHT_CONTROL)
+	{
+		if (_the_blob != nullptr)
+		{
+			_the_blob->split();
+		}
 	}
 	if (key == '0')
 	{

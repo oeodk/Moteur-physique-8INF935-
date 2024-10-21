@@ -18,6 +18,8 @@ Particle::Particle(const Vector3D& init_pos, const Vector3D& init_vel, float mas
 	_world_position = &_position;
 	_trail.setMode(OF_PRIMITIVE_LINE_STRIP);
 	_trail.addVertex(_position);
+	_friction_k1 = 0.1;
+	_friction_k2 = 0.0001;
 }
 
 void Particle::addForce(const Vector3D& force) {
@@ -53,7 +55,17 @@ void Particle::integrate(float dt, IntegrationMethods method) {
 }
 
 Vector3D Particle::eulerUpdateVelocity(float dt) {
-	Vector3D v =  std::pow(_drag, dt) * _velocity + dt * _acceleration + _velocity_increment_delay;
+	//Vector3D v =  std::pow(_drag, dt) * _velocity + dt * _acceleration + _velocity_increment_delay;
+	Vector3D v =  _velocity + dt * _acceleration + _velocity_increment_delay;
+	if(v.squareNorm() != 0)
+	{
+		Vector3D v_dir(v);
+		v_dir.normalize();
+		if (Vector3D::dotProduct(G_ACC * dt, v_dir) > Vector3D::dotProduct(v, v_dir))
+		{
+			return Vector3D(0);
+		}
+	}
 	_velocity_increment_delay.set(0);
 	return v;
 }
@@ -97,6 +109,10 @@ void Particle::checkCollision(Particle* otherParticle, float dt) {
 	const Vector3D v_relative(_velocity - otherParticle->_velocity);
 	const float distance = (otherParticle->_position - _position).squareNorm();
 	Vector3D contactNormal = (otherParticle->_position - _position);
+	if (contactNormal.squareNorm() == 0)
+	{
+		return;
+	}
 	contactNormal.normalize();
 	const float SUM_OF_RADIUS = _radius + otherParticle->_radius;
 	if (distance <= SUM_OF_RADIUS * SUM_OF_RADIUS){
@@ -110,6 +126,7 @@ void Particle::solveCollision(Particle* otherParticle, const Vector3D& v_relativ
 	float K;
 	const float e = 0.5; //elasticity
 	K = ((e + 1) * Vector3D::dotProduct(contact_normal, v_relative)) / (_inverse_mass + otherParticle->_inverse_mass);
+	//K *= 0.25; // Only here to have better result with our particle value
 	const float dep_1 = (chevauchement * otherParticle->_mass) / (_mass + otherParticle->_mass);
 	const float dep_2 = (chevauchement * _mass) / (_mass + otherParticle->_mass);
 	_position = _position + dep_1 * contact_normal;

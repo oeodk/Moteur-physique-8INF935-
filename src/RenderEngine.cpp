@@ -309,8 +309,9 @@ void RenderEngine::updateSelectedParticle(BulletType bullet) {
 bool RenderEngine::willRender(Vector3D target_position) const {
 	Vector3D look_at_dir(_camera.getLookAtDir());
 	Vector3D camera_target_vector(target_position - _camera.getPosition());
+	const float DISTANCE_SQUARED = camera_target_vector.squareNorm();
 	camera_target_vector.normalize();
-	if (Vector3D::dotProduct(look_at_dir, camera_target_vector) > 0.25) {
+	if (Vector3D::dotProduct(look_at_dir, camera_target_vector) > 0.25 || DISTANCE_SQUARED < RENDER_DISTANCE * RENDER_DISTANCE / 25) {
 		return true;
 	}
 	return false;
