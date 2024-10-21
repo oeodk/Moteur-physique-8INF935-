@@ -129,8 +129,8 @@ void Particle::solveCollision(Particle* otherParticle, const Vector3D& v_relativ
 	//K *= 0.25; // Only here to have better result with our particle value
 	const float dep_1 = (chevauchement * otherParticle->_mass) / (_mass + otherParticle->_mass);
 	const float dep_2 = (chevauchement * _mass) / (_mass + otherParticle->_mass);
-	_position = _position + dep_1 * contact_normal;
-	otherParticle->_position = otherParticle->_position - dep_2 * contact_normal;
+	_position = _position - dep_1 * contact_normal;
+	otherParticle->_position = otherParticle->_position + dep_2 * contact_normal;
 
 	incrementVelocityWithDelay( contact_normal * -K * _inverse_mass);
 	otherParticle->incrementVelocityWithDelay( contact_normal * K * otherParticle->_inverse_mass);

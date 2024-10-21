@@ -14,7 +14,7 @@ Blob::Blob(std::vector<Particle*>* world_particles, ParticleForceRegistry* force
 
 void Blob::updateBlob()
 {
-	constexpr float SPRING_K = 5;
+	constexpr float SPRING_K = 1;
 	constexpr float SPRING_LENGTH = 200;
 	for (Particle* particle : *_world_particles)
 	{
