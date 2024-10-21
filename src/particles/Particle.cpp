@@ -65,6 +65,13 @@ Vector3D Particle::eulerUpdateVelocity(float dt) {
 		{
 			return Vector3D(0);
 		}
+		if (_velocity.squareNorm() == 0)
+		{
+			if (v.squareNorm() < _mu_s * _mu_s)
+			{
+				return Vector3D(0);
+			}
+		}
 	}
 	_velocity_increment_delay.set(0);
 	return v;

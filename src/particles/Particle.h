@@ -20,7 +20,7 @@ protected:
 	float _inverse_mass;
 	float _radius;
 
-	float _friction_k1, _friction_k2;
+	float _friction_k1, _friction_k2, _mu_s;
 
 	Vector3D _color;
 	float _alpha;
