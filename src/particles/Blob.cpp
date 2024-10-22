@@ -34,14 +34,12 @@ void Blob::updateBlob()
 				{
 					added = true;
 					_blob_particles.push_back(particle);
-					//if(_forces[particle].size() < 4)
-					{
-						_forces[particle].emplace_back();
-						_forces[particle].back().generator = new SpringParticleForce(SPRING_K, SPRING_LENGTH, &_position);
-						_forces[particle].back().source = this;
-						_particles_links.emplace_back(this, particle);
-						particle->addConstrain(std::make_shared<CableConstrain>(_CABLE_RANGE, this));
-					}
+
+					_forces[particle].emplace_back();
+					_forces[particle].back().generator = new SpringParticleForce(SPRING_K, SPRING_LENGTH, &_position);
+					_forces[particle].back().source = this;
+					_particles_links.emplace_back(this, particle);
+					particle->addConstrain(std::make_shared<CableConstrain>(_CABLE_RANGE, this));
 				}
 			}
 			const size_t particles_count = _blob_particles.size();
