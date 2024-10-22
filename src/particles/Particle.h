@@ -60,6 +60,8 @@ public:
 	void updateConstrain(float dt);
 
 	void addConstrain(std::shared_ptr<Constrain> constrain) { _constrains.push_back(constrain); }
+	void removeConstrains(std::shared_ptr<Constrain> constrain);
+	const std::vector< std::shared_ptr<Constrain>>& getConstrains() const { return _constrains; }
 	/* Compute the next position and velocity using the Euler integration formula.
 	   Takes the frame length (in milliseconds) as parameter. */
 

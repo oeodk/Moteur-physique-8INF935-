@@ -92,6 +92,18 @@ void Particle::updateConstrain(float dt)
 	}
 }
 
+void Particle::removeConstrains(std::shared_ptr<Constrain> constrain)
+{
+	for (size_t i = 0; i < _constrains.size(); i++)
+	{
+		if (_constrains[i] == constrain)
+		{
+			_constrains.erase(_constrains.begin() + i);
+			return;
+		}
+	}
+}
+
 void Particle::integrateEuler(float dt) {
 	_velocity.set(eulerUpdateVelocity(dt));
 	_position.set(eulerUpdatePosition(dt));
