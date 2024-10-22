@@ -32,7 +32,8 @@ private:
 
 	Terrain _terrain;
 
-	Blob* _the_blob = nullptr;
+	std::vector<Blob*> _blobs;
+	std::map<ofKey, bool> _blob_key;
 public:
 	void setup();
 	void update();
@@ -53,4 +54,5 @@ public:
 	void gotMessage(ofMessage msg);
 
 	void spawnParticle(BulletType type = BULLET);
+	void moveBlobs();
 };

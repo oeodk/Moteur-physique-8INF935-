@@ -11,7 +11,8 @@ void PhysicsEngine::updateParticles(float dt, const std::vector<class Particle*>
             }
             p->checkCollisionTerrain(terrain, dt);
         }
-
+        
+        p->updateConstrain(dt);
         p->computeForces();
         p->integrate(dt, _integration_method);
         p->clearAccum();

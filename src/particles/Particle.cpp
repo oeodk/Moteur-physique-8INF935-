@@ -20,6 +20,7 @@ Particle::Particle(const Vector3D& init_pos, const Vector3D& init_vel, float mas
 	_trail.addVertex(_position);
 	_friction_k1 = 0.1;
 	_friction_k2 = 0.0001;
+	_mu_s = 0.15;
 }
 
 void Particle::addForce(const Vector3D& force) {
@@ -32,7 +33,6 @@ void Particle::clearAccum() {
 
 
 void Particle::computeForces() {
-	//std::cout << _accum_force.y << " x " << _inverse_mass << "\n";
 	_acceleration = _accum_force * _inverse_mass;
 }
 
@@ -59,12 +59,6 @@ Vector3D Particle::eulerUpdateVelocity(float dt) {
 	Vector3D v =  _velocity + dt * _acceleration + _velocity_increment_delay;
 	if(v.squareNorm() != 0)
 	{
-		Vector3D v_dir(v);
-		v_dir.normalize();
-		if (Vector3D::dotProduct(G_ACC * dt, v_dir) > Vector3D::dotProduct(v, v_dir))
-		{
-			return Vector3D(0);
-		}
 		if (_velocity.squareNorm() == 0)
 		{
 			if (v.squareNorm() < _mu_s * _mu_s)
@@ -78,7 +72,24 @@ Vector3D Particle::eulerUpdateVelocity(float dt) {
 }
 
 Vector3D Particle::eulerUpdatePosition(float dt) {
+	Vector3D v_dir(_velocity);
+	if(v_dir.squareNorm() != 0)
+	{
+		v_dir.normalize();
+		if (Vector3D::dotProduct(G_ACC * dt, v_dir) > Vector3D::dotProduct(_velocity, v_dir))
+		{
+			return _position;
+		}
+	}
 	return _position + dt * _velocity;
+}
+
+void Particle::updateConstrain(float dt)
+{
+	for (auto& constrain : _constrains)
+	{
+		constrain->updateConstrain(this, dt);
+	}
 }
 
 void Particle::integrateEuler(float dt) {
@@ -112,35 +123,34 @@ void Particle::drawNoLight() {
 	}
 }
 
-void Particle::checkCollision(Particle* otherParticle, float dt) {
-	const Vector3D v_relative(_velocity - otherParticle->_velocity);
-	const float distance = (otherParticle->_position - _position).squareNorm();
-	Vector3D contactNormal = (otherParticle->_position - _position);
-	if (contactNormal.squareNorm() == 0)
+void Particle::checkCollision(Particle* other_particle, float dt) {
+	const Vector3D v_relative(_velocity - other_particle->_velocity);
+	const float distance = (other_particle->_position - _position).squareNorm();
+	Vector3D contact_normal = (other_particle->_position - _position);
+	if (contact_normal.squareNorm() == 0)
 	{
 		return;
 	}
-	contactNormal.normalize();
-	const float SUM_OF_RADIUS = _radius + otherParticle->_radius;
+	contact_normal.normalize();
+	const float SUM_OF_RADIUS = _radius + other_particle->_radius;
 	if (distance <= SUM_OF_RADIUS * SUM_OF_RADIUS){
 		const float chevauchement = SUM_OF_RADIUS - sqrt(distance);
-		solveCollision(otherParticle, v_relative, chevauchement, contactNormal);
+		solveCollision(other_particle, v_relative, chevauchement, contact_normal);
 	}
 }
 
-void Particle::solveCollision(Particle* otherParticle, const Vector3D& v_relative, float chevauchement, const Vector3D& contact_normal)
+void Particle::solveCollision(Particle* other_particle, const Vector3D& v_relative, float chevauchement, const Vector3D& contact_normal)
 {
 	float K;
 	const float e = 0.5; //elasticity
-	K = ((e + 1) * Vector3D::dotProduct(contact_normal, v_relative)) / (_inverse_mass + otherParticle->_inverse_mass);
-	//K *= 0.25; // Only here to have better result with our particle value
-	const float dep_1 = (chevauchement * otherParticle->_mass) / (_mass + otherParticle->_mass);
-	const float dep_2 = (chevauchement * _mass) / (_mass + otherParticle->_mass);
+	K = ((e + 1) * Vector3D::dotProduct(contact_normal, v_relative)) / (_inverse_mass + other_particle->_inverse_mass);
+	const float dep_1 = (chevauchement * other_particle->_mass) / (_mass + other_particle->_mass);
+	const float dep_2 = (chevauchement * _mass) / (_mass + other_particle->_mass);
 	_position = _position - dep_1 * contact_normal;
-	otherParticle->_position = otherParticle->_position + dep_2 * contact_normal;
+	other_particle->_position = other_particle->_position + dep_2 * contact_normal;
 
 	incrementVelocityWithDelay( contact_normal * -K * _inverse_mass);
-	otherParticle->incrementVelocityWithDelay( contact_normal * K * otherParticle->_inverse_mass);
+	other_particle->incrementVelocityWithDelay( contact_normal * K * other_particle->_inverse_mass);
 
 }
 
@@ -160,6 +170,12 @@ void Particle::solveCollisionTerrain(const Vector3D& v_relative, float chevauche
 	K = ((e + 1) * Vector3D::dotProduct(contact_normal, v_relative)) / _inverse_mass;
 	_position = _position + chevauchement * contact_normal;
 	incrementVelocityWithDelay(contact_normal * -K * _inverse_mass);
+}
+
+void Particle::resetMovement()
+{
+	_acceleration.set(0);
+	_velocity.set(0);
 }
 
 
