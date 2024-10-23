@@ -101,10 +101,14 @@ void GUIManager::drawInstructions() {
 	string messages[] = {
 		"Clic gauche : Tirer une particule",
 		"Molette : Choisir une particule",
-		"Shift gauche : Deplacement rapide",
-		"Shift droit : Montrer / cacher les trainees des particules",
-		"Entree : Effacer toutes les particules",
-		"0 : Creer un noyau de blob"
+		"Ctrl gauche : Sprint",
+		"Tab : Montrer / cacher les trainees des particules",
+		"Alt : Effacer toutes les particules",
+		"Flèches et Entree : Deplacer le blob",
+		"Maj droite : Arrêter les mouvements du blob",
+		"Ctrl droite : Separer le blob",
+		"1 : Exemple contrainte de cable",
+		"2 : Exemple contrainte de tige"
 	};
 
 	int length = sizeof(messages) / sizeof(messages[0]);
