@@ -138,7 +138,7 @@ void ofApp::keyPressed(int key) {
 	}
 	if (key == '1')
 	{
-		Anchor* anchor = new Anchor(_render_engine.getCameraPosition());
+		Anchor* anchor = new Anchor(_render_engine.getCameraPosition(), Vector3D(150, 150, 150));
 		Particle* particle = new FireballParticle(_render_engine.getCameraPosition()- Vector3D(0,30,0), Vector3D());
 		_particles.push_back(anchor);
 		_particles.push_back(particle);
@@ -147,7 +147,7 @@ void ofApp::keyPressed(int key) {
 	}
 	if (key == '2')
 	{
-		Anchor* anchor = new Anchor(_render_engine.getCameraPosition());
+		Anchor* anchor = new Anchor(_render_engine.getCameraPosition(), Vector3D(0, 0, 0));
 		Particle* particle = new FireballParticle(_render_engine.getCameraPosition() - Vector3D(0, 30, 0), Vector3D());
 		_particles.push_back(anchor);
 		_particles.push_back(particle);
