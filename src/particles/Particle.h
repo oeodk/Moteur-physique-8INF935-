@@ -2,7 +2,8 @@
 #include "../Vector3D.h"
 #include "../Drawable.h"
 #include "ofVboMesh.h"
-#include "../GlobalConstants.h"
+#include "GlobalConstants.h"
+#include "constrain/Constrain.h"
 
 class Particle : public Drawable {
 protected:
@@ -29,6 +30,8 @@ protected:
 	static constexpr float _TRAIL_POINT_DELAY = 0.25;
 	float _time_counter;
 
+	std::vector<std::shared_ptr<Constrain>> _constrains;
+
 public:
 	enum IntegrationMethods { EULER, VERLET };
 	inline static bool _draw_trail = true;
@@ -52,10 +55,13 @@ public:
 	virtual void computeForces();
 	void integrate(float dt, IntegrationMethods method);
 
-	Vector3D eulerUpdateVelocity(float dt);
+	virtual Vector3D eulerUpdateVelocity(float dt);
 	Vector3D eulerUpdatePosition(float dt);
+	void updateConstrain(float dt);
 
-
+	void addConstrain(std::shared_ptr<Constrain> constrain) { _constrains.push_back(constrain); }
+	void removeConstrains(std::shared_ptr<Constrain> constrain);
+	const std::vector< std::shared_ptr<Constrain>>& getConstrains() const { return _constrains; }
 	/* Compute the next position and velocity using the Euler integration formula.
 	   Takes the frame length (in milliseconds) as parameter. */
 
@@ -79,6 +85,7 @@ public:
 
 	void solveCollisionTerrain(const Vector3D& v_relative, float chevauchement, const Vector3D& contact_normal);
 
+	void resetMovement();
 
 	static void testParticle();
 };

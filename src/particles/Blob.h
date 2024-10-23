@@ -9,7 +9,7 @@ class Blob :
 {
 private:
     static constexpr float _GRAB_RANGE = 50;
-    static constexpr float _CABLE_RANGE = 500;
+    static constexpr float _CABLE_RANGE = 300;
     
     std::vector<Particle*> _blob_particles;
     std::vector<Particle*>* _world_particles;
@@ -36,5 +36,6 @@ public :
     void updateBlob();
     void drawNoLight() override;
     void split();
+
 };
 

@@ -67,9 +67,6 @@ public:
 	~RenderEngine();
 
 	void mouseMoved(ofMouseEventArgs& mouse);
-
-	ofVboMesh point;
-
 	/*
 		The event mouseDragged is triggered when the mouse button is pressed and the mouse is moving
 		With this event the user is able move his mouse on the screen without moving the camera

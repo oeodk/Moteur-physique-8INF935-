@@ -4,8 +4,11 @@
 #include "particles/CannonballParticle.h"
 #include "particles/FireballParticle.h"
 #include "particles/BubbleParticle.h"
+#include "particles/Anchor.h"
 #include "forces/GravityParticleForce.h"
 #include "forces/FrictionForceGenerator.h"
+#include "constrain/BarConstrain.h"
+#include "constrain/CableConstrain.h"
 #include <execution>
 #include <cmath>
 
@@ -26,6 +29,12 @@ void ofApp::setup() {
 
 	Vector3D::testVector3D();
 	Particle::testParticle();
+
+	_blob_key.insert({ ofKey::OF_KEY_RETURN, false });
+	_blob_key.insert({ ofKey::OF_KEY_UP    , false });
+	_blob_key.insert({ ofKey::OF_KEY_DOWN  , false });
+	_blob_key.insert({ ofKey::OF_KEY_RIGHT , false });
+	_blob_key.insert({ ofKey::OF_KEY_LEFT  , false });
 }
 
 //--------------------------------------------------------------
@@ -42,10 +51,11 @@ void ofApp::update() {
 		_forces_registry.add(particle, &friction_force);
 	}
 
-	if(_the_blob)
+	for (Blob* blob: _blobs)
 	{
-		_the_blob->updateBlob();
+		blob->updateBlob();
 	}
+	moveBlobs();
 
 	_forces_registry.updateForces(_dt);
 	_physics_engine.updateParticles(_dt, _particles, &_terrain);
@@ -56,9 +66,13 @@ void ofApp::update() {
 	for (size_t i = 0; i < _particles.size(); i++) {
 		Vector3D particle_dist(_particles[i]->getParticlePosition() - _render_engine.getCameraPosition());
 		if (particle_dist.squareNorm() > std::pow(_render_engine.getFarPlane(), 2)) {
-			if (_particles[i] == _the_blob)
+			if (Blob* blob = dynamic_cast<Blob*>(_particles[i]))
 			{
-				_the_blob = nullptr;
+				auto& blob_pos = std::find(_blobs.begin(), _blobs.end(), blob);
+				if (blob_pos != _blobs.end())
+				{
+					_blobs.erase(blob_pos);
+				}
 			}
 			delete _particles[i];
 			_particles.erase(_particles.begin() + i);
@@ -86,14 +100,6 @@ void ofApp::draw() {
 
 	_render_engine.render();
 	_gui_manager.draw();
-
-	auto player_position = _render_engine.getCameraPosition();
-	auto& p = _render_engine.point.getVertices()[0];
-	//std::cout << _terrain.getHeight(player_position.x, player_position.z) << std::endl;
-	p.x = player_position.x;//(Vector3D(player_position.x, 10 + _terrain.getHeight(player_position.x, player_position.z), player_position.z));
-	p.y = 10 + _terrain.getHeight(player_position.x, player_position.z);//(Vector3D(player_position.x, 10 + _terrain.getHeight(player_position.x, player_position.z), player_position.z));
-	p.z = player_position.z;//(Vector3D(player_position.x, 10 + _terrain.getHeight(player_position.x, player_position.z), player_position.z));
-
 }
 
 void ofApp::exit() {
@@ -105,33 +111,72 @@ void ofApp::exit() {
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
 	if (key == ofKey::OF_KEY_RIGHT_SHIFT) {
-		Particle::_draw_trail = !Particle::_draw_trail;
+		for (Blob* blob : _blobs)
+		{
+			blob->resetMovement();
+		}
 	}
 	if (key == ofKey::OF_KEY_RIGHT_CONTROL)
 	{
-		if (_the_blob != nullptr)
+		for(Blob* blob : _blobs)
 		{
-			_the_blob->split();
+			blob->split();
 		}
 	}
-	if (key == '0')
+	if (key == ofKey::OF_KEY_ALT)
 	{
-		spawnParticle(BulletType::BLOB);
-	}
-	if (key == ofKey::OF_KEY_RETURN)
-	{
-		_the_blob = nullptr;
+		_blobs.clear();
 		for (size_t i = 0; i < _particles.size(); i++)
 		{
 			delete _particles[i];
 		}
 		_particles.clear();
 	}
+	if (key == '0')
+	{
+		spawnParticle(BulletType::BLOB);
+	}
+	if (key == '1')
+	{
+		Anchor* anchor = new Anchor(_render_engine.getCameraPosition(), Vector3D(150, 150, 150));
+		Particle* particle = new FireballParticle(_render_engine.getCameraPosition()- Vector3D(0,30,0), Vector3D());
+		_particles.push_back(anchor);
+		_particles.push_back(particle);
+
+		particle->addConstrain(std::make_shared<CableConstrain>(100, anchor));
+	}
+	if (key == '2')
+	{
+		Anchor* anchor = new Anchor(_render_engine.getCameraPosition(), Vector3D(0, 0, 0));
+		Particle* particle = new FireballParticle(_render_engine.getCameraPosition() - Vector3D(0, 30, 0), Vector3D());
+		_particles.push_back(anchor);
+		_particles.push_back(particle);
+
+		particle->addConstrain(std::make_shared<BarConstrain>(100, anchor));
+	}
+	for(auto& input : _blob_key)
+	{
+		if (key == input.first)
+		{
+			_blob_key.at(input.first) = true;
+		}
+	}
+	if (key == ofKey::OF_KEY_TAB)
+	{
+		Particle::_draw_trail = !Particle::_draw_trail;
+	}
+
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key) {
-
+	for (auto& input : _blob_key)
+	{
+		if (key == input.first)
+		{
+			_blob_key.at(input.first) = false;
+		}
+	}
 }
 
 //--------------------------------------------------------------
@@ -227,7 +272,7 @@ void ofApp::spawnParticle(BulletType type) {
 		break;
 	case BLOB:
 		newParticle = new Blob(&_particles, &_forces_registry, current_position, look_at_dir);
-		_the_blob = dynamic_cast<Blob*>(newParticle);
+		_blobs.push_back(dynamic_cast<Blob*>(newParticle));
 		_particles.push_back(newParticle);
 		break;
 	default:
@@ -255,4 +300,42 @@ void ofApp::spawnParticle(BulletType type) {
 		break;
 	}
 
+}
+
+void ofApp::moveBlobs()
+{
+	if (_blobs.size() > 0)
+	{
+		Vector3D blob_forces;
+		const float BLOB_MASS = _blobs[0]->getMass();
+		Vector3D look_at_dir = _render_engine.getCamera().getLookAtDir();
+		look_at_dir.y = 0;
+		look_at_dir.normalize();
+		const Vector3D side_dir = _render_engine.getCamera().getSideDir();
+		if (_blob_key.at(ofKey::OF_KEY_RETURN))
+		{
+			blob_forces.y += (-2) * G_ACC.y;
+		}
+		if (_blob_key.at(ofKey::OF_KEY_UP))
+		{
+			blob_forces -= look_at_dir * G_ACC.y;
+		}
+		if (_blob_key.at(ofKey::OF_KEY_DOWN))
+		{
+			blob_forces += look_at_dir * G_ACC.y;
+		}
+		if (_blob_key.at(ofKey::OF_KEY_RIGHT))
+		{
+			blob_forces -= side_dir * G_ACC.y;
+		}
+		if (_blob_key.at(ofKey::OF_KEY_LEFT))
+		{
+			blob_forces += side_dir * G_ACC.y;
+		}
+
+		for (Blob* blob : _blobs)
+		{
+			blob->addForce(blob_forces * BLOB_MASS * 5);
+		}
+	}
 }

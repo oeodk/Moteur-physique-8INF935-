@@ -12,8 +12,6 @@ constexpr int NOON_COLOR = 190;
 constexpr int DELTA_NIGHT_COLOR = 50;
 
 RenderEngine::RenderEngine() {
-	point.addVertex(Vector3D());
-	point.addIndex(0);
 
 	ofAddListener(ofEvents().mouseMoved, this, &RenderEngine::mouseMoved);
 	ofAddListener(ofEvents().mouseDragged, this, &RenderEngine::mouseDragged);
@@ -164,7 +162,7 @@ void RenderEngine::update(float delta_t) {
 		_camera.move(movement);
 	}
 
-	constexpr float TIME_FACTOR = 0;//2;
+	constexpr float TIME_FACTOR = 2;
 	_light_source.rotate(delta_t * TIME_FACTOR, 1, 0, 0);// day night cycle of 1 min
 	_night_light_source.rotate(delta_t * TIME_FACTOR, 1, 0, 0);// day night cycle of 1 min
 
@@ -201,13 +199,7 @@ void RenderEngine::render() {
 		}
 	}
 
-	ofSetColor(ofColor::red);
-	point.setMode(OF_PRIMITIVE_POINTS);
-	point.draw();
-
-	//if(_light_source.getOrientationEuler().x > -90)
 		_light_source.enable();
-	//if(_night_light_source.getOrientationEuler().x > -90)
 		_night_light_source.enable();
 	
 	for (Drawable* render_target : _render_targets) {
@@ -312,8 +304,12 @@ bool RenderEngine::willRender(Vector3D target_position) const {
 	Vector3D look_at_dir(_camera.getLookAtDir());
 	Vector3D camera_target_vector(target_position - _camera.getPosition());
 	const float DISTANCE_SQUARED = camera_target_vector.squareNorm();
+	if (DISTANCE_SQUARED == 0)
+	{
+		return false;
+	}
 	camera_target_vector.normalize();
-	if (Vector3D::dotProduct(look_at_dir, camera_target_vector) > 0.25 || DISTANCE_SQUARED < RENDER_DISTANCE * RENDER_DISTANCE / 25) {
+	if (Vector3D::dotProduct(look_at_dir, camera_target_vector) > 0.25 || DISTANCE_SQUARED < RENDER_DISTANCE * RENDER_DISTANCE / 9) {
 		return true;
 	}
 	return false;

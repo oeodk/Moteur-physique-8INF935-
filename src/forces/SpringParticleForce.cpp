@@ -1,12 +1,11 @@
 #include "SpringParticleForce.h"
 
 void SpringParticleForce::updateForce(Particle* particle, float dt) const {
-	constexpr float STRETCH_LIMIT = 200;
-	Vector3D force(*_hookingPoint - particle->getParticlePosition());
-	if (force.squareNorm() > STRETCH_LIMIT * STRETCH_LIMIT)
+	const Vector3D force(particle->getParticlePosition()  - *_hooking_point);
+	if(force.squareNorm()!= 0)
 	{
-		force /= force.getNorm();
-		force *= STRETCH_LIMIT;
+		Vector3D dir(force);
+		dir.normalize();
+		particle->addForce(((_resting_length - force.getNorm()) * _elasticity) * dir);
 	}
-	particle->addForce(force * _elasticity);
 }
