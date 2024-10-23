@@ -22,10 +22,10 @@ protected:
 	float _dt;
 	
 	// HUD Oscillation
-	ofTrueTypeFont _particle_count_font;
-	const float GUI_OSCILLATION_FREQUENCY = 6.f;
-	const float GUI_OSCILLATION_DAMPING_RATIO = .65f;
-	const float GUI_OSCILLATION_AMPLITUDE = 80.f;
+	int _blob_particle_count;		// -1 if there is no blob
+	const float GUI_OSCILLATION_FREQUENCY = 10.f;
+	const float GUI_OSCILLATION_DAMPING_RATIO = .9f;
+	const float GUI_OSCILLATION_AMPLITUDE = 40.f;
 	float _gui_oscillation_t;
 	float _gui_particle_count_height;
 

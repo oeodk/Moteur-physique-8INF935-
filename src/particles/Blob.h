@@ -15,7 +15,6 @@ private:
     std::vector<Particle*>* _world_particles;
     ParticleForceRegistry* _world_force_registry;
 
-    GravityParticleForce _gravity_nullification;
     struct GeneratorSource
     {
         ParticleForceGenerator* generator;
@@ -36,6 +35,7 @@ public :
     void updateBlob();
     void drawNoLight() override;
     void split();
-
+    
+    int getParticleCount();
 };
 

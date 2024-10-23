@@ -5,7 +5,7 @@ void GUIManager::setup(const std::vector<BulletType>& particle_types) {
 	_particle_types = particle_types;
 	_nb_of_slots = _particle_types.size();
 	_gui_oscillation_t = 0.f;
-	//_particle_count_font.load("", 30);
+	_blob_particle_count = -1;
 	setupSlots();
 }
 
@@ -120,9 +120,14 @@ void GUIManager::updateBlobParticleCountTextHeight(float const dt) {
 }
 
 void GUIManager::drawBlobParticleCount() {
-	ofDrawBitmapString("Blob : ", 20, 70 + _gui_particle_count_height);
+	if (_blob_particle_count < 0) return;
+	string text = "Nb. particules du blob : " + std::to_string(_blob_particle_count);
+	ofDrawBitmapString(text, 20, 70 + _gui_particle_count_height);
 }
 
+// Called in ofApp.cpp
 void GUIManager::setBlobParticleCount(int count) {
+	if (count == _blob_particle_count) return;
+	_blob_particle_count = count;
 	_gui_oscillation_t = 0.f;
 }

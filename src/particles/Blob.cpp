@@ -1,12 +1,11 @@
 #include "Blob.h"
 #include <of3dGraphics.h>
 #include <ofGraphics.h>
-#include "constrain/CableConstrain.h"
-#include "forces/SpringParticleForce.h"
+#include "../constrain/CableConstrain.h"
+#include "../forces/SpringParticleForce.h"
 
 Blob::Blob(std::vector<Particle*>* world_particles, ParticleForceRegistry* force_registry, const Vector3D& init_pos, const Vector3D& init_vel)
 	:Particle(init_pos, init_vel, 1000000, 10, Vector3D(255, 255, 255), 255),
-	_gravity_nullification(Vector3D(G_ACC * -1)),
 	_world_particles(world_particles), _world_force_registry(force_registry)
 {
 	_joins.setMode(OF_PRIMITIVE_LINES);
@@ -21,63 +20,62 @@ void Blob::updateBlob()
 	for (Particle* particle : *_world_particles)
 	{
 		Vector3D dist(_position - particle->getParticlePosition());
-		if(particle != this)
+		if (particle == this) continue;
+		
+		bool added = false;
+
+		ParticlePair p(this, particle);
+		// Add particle to the blob if the particle is close enough
+		// The particle is linked to the blob with a spring and the blob is not really linked to the particle
+		if (std::find_if(_particles_links.begin(), _particles_links.end(), [&p](const ParticlePair& x) { return p.p1 == x.p1 && p.p2 == x.p2; }) == _particles_links.end())
 		{
-			bool added = false;
-
-			ParticlePair p(this, particle);
-			// Add particle to the blob if the particle is close enough
-			// The particle is linked to the blob with a spring and the blob is not really linked to the particle
-			if (std::find_if(_particles_links.begin(), _particles_links.end(), [&p](const ParticlePair& x) { return p.p1 == x.p1 && p.p2 == x.p2; }) == _particles_links.end())
+			if (dist.squareNorm() < _GRAB_RANGE * _GRAB_RANGE)
 			{
-				if (dist.squareNorm() < _GRAB_RANGE * _GRAB_RANGE)
-				{
-					added = true;
-					_blob_particles.push_back(particle);
+				added = true;
+				_blob_particles.push_back(particle);
 
-					_forces[particle].emplace_back();
-					_forces[particle].back().generator = new SpringParticleForce(SPRING_K, SPRING_LENGTH, &_position);
-					_forces[particle].back().source = this;
-					_particles_links.emplace_back(this, particle);
-					particle->addConstrain(std::make_shared<CableConstrain>(_CABLE_RANGE, this));
-				}
+				_forces[particle].emplace_back();
+				_forces[particle].back().generator = new SpringParticleForce(SPRING_K, SPRING_LENGTH, &_position);
+				_forces[particle].back().source = this;
+				_particles_links.emplace_back(this, particle);
+				particle->addConstrain(std::make_shared<CableConstrain>(_CABLE_RANGE, this));
 			}
-			const size_t particles_count = _blob_particles.size();
-			// Add particle to the blob if the particle is close of another blob's particle 
-			// Both particle are linked with a spring
-			for (size_t i = 0; i < particles_count; i++)
+		}
+		const size_t particles_count = _blob_particles.size();
+		// Add particle to the blob if the particle is close of another blob's particle 
+		// Both particle are linked with a spring
+		for (size_t i = 0; i < particles_count; i++)
+		{
+			ParticlePair p(_blob_particles[i], particle);
+			if(std::find_if(_particles_links.begin(), _particles_links.end(), [&p](const ParticlePair& x) { return p.p1 == x.p1 && p.p2 == x.p2; }) == _particles_links.end())
 			{
-				ParticlePair p(_blob_particles[i], particle);
-				if(std::find_if(_particles_links.begin(), _particles_links.end(), [&p](const ParticlePair& x) { return p.p1 == x.p1 && p.p2 == x.p2; }) == _particles_links.end())
+				Vector3D d(_blob_particles[i]->getParticlePosition() - particle->getParticlePosition());
+				if (d.squareNorm() < _GRAB_RANGE * _GRAB_RANGE)
 				{
-					Vector3D d(_blob_particles[i]->getParticlePosition() - particle->getParticlePosition());
-					if (d.squareNorm() < _GRAB_RANGE * _GRAB_RANGE)
+					if (_forces[particle].size() < 4)
 					{
-						if (_forces[particle].size() < 4)
+						if (!added)
 						{
-							if (!added)
-							{
-								_blob_particles.push_back(particle);
-								added = true;
-							}
-							_forces[particle].emplace_back();
-							_forces[particle].back().generator = new SpringParticleForce(SPRING_K, SPRING_LENGTH, _blob_particles[i]->getPosition());
-							_forces[particle].back().source = _blob_particles[i];
-							_blob_particles[i]->addConstrain(std::make_shared<CableConstrain>(_CABLE_RANGE, particle));
-
-							_forces[_blob_particles[i]].emplace_back();
-							_forces[_blob_particles[i]].back().generator = new SpringParticleForce(SPRING_K, SPRING_LENGTH, particle->getPosition());
-							_forces[_blob_particles[i]].back().source = particle;
-
-							particle->addConstrain(std::make_shared<CableConstrain>(_CABLE_RANGE, _blob_particles[i]));
-							_particles_links.emplace_back(_blob_particles[i], particle);
+							_blob_particles.push_back(particle);
+							added = true;
 						}
+						_forces[particle].emplace_back();
+						_forces[particle].back().generator = new SpringParticleForce(SPRING_K, SPRING_LENGTH, _blob_particles[i]->getPosition());
+						_forces[particle].back().source = _blob_particles[i];
+						_blob_particles[i]->addConstrain(std::make_shared<CableConstrain>(_CABLE_RANGE, particle));
+
+						_forces[_blob_particles[i]].emplace_back();
+						_forces[_blob_particles[i]].back().generator = new SpringParticleForce(SPRING_K, SPRING_LENGTH, particle->getPosition());
+						_forces[_blob_particles[i]].back().source = particle;
+
+						particle->addConstrain(std::make_shared<CableConstrain>(_CABLE_RANGE, _blob_particles[i]));
+						_particles_links.emplace_back(_blob_particles[i], particle);
 					}
 				}
-
 			}
 
 		}
+
 	}
 
 	for (size_t i = 0; i < _blob_particles.size(); i++)
@@ -135,4 +133,11 @@ void Blob::split()
 			_particles_links.erase(_particles_links.begin() + i);
 		}
 	}
+}
+
+int Blob::getParticleCount() {
+	auto v = _blob_particles;
+	std::sort(v.begin(), v.end());
+	
+	return std::unique(v.begin(), v.end()) - v.begin();
 }

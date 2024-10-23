@@ -100,6 +100,9 @@ void ofApp::draw() {
 
 	_render_engine.render();
 	_gui_manager.draw();
+	_gui_manager.setBlobParticleCount(
+		_blobs.size() > 0 ? _blobs[0]->getParticleCount() : -1
+	);
 }
 
 void ofApp::exit() {

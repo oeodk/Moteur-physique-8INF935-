@@ -2,8 +2,8 @@
 #include "../Vector3D.h"
 #include "../Drawable.h"
 #include "ofVboMesh.h"
-#include "GlobalConstants.h"
-#include "constrain/Constrain.h"
+#include "../GlobalConstants.h"
+#include "../constrain/Constrain.h"
 
 class Particle : public Drawable {
 protected:
