@@ -1,5 +1,5 @@
 #pragma once
-#include "forces/ParticleForceGenerator.h"
+#include "ParticleForceGenerator.h"
 class FrictionForceGenerator :
     public ParticleForceGenerator
 {

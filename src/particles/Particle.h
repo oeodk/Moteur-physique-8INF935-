@@ -1,8 +1,8 @@
 #pragma once
-#include "Vector3D.h"
-#include "Drawable.h"
+#include "../Vector3D.h"
+#include "../Drawable.h"
 #include "ofVboMesh.h"
-#include "GlobalConstants.h"
+#include "../GlobalConstants.h"
 
 class Particle : public Drawable {
 protected:

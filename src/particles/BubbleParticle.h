@@ -1,6 +1,6 @@
 #pragma once
 #include "Particle.h"
-#include "forces/GravityParticleForce.h"
+#include "../forces/GravityParticleForce.h"
 
 
 class BubbleParticle : public Particle {

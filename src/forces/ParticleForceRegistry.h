@@ -1,6 +1,6 @@
 #pragma once
 
-#include "particles/Particle.h"
+#include "../particles/Particle.h"
 #include "ParticleForceGenerator.h"
 
 

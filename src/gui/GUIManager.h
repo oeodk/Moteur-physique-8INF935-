@@ -20,6 +20,14 @@ protected:
 
 	float _fps;
 	float _dt;
+	
+	// HUD Oscillation
+	ofTrueTypeFont _particle_count_font;
+	const float GUI_OSCILLATION_FREQUENCY = 6.f;
+	const float GUI_OSCILLATION_DAMPING_RATIO = .65f;
+	const float GUI_OSCILLATION_AMPLITUDE = 80.f;
+	float _gui_oscillation_t;
+	float _gui_particle_count_height;
 
 public:
 	void setup(const std::vector<BulletType>& particle_types);
@@ -33,6 +41,10 @@ public:
 	void drawSlots();
 
 	void drawFps();
+	void drawBlobParticleCount();
+	void updateBlobParticleCountTextHeight(float const dt);
+	void setBlobParticleCount(int count);
+	void drawInstructions();
 
 	int getSelectedSlot() { return _current_slot; }
 	void setSelectedSlot(const int slot) { _current_slot = slot; }

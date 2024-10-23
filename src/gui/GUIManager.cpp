@@ -1,8 +1,11 @@
 #include "GUIManager.h"
+#include <cmath>
 
 void GUIManager::setup(const std::vector<BulletType>& particle_types) {
 	_particle_types = particle_types;
 	_nb_of_slots = _particle_types.size();
+	_gui_oscillation_t = 0.f;
+	//_particle_count_font.load("", 30);
 	setupSlots();
 }
 
@@ -11,6 +14,7 @@ void GUIManager::update(float const dt, unsigned char const selected_particle) {
 	_fps = ofGetFrameRate();
 
 	setSelectedSlot(selected_particle);
+	updateBlobParticleCountTextHeight(dt);
 }
 
 void GUIManager::draw() {
@@ -19,6 +23,9 @@ void GUIManager::draw() {
 
 	drawFps();
 	drawSlots();
+
+	drawBlobParticleCount();
+	drawInstructions();
 
 	ofDisableAlphaBlending();
 }
@@ -30,6 +37,7 @@ std::string GUIManager::getDisplayName(BulletType bullet_type) {
 	case CANNONBALL: return "Boulet de canon";
 	case FIREBALL: return "Boule de feu";
 	case BUBBLE: return "Bulle de savon";
+	case BLOB: return "Noyau de blob";
 	default: return "";
 	}
 }
@@ -41,6 +49,7 @@ std::string GUIManager::getIconPath(BulletType bullet_type) {
 	case CANNONBALL: return "particle_cannonball.png";
 	case FIREBALL: return "particle_fireball.png";
 	case BUBBLE: return "particle_bubble.png";
+	case BLOB: return "particle_blob.png";
 	default: return "";
 	}
 }
@@ -85,4 +94,35 @@ void GUIManager::drawFps() {
 		<< std::setprecision(3) << "(" << _dt << "s)";
 
 	ofDrawBitmapString(fspStringStream.str(), 20, 20);
+}
+
+void GUIManager::drawInstructions() {
+	const int screenHeight = ofGetHeight();
+	string messages[] = {
+		"Clic gauche : Tirer une particule",
+		"Molette : Choisir une particule",
+		"Shift gauche : Deplacement rapide",
+		"Shift droit : Montrer / cacher les trainees des particules",
+		"Entree : Effacer toutes les particules",
+		"0 : Creer un noyau de blob"
+	};
+
+	int length = sizeof(messages) / sizeof(messages[0]);
+	for (int i = 0; i < length; i++)
+		ofDrawBitmapString(messages[i], 20, screenHeight - (5 + 12 * (length - i)));
+}
+
+void GUIManager::updateBlobParticleCountTextHeight(float const dt) {
+	_gui_oscillation_t += dt;
+
+	float amplitude = GUI_OSCILLATION_AMPLITUDE * std::exp(-GUI_OSCILLATION_DAMPING_RATIO * _gui_oscillation_t);
+	_gui_particle_count_height = amplitude * std::sin(GUI_OSCILLATION_FREQUENCY * _gui_oscillation_t);
+}
+
+void GUIManager::drawBlobParticleCount() {
+	ofDrawBitmapString("Blob : ", 20, 70 + _gui_particle_count_height);
+}
+
+void GUIManager::setBlobParticleCount(int count) {
+	_gui_oscillation_t = 0.f;
 }

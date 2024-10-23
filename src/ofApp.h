@@ -17,7 +17,7 @@ private:
 		BulletType::BULLET,
 		BulletType::CANNONBALL,
 		BulletType::FIREBALL,
-		BulletType::BUBBLE
+		BulletType::BLOB
 	};
 
 	ParticleForceRegistry _forces_registry;

@@ -301,6 +301,8 @@ void RenderEngine::updateSelectedParticle(BulletType bullet) {
 	case BUBBLE:
 		_cannon_color.set(30, 255, 255);
 		break;
+	case BLOB:
+		_cannon_color.set(240, 240, 240);
 	default:
 		break;
 	}

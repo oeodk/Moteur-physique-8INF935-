@@ -2,7 +2,7 @@
 #include <of3dGraphics.h>
 #include <ofGraphics.h>
 #include <stdexcept>
-#include "Terrain.h"
+#include "../Terrain.h"
 
 Particle::Particle() :_position(), _previous_position(), _velocity(), _acceleration(0, 0, 0), _inverse_mass(0), _mass(FLT_MAX), _radius(), _color(), _alpha(), _time_counter(0) {
 	_world_position = &_position;

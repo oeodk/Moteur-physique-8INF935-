@@ -1,7 +1,7 @@
 #pragma once
 #include "Particle.h"
-#include "forces/ParticleForceRegistry.h"
-#include "forces/GravityParticleForce.h"
+#include "../forces/ParticleForceRegistry.h"
+#include "../forces/GravityParticleForce.h"
 #include <of3dPrimitives.h>
 
 class Blob :
