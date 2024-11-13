@@ -7,10 +7,10 @@ class CableConstrain :
 {
 private :
     float _length;
-    Particle* _anchor_point;
+    RigidBody* _anchor_point;
 public:
-    CableConstrain(float length, Particle* anchor_point):_length(length), _anchor_point(anchor_point){}
-    void updateConstrain(Particle* particle, float dt) override;
-    const Particle* getAnchorPoint()const { return _anchor_point; }
+    CableConstrain(float length, RigidBody* anchor_point):_length(length), _anchor_point(anchor_point){}
+    void updateConstrain(RigidBody* particle, float dt) override;
+    const RigidBody* getAnchorPoint()const { return _anchor_point; }
 };
 

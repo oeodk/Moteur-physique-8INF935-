@@ -1,8 +1,8 @@
 #include "CableConstrain.h"
-#include "../particles/Particle.h"
+#include "RigidBody.h"
 #include <ofGraphics.h>
 
-void CableConstrain::updateConstrain(Particle* particle, float dt)
+void CableConstrain::updateConstrain(RigidBody* particle, float dt)
 {
 	Vector3D dist(_anchor_point->getParticlePosition() - particle->getParticlePosition());
 	// If particles are too far the spring became a cable

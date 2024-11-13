@@ -1,7 +1,7 @@
 #include "BarConstrain.h"
-#include "../particles/Particle.h"
+#include "RigidBody.h"
 
-void BarConstrain::updateConstrain(Particle* particle, float dt)
+void BarConstrain::updateConstrain(RigidBody* particle, float dt)
 {
 	Vector3D dist(_anchor_point->getParticlePosition() - particle->getParticlePosition());
 	const float DELTA_DIST = dist.getNorm() - _length;
