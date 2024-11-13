@@ -59,7 +59,7 @@ void ofApp::update() {
 
 	_forces_registry.updateForces(_dt);
 	_physics_engine.updateParticles(_dt, _particles, &_terrain);
-	_terrain.update(_render_engine.getCameraPosition());
+	_terrain.update(_render_engine.getCameraPosition(), _dt);
 	_forces_registry.clear();
 
 	//Delete a particle if it is too high or too low

@@ -39,7 +39,7 @@ public:
 	~Terrain();
 	void setup();
 
-	void update(const Vector3D& player_position);
+	void update(const Vector3D& player_position, float dt);
 	const std::vector<Chunk*>& getRenderedChunk() const { return _rendered_chunks; }
 	void sedRenderDistance(float value);
 	void keyPressed(ofKeyEventArgs& key);

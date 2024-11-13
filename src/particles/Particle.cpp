@@ -21,6 +21,17 @@ Particle::Particle(const Vector3D& init_pos, const Vector3D& init_vel, float mas
 	_friction_k1 = 0.1;
 	_friction_k2 = 0.0001;
 	_mu_s = 0.15;
+
+	if (!mesh_init_)
+	{
+		mesh_init_ = true;
+		_mesh.load("test.ply");
+		_mesh.clearTexCoords();
+		_mesh.clearColors();
+	}
+	//_shoot_sound.load("chicken.wav");
+	//_shoot_sound.setSpeed(pow(1 / (_radius), 0.25));
+	//_shoot_sound.play();
 }
 
 void Particle::addForce(const Vector3D& force) {
@@ -123,8 +134,17 @@ void Particle::integrateVerlet(float dt) {
 }
 
 void Particle::draw() {
+	_transformation.setPosition(_position);
+	_transformation.setScale(_radius);
+	_transformation.lookAt(_position + _velocity);
+	_transformation.transformGL();
 	ofSetColor(_color.x, _color.y, _color.z, _alpha);
-	ofDrawSphere(_position, _radius);
+	_mesh.draw();
+	_transformation.restoreTransformGL();
+
+	//ofSetColor(255,255,255, 120);
+	//ofDrawSphere(_position, _radius);
+	//ofDrawSphere(_position, _radius);
 }
 
 void Particle::drawNoLight() {

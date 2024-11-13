@@ -2,8 +2,10 @@
 #include "../Vector3D.h"
 #include "../Drawable.h"
 #include "ofVboMesh.h"
+#include "ofNode.h"
 #include "../GlobalConstants.h"
 #include "../constrain/Constrain.h"
+#include <ofSoundPlayer.h>
 
 class Particle : public Drawable {
 protected:
@@ -31,6 +33,12 @@ protected:
 	float _time_counter;
 
 	std::vector<std::shared_ptr<Constrain>> _constrains;
+
+	inline static bool mesh_init_ = false;
+	inline static ofVboMesh _mesh;
+	ofNode _transformation;
+	
+	ofSoundPlayer _shoot_sound;
 
 public:
 	enum IntegrationMethods { EULER, VERLET };

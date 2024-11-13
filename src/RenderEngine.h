@@ -30,7 +30,7 @@ private:
 	std::vector<Drawable*> _render_targets;
 	std::vector<Drawable*> _render_targets_no_light;
 
-	static constexpr float _CAMERA_SPEED = 100;//100
+	static constexpr float _CAMERA_SPEED = 250;//100
 	static constexpr float _CAMERA_SPRINT_VALUE = 5;//5
 	static constexpr float _MOUSE_SENSIBILITY = 5.f;
 
