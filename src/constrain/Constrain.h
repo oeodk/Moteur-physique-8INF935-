@@ -3,6 +3,6 @@
 class Constrain
 {
 public:
-	virtual void updateConstrain(class RigidBody* particle, float dt) = 0;
+	virtual void updateConstrain(class Particle* particle, float dt) = 0;
 };
 
