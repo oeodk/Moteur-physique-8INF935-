@@ -261,17 +261,11 @@ void ofApp::spawnParticle(BulletType type) {
 	case BULLET:
 		//newParticle = new BulletParticle(current_position, look_at_dir);
 	{
-		std::array<std::array<float, 3>, 3> tmp = {
-			std::array<float, 3>{side_dir.x   , side_dir.y   , side_dir.z},
-			std::array<float, 3>{up_dir.x     , up_dir.y     , up_dir.z},
-			std::array<float, 3>{look_at_dir.x, look_at_dir.y, look_at_dir.z}
-		};
-		glm::mat3x3 base_orientation_mat(side_dir, up_dir, look_at_dir);
-		glm::quat base_orientation = glm::quat_cast(base_orientation_mat);
+		glm::quat base_orientation(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
 
 		newParticle = new Chicken(current_position, look_at_dir, 
 			Quaternion(base_orientation.w, base_orientation.x, base_orientation.y, base_orientation.z), 
-			Vector3D(0, 0, 0), Vector3D(0, 0, 0), Vector3D(0, 0, 0));// look_at_dir * 0.01, Vector3D(0, 10, 0));
+			Vector3D(0, 0, 0), look_at_dir * 10, up_dir * 10);
 		_particles.push_back(newParticle);
 	}
 		break;
