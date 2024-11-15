@@ -271,7 +271,7 @@ void ofApp::spawnParticle(BulletType type) {
 
 		newParticle = new Chicken(current_position, look_at_dir, 
 			Quaternion(base_orientation.w, base_orientation.x, base_orientation.y, base_orientation.z), 
-			Vector3D(0, 0, 0), Vector3D(0, 0, 0), Vector3D(0, 0, 0));// look_at_dir * 0.01, Vector3D(0, 10, 0));
+			Vector3D(0, 0, 0), look_at_dir * 0.01, Vector3D(0, 10, 0));
 		_particles.push_back(newParticle);
 	}
 		break;
