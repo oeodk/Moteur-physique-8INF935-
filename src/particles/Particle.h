@@ -4,6 +4,7 @@
 #include "ofVboMesh.h"
 #include "../GlobalConstants.h"
 #include "../constrain/Constrain.h"
+#include "ofNode.h"
 
 class Particle : public Drawable
 {
@@ -54,7 +55,7 @@ public:
 	float getFrictionK2() const { return _friction_k2; }
 
 	virtual void computeForces();
-	void integrate(float dt, IntegrationMethods method);
+	virtual void integrate(float dt, IntegrationMethods method = EULER);
 
 	virtual Vector3D eulerUpdateVelocity(float dt);
 	Vector3D eulerUpdatePosition(float dt);

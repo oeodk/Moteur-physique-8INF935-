@@ -16,6 +16,8 @@ public:
 	void setCoef(int i, int j, float value) { _mat[i][j] = value; }
 	float getDeterminant() const;
 
+	void setToIdentity();
+
 	Matrix3 getCofactors() const;
 
 	Matrix3 getInverse() const;

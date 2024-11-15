@@ -53,6 +53,11 @@ float Matrix3::getDeterminant() const {
 	return det;
 }
 
+void Matrix3::setToIdentity()
+{
+	*this = Matrix3();
+}
+
 bool operator==(const Matrix3& m1, const Matrix3& m2) {
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {

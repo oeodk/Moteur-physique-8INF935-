@@ -4,6 +4,7 @@
 #include "particles/CannonballParticle.h"
 #include "particles/FireballParticle.h"
 #include "particles/BubbleParticle.h"
+#include "particles/rigid_bodies/Chicken.h"
 #include "particles/Anchor.h"
 #include "forces/GravityParticleForce.h"
 #include "forces/FrictionForceGenerator.h"
@@ -250,7 +251,7 @@ void ofApp::spawnParticle(BulletType type) {
 	const Vector3D& side_dir = camera.getSideDir();
 	const Vector3D up_dir = Vector3D::crossProduct(side_dir, look_at_dir);
 	Particle* newParticle;
-
+	
 	Vector3D cannon_offset;
 
 	static int dep = 0;
@@ -258,8 +259,21 @@ void ofApp::spawnParticle(BulletType type) {
 	current_position += (side_dir * 6 + look_at_dir * 24 + up_dir * (-4));
 	switch (type) {
 	case BULLET:
-		newParticle = new BulletParticle(current_position, look_at_dir);
+		//newParticle = new BulletParticle(current_position, look_at_dir);
+	{
+		std::array<std::array<float, 3>, 3> tmp = {
+			std::array<float, 3>{side_dir.x   , side_dir.y   , side_dir.z},
+			std::array<float, 3>{up_dir.x     , up_dir.y     , up_dir.z},
+			std::array<float, 3>{look_at_dir.x, look_at_dir.y, look_at_dir.z}
+		};
+		glm::mat3x3 base_orientation_mat(side_dir, up_dir, look_at_dir);
+		glm::quat base_orientation = glm::quat_cast(base_orientation_mat);
+
+		newParticle = new Chicken(current_position, look_at_dir, 
+			Quaternion(base_orientation.w, base_orientation.x, base_orientation.y, base_orientation.z), 
+			Vector3D(0, 0, 0), Vector3D(0, 0, 0), Vector3D(0, 0, 0));// look_at_dir * 0.01, Vector3D(0, 10, 0));
 		_particles.push_back(newParticle);
+	}
 		break;
 	case CANNONBALL:
 		newParticle = new CannonballParticle(current_position, look_at_dir);
@@ -342,3 +356,4 @@ void ofApp::moveBlobs()
 		}
 	}
 }
+
