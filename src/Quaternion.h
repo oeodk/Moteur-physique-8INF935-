@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector3D.h"
+#include <glm/mat4x4.hpp>
 
 class Quaternion
 {
@@ -40,6 +41,6 @@ bool operator==(const Quaternion& q1, const Quaternion& q2);
 bool operator!=(const Quaternion& q1, const Quaternion& q2);
 
 namespace constants {
-	inline static const Quaternion IDENTITY_POSITIVE = Quaternion(1, 0, 0, 0);
-	inline static const Quaternion IDENTITY_NEGATIVE = Quaternion(-1, 0, 0, 0);
+	static const Quaternion IDENTITY_POSITIVE = Quaternion(1, 0, 0, 0);
+	static const Quaternion IDENTITY_NEGATIVE = Quaternion(-1, 0, 0, 0);
 }

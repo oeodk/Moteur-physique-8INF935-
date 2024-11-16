@@ -1,5 +1,6 @@
 #define _USE_MATH_DEFINES
 #include "ofApp.h"
+#include "test/TestQuaternion.h"
 #include "particles/BulletParticle.h"
 #include "particles/CannonballParticle.h"
 #include "particles/FireballParticle.h"
@@ -28,6 +29,7 @@ void ofApp::setup() {
 	_render_engine.setCameraPosition(Vector3D(0, 100 + _terrain.getHeight(0, 0), 0));
 
 	Vector3D::testVector3D();
+	TestQuaternion::launchTests();
 	Particle::testParticle();
 
 	_blob_key.insert({ ofKey::OF_KEY_RETURN, false });
