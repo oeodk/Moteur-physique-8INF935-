@@ -30,6 +30,7 @@ void ofApp::setup() {
 
 	Vector3D::testVector3D();
 	Particle::testParticle();
+	Matrix3::testMatrix3();
 
 	_blob_key.insert({ ofKey::OF_KEY_RETURN, false });
 	_blob_key.insert({ ofKey::OF_KEY_UP    , false });
@@ -263,9 +264,9 @@ void ofApp::spawnParticle(BulletType type) {
 	{
 		glm::quat base_orientation(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
 
-		newParticle = new Chicken(current_position, look_at_dir, 
-			Quaternion(base_orientation.w, base_orientation.x, base_orientation.y, base_orientation.z), 
-			Vector3D(0, 0, 0), look_at_dir * 10, up_dir * 10);
+		newParticle = new Chicken(current_position, look_at_dir,
+			Quaternion(base_orientation.w, base_orientation.x, base_orientation.y, base_orientation.z),
+			Vector3D(0, 0, 0), look_at_dir * 10000, Vector3D(0, 10, 0));// look_at_dir * 10, up_dir * 10);
 		_particles.push_back(newParticle);
 	}
 		break;

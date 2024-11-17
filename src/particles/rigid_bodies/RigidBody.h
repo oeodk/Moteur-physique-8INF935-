@@ -17,7 +17,8 @@ protected :
 	ofVboMesh _mass_center_mesh;
 	ofNode _transformation;
 
-	Matrix3 _inertia_moment;
+	Vector3D _torque;
+	Matrix3 _inertia_moment_inverted;
 
 	void initAngularAcceleration(const Vector3D& base_force_for_rotation, const Vector3D& application_point);
 
@@ -27,5 +28,6 @@ public :
 	void integrate(float dt, IntegrationMethods method = EULER) override;
 	void draw() override;
 	virtual void getInertiaMoment(Matrix3& mat) const {};
+	void addForceToPoint(const Vector3D& base_force_for_rotation, const Vector3D& application_point);
 };
 

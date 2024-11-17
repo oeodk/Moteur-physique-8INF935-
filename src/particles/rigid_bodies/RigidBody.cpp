@@ -1,13 +1,12 @@
 #include "RigidBody.h"
 #include "ofGraphics.h"
 #include "of3DGraphics.h"
-
+#include "glm/mat3x3.hpp"
 void RigidBody::initAngularAcceleration(const Vector3D& base_force_for_rotation, const Vector3D& application_point)
 {
-	Matrix3 inertia_moment;
-	getInertiaMoment(inertia_moment);
-	_angular_acceleration = inertia_moment.getInverse() * Vector3D::crossProduct(application_point - _position, base_force_for_rotation);
-
+	getInertiaMoment(_inertia_moment_inverted);
+	_inertia_moment_inverted = _inertia_moment_inverted.getInverse();
+	addForceToPoint(base_force_for_rotation, application_point);
 }
 
 RigidBody::RigidBody(const Vector3D& init_pos, const Vector3D& init_vel, float mass, float radius, const Quaternion& init_orientation, const Vector3D& init_angular_vel)
@@ -25,6 +24,13 @@ RigidBody::RigidBody(const Vector3D& init_pos, const Vector3D& init_vel, float m
 void RigidBody::integrate(float dt, IntegrationMethods method)
 {
 	Particle::integrate(dt, method);
+
+	glm::mat3x3 tmp_mat;
+	tmp_mat = glm::inverse(glm::identity<glm::mat3x3>() * (0.4 * _mass * _radius * _radius));
+	
+	_angular_acceleration = tmp_mat * _torque;
+	_torque.set(0, 0, 0);
+
 	_angular_velocity = _angular_velocity + _angular_acceleration * dt;
 	glm::quat tmp(_orientation);
 
@@ -54,4 +60,10 @@ void RigidBody::draw()
 	ofSetColor(255, 0, 0, 255);
 	_mass_center_mesh.draw();
 	ofEnableDepthTest();
+}
+
+void RigidBody::addForceToPoint(const Vector3D& base_force_for_rotation, const Vector3D& application_point)
+{
+	_torque += Vector3D::crossProduct(application_point, base_force_for_rotation);
+	std::cout << "x : " << _torque.x << "y : " << _torque.y << "z : " << _torque.z << std::endl;
 }
