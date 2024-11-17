@@ -1,12 +1,14 @@
 #pragma once
 #include "Vector3D.h"
+#include "Matrix4.h"
+#include "glm/gtc/quaternion.hpp"
 #include <glm/mat4x4.hpp>
 
 class Quaternion
 {
 public:
 	float w, x, y, z;
-	Quaternion(float w, float x, float y, float z);
+	Quaternion(float w = 0, float x = 0, float y = 0, float z = 0);
 	Quaternion(float w, Vector3D v);
 	Quaternion(const Quaternion&) = default;
 
@@ -16,9 +18,13 @@ public:
 	float squareNorm() const;
 	float getNorm() const;
 
+	void normalize();
+
 	Quaternion negate() const;
 	Quaternion conjugate() const;
 	Quaternion inverse() const;
+
+	Matrix4 toMatrix() const;
 
 	static Quaternion difference(const Quaternion& q1, const Quaternion& q2);
 	static float dotProduct(const Quaternion& q1, const Quaternion& q2);
@@ -29,6 +35,8 @@ public:
 	void operator/=(float value);
 	void operator+=(const Quaternion& q);
 	void operator-=(const Quaternion& q);
+
+	operator glm::quat() const { return glm::quat(w, x, y, z); }
 };
 
 Quaternion operator*(const Quaternion& q, float value);

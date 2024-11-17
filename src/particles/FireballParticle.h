@@ -9,6 +9,9 @@ public:
 
 	FireballParticle(const Vector3D& init_pos, const Vector3D& init_dir);
 
+	void draw() override {};
+	void drawNoLight() override;
+
 private:
 
 };

@@ -68,7 +68,7 @@ std::tuple<int, int> Terrain::getInGridCoordinate(float x, float z) const {
 	return { std::floor((x) / _chunk_size), std::floor((z) / _chunk_size) };
 }
 
-void Terrain::update(const Vector3D& player_position) {
+void Terrain::update(const Vector3D& player_position, float dt) {
 
 	for (const std::future<void>& generator : _chunk_generators) {
 		if (generator.valid()) {
@@ -93,7 +93,7 @@ void Terrain::update(const Vector3D& player_position) {
 		const float chunk_distance_squared_norm = chunk_distance.squareNorm();
 		// Only render chunk that are not too far from the player
 		if (chunk_distance_squared_norm < _render_distance * _render_distance) {
-			_chunks[i]->update(chunk_distance_squared_norm);
+			_chunks[i]->update(chunk_distance_squared_norm, dt);
 			_rendered_chunks.push_back(_chunks[i]);
 		}
 		else {

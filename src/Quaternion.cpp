@@ -27,6 +27,15 @@ float Quaternion::getNorm() const {
 	return std::sqrt(squareNorm());
 }
 
+void Quaternion::normalize()
+{
+	const float norm = getNorm();
+	w /= norm;
+	x /= norm;
+	y /= norm;
+	z /= norm;
+}
+
 Quaternion Quaternion::negate() const {
 	return Quaternion(-w, -x, -y, -z);
 }
@@ -37,6 +46,18 @@ Quaternion Quaternion::conjugate() const {
 
 Quaternion Quaternion::inverse() const {
 	return conjugate() / getNorm();
+}
+
+Matrix4 Quaternion::toMatrix() const
+{
+	const float a = w, b = x, c = y, d = z;
+	const std::array<std::array<float, 4>, 4> data = {
+		std::array<float, 4>{ a,-d, c, b},
+		std::array<float, 4>{ d, a,-b, c},
+		std::array<float, 4>{-c, b, a, d},
+		std::array<float, 4>{-b,-c,-d, a}
+	};
+	return Matrix4(data);
 }
 
 Quaternion Quaternion::difference(const Quaternion& q1, const Quaternion& q2){

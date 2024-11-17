@@ -4,7 +4,8 @@
 #include <stdexcept>
 #include "../Terrain.h"
 
-Particle::Particle() :_position(), _previous_position(), _velocity(), _acceleration(0, 0, 0), _inverse_mass(0), _mass(FLT_MAX), _radius(), _color(), _alpha(), _time_counter(0) {
+Particle::Particle() :_position(), _previous_position(), _velocity(), _acceleration(0, 0, 0), _inverse_mass(0), _mass(FLT_MAX), _radius(), _color(), _alpha(), _time_counter(0)
+{
 	_world_position = &_position;
 	_trail.setMode(OF_PRIMITIVE_POINTS);
 	_trail.addVertex(_position);
@@ -12,7 +13,8 @@ Particle::Particle() :_position(), _previous_position(), _velocity(), _accelerat
 }
 
 Particle::Particle(const Vector3D& init_pos, const Vector3D& init_vel, float mass, float radius, const Vector3D& color, float alpha)
-	: _position(init_pos), _velocity(init_vel), _acceleration(0), _accum_force(0), _radius(radius), _color(color), _alpha(alpha), _time_counter(0) {
+	: _position(init_pos), _velocity(init_vel), _acceleration(0), _accum_force(0), _radius(radius), _color(color), _alpha(alpha), _time_counter(0)
+{
 	_mass = mass;
 	_inverse_mass = mass == 0 ? FLT_MAX : 1 / mass;
 	_world_position = &_position;
@@ -23,21 +25,26 @@ Particle::Particle(const Vector3D& init_pos, const Vector3D& init_vel, float mas
 	_mu_s = 0.15;
 }
 
-void Particle::addForce(const Vector3D& force) {
+void Particle::addForce(const Vector3D& force)
+{
 	_accum_force += force;
 }
 
-void Particle::clearAccum() {
+void Particle::clearAccum()
+{
 	_accum_force = 0;
 }
 
 
-void Particle::computeForces() {
+void Particle::computeForces()
+{
 	_acceleration = _accum_force * _inverse_mass;
 }
 
-void Particle::integrate(float dt, IntegrationMethods method) {
-	switch (method) {
+void Particle::integrate(float dt, IntegrationMethods method)
+{
+	switch (method)
+	{
 	case Particle::VERLET:
 		integrateVerlet(dt); break;
 	default:
@@ -47,17 +54,19 @@ void Particle::integrate(float dt, IntegrationMethods method) {
 
 	// Generate the trail effect
 	_time_counter += dt;
-	if (_time_counter > _TRAIL_POINT_DELAY) {
+	if (_time_counter > _TRAIL_POINT_DELAY)
+	{
 		_trail.addVertex(_position);
 		_time_counter -= _TRAIL_POINT_DELAY;
 	}
 	_trail.getVertices().back() = _position;
 }
 
-Vector3D Particle::eulerUpdateVelocity(float dt) {
+Vector3D Particle::eulerUpdateVelocity(float dt)
+{
 	//Vector3D v =  std::pow(_drag, dt) * _velocity + dt * _acceleration + _velocity_increment_delay;
-	Vector3D v =  _velocity + dt * _acceleration + _velocity_increment_delay;
-	if(v.squareNorm() != 0)
+	Vector3D v = _velocity + dt * _acceleration + _velocity_increment_delay;
+	if (v.squareNorm() != 0)
 	{
 		if (_velocity.squareNorm() == 0)
 		{
@@ -71,9 +80,10 @@ Vector3D Particle::eulerUpdateVelocity(float dt) {
 	return v;
 }
 
-Vector3D Particle::eulerUpdatePosition(float dt) {
+Vector3D Particle::eulerUpdatePosition(float dt)
+{
 	Vector3D v_dir(_velocity);
-	if(v_dir.squareNorm() != 0)
+	if (v_dir.squareNorm() != 0)
 	{
 		v_dir.normalize();
 		if (Vector3D::dotProduct(G_ACC * dt, v_dir) > Vector3D::dotProduct(_velocity, v_dir))
@@ -104,38 +114,45 @@ void Particle::removeConstrains(std::shared_ptr<Constrain> constrain)
 	}
 }
 
-void Particle::integrateEuler(float dt) {
+void Particle::integrateEuler(float dt)
+{
 	_velocity.set(eulerUpdateVelocity(dt));
 	_position.set(eulerUpdatePosition(dt));
 }
 
-void Particle::integrateVerlet(float dt) {
+void Particle::integrateVerlet(float dt)
+{
 	// can be done because particle are deleted below 80
-	if (_previous_position != constants::EMPTY_VECTOR3D) {
+	if (_previous_position != constants::EMPTY_VECTOR3D)
+	{
 		Vector3D copy_previous_position = _previous_position;
 		_previous_position = _position;
 		_position = 2 * _position - copy_previous_position + dt * dt * _acceleration;
 	}
-	else {
+	else
+	{
 		_previous_position = _position;
 		integrateEuler(dt);
 	}
 }
 
-void Particle::draw() {
+void Particle::draw()
+{
 	ofSetColor(_color.x, _color.y, _color.z, _alpha);
 	ofDrawSphere(_position, _radius);
 }
 
-void Particle::drawNoLight() {
-	if(_draw_trail)
+void Particle::drawNoLight()
+{
+	if (_draw_trail)
 	{
 		ofSetColor(_color.x, _color.y, _color.z, 255);
 		_trail.draw();
 	}
 }
 
-void Particle::checkCollision(Particle* other_particle, float dt) {
+void Particle::checkCollision(Particle* other_particle, float dt)
+{
 	const Vector3D v_relative(_velocity - other_particle->_velocity);
 	const float distance = (other_particle->_position - _position).squareNorm();
 	Vector3D contact_normal = (other_particle->_position - _position);
@@ -145,7 +162,8 @@ void Particle::checkCollision(Particle* other_particle, float dt) {
 	}
 	contact_normal.normalize();
 	const float SUM_OF_RADIUS = _radius + other_particle->_radius;
-	if (distance <= SUM_OF_RADIUS * SUM_OF_RADIUS){
+	if (distance <= SUM_OF_RADIUS * SUM_OF_RADIUS)
+	{
 		const float chevauchement = SUM_OF_RADIUS - sqrt(distance);
 		solveCollision(other_particle, v_relative, chevauchement, contact_normal);
 	}
@@ -161,8 +179,8 @@ void Particle::solveCollision(Particle* other_particle, const Vector3D& v_relati
 	_position = _position - dep_1 * contact_normal;
 	other_particle->_position = other_particle->_position + dep_2 * contact_normal;
 
-	incrementVelocityWithDelay( contact_normal * -K * _inverse_mass);
-	other_particle->incrementVelocityWithDelay( contact_normal * K * other_particle->_inverse_mass);
+	incrementVelocityWithDelay(contact_normal * -K * _inverse_mass);
+	other_particle->incrementVelocityWithDelay(contact_normal * K * other_particle->_inverse_mass);
 
 }
 
@@ -191,7 +209,8 @@ void Particle::resetMovement()
 }
 
 
-void Particle::testParticle() {
+void Particle::testParticle()
+{
 	Particle particle1;
 
 	_ASSERT(particle1._position == Vector3D(0, 0, 0));

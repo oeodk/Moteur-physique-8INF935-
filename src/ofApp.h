@@ -12,7 +12,7 @@
 
 class ofApp : public ofBaseApp {
 private:
-	std::vector<class Particle*> _particles;
+	inline static std::vector<class Particle*> _particles;
 	std::vector<BulletType> _particle_types = {
 		BulletType::BULLET,
 		BulletType::CANNONBALL,
@@ -55,4 +55,6 @@ public:
 
 	void spawnParticle(BulletType type = BULLET);
 	void moveBlobs();
+
+	static void addParticle(Particle* particle) { _particles.push_back(particle); }
 };

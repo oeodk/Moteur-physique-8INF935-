@@ -199,8 +199,8 @@ void RenderEngine::render() {
 		}
 	}
 
-		_light_source.enable();
-		_night_light_source.enable();
+	_light_source.enable();
+	_night_light_source.enable();
 	
 	for (Drawable* render_target : _render_targets) {
 		if (willRender(*render_target->getPosition())) {
