@@ -1,7 +1,7 @@
 #pragma once
-#include "particles/Particle.h"
-#include "Quaternion.h"
-#include "Matrix3.h"
+#include "../Particle.h"
+#include "../../Quaternion.h"
+#include "../../Matrix3.h"
 #include <vector>
 #include <memory>
 
