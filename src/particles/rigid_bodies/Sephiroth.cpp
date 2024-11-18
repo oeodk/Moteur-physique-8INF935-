@@ -7,7 +7,7 @@ Sephiroth::Sephiroth(const Vector3D& init_pos, const Vector3D& init_vel, const Q
 	if (!mesh_init_)
 	{
 		mesh_init_ = true;
-		_sephiroth_mesh.load("sephiroth.ply");
+		_sephiroth_mesh.load("Sephiroth.ply");
 		_sephiroth_mesh.clearTexCoords();
 	}
 	_mesh = &_sephiroth_mesh;
