@@ -40,6 +40,7 @@ Matrix3 operator*(float value, const Matrix3& m1) {
 }
 Matrix3 operator*(const Matrix3& m1, const Matrix3& m2);
 Vector3D operator*(const Matrix3& m1, const Vector3D& v2);
+Matrix3 operator+(const Matrix3& m1, const Matrix3& m2);
 
 
 namespace constants {
