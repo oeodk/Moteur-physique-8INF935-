@@ -191,8 +191,8 @@ Quaternion operator*(const Quaternion& q1, const Quaternion& q2) {
 	const Vector3D v2 = Vector3D(q2.x, q2.y, q2.z);
 
 	return Quaternion(
-		q1.w * q2.w,
-		-Vector3D::dotProduct(v1, v2) * (q1.w * v2 + q2.w * v1 + Vector3D::crossProduct(v1, v2))
+		q1.w * q2.w	- Vector3D::dotProduct(v1, v2),
+		(q1.w * v2 + q2.w * v1 + Vector3D::crossProduct(v1, v2))
 	);
 }
 

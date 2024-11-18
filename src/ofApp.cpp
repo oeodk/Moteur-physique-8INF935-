@@ -42,6 +42,8 @@ void ofApp::setup() {
 	_blob_key.insert({ ofKey::OF_KEY_DOWN  , false });
 	_blob_key.insert({ ofKey::OF_KEY_RIGHT , false });
 	_blob_key.insert({ ofKey::OF_KEY_LEFT  , false });
+
+	Sephiroth::loadMesh();
 }
 
 //--------------------------------------------------------------
@@ -267,27 +269,28 @@ void ofApp::spawnParticle(BulletType type) {
 	case BULLET:
 	{
 		Quaternion base_orientation = Quaternion::fromEulerAngle(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
-
-		Vector3D base_force(rand() % 1000 / 500.f - 1, rand() % 1000 / 500.f - 1, rand() % 1000 / 500.f - 1);
+		
+		/*Vector3D base_force(rand() % 1000 / 500.f - 1, rand() % 1000 / 500.f - 1, rand() % 1000 / 500.f - 1);
 		newParticle = new Chicken(current_position, look_at_dir,
-			Quaternion(base_orientation.w, base_orientation.x, base_orientation.y, base_orientation.z),
+			base_orientation,
 			Vector3D(0, 0, 0), base_force * 10000, up_dir * 10);
-		
-		/*newParticle = new Masamune(current_position, look_at_dir,
-		Quaternion(base_orientation.w, base_orientation.x, base_orientation.y, base_orientation.z),
-		Vector3D(0, 0, 0), look_at_dir * 10000, up_dir * 10);*/
-		
+		*/
 		/*
+		newParticle = new Masamune(current_position, look_at_dir,
+		base_orientation,
+		Vector3D(0, 0, 0), look_at_dir * 100000, up_dir * 100);
+		*/
+		
 		newParticle = new Sephiroth(current_position, look_at_dir,
-			Quaternion(base_orientation.w, base_orientation.x, base_orientation.y, base_orientation.z),
-			Vector3D(0, 0, 0), side_dir * 10000, up_dir * 10);
-		*/	
+			base_orientation,
+			Vector3D(0, 0, 0), up_dir * 500000, side_dir * 120);
+			
 		
 		/*
 		newParticle = new Goat(current_position, look_at_dir,
 			base_orientation,
-			Vector3D(0, 0, 0), look_at_dir * 10000, side_dir * 10);
-			*/
+			Vector3D(0, 0, 0), look_at_dir * 100000, side_dir * 15);
+		*/
 		_particles.push_back(newParticle);
 	}
 		break;
