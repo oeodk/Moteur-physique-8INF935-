@@ -99,7 +99,7 @@ Matrix3 operator*(const Matrix3& m1, const Matrix3& m2) {
 Vector3D operator*(const Matrix3& m1, const Vector3D& v2) {
 	Vector3D product;
 	product.x = m1.getCoef(0, 0) * v2.x + m1.getCoef(0, 1) * v2.y + m1.getCoef(0, 2) * v2.z;
-	product.y = m1.getCoef(1, 0) * v2.x + m1.getCoef(1, 1) * v2.y + m1.getCoef(2, 2) * v2.z;
+	product.y = m1.getCoef(1, 0) * v2.x + m1.getCoef(1, 1) * v2.y + m1.getCoef(1, 2) * v2.z;
 	product.z = m1.getCoef(2, 0) * v2.x + m1.getCoef(2, 1) * v2.y + m1.getCoef(2, 2) * v2.z;
 
 	return product;
@@ -124,7 +124,7 @@ void Matrix3::testMatrix3() {
 
 	Vector3D v2 = IDENTITY_MATRIX3 * v;
 
-	//assert(v == v2);
+	assert(v == v2);
 
 	assert(m1 != m2);
 	for (int i = 0; i < 3; i++) {
