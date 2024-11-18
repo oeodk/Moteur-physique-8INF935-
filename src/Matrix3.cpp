@@ -105,6 +105,15 @@ Vector3D operator*(const Matrix3& m1, const Vector3D& v2) {
 	return product;
 }
 
+Matrix3 operator+(const Matrix3& m1, const Matrix3& m2) {
+	Matrix3 sum;
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			sum.setCoef(i, j, m1.getCoef(i, j) + m2.getCoef(i, j));
+		}
+	}
+	return sum;
+}
 void Matrix3::testMatrix3() {
 	printf("-- TESTING MATRIX3 --\n");
 	Matrix3 m1;
@@ -116,6 +125,7 @@ void Matrix3::testMatrix3() {
 	std::array<std::array<float, 3>, 3> values3{ {{20,27,28},{56,72,73},{92,117,118}} };
 	std::array<std::array<float, 3>, 3> values4{ {{1,2,3},{0,1,4},{0,0,1}} };
 	std::array<std::array<float, 3>, 3> values5{ {{1,-2,5},{0,1,-4},{0,0,1}} };
+	std::array<std::array<float, 3>, 3> values6{ {{2,4,6},{4,6,10},{7,8,10}} };
 	Matrix3 m5(values4);
 
 	Vector3D v(1, 2, 3);
@@ -137,5 +147,6 @@ void Matrix3::testMatrix3() {
 	assert(m3.getDeterminant() == 15);
 	assert(m4 == Matrix3(values3));
 	assert(m5.getInverse() == Matrix3(values5));
+	assert(m2 + m5 == Matrix3(values6));
 	printf("-- TEST SUCCEEDED -- \n");
 }

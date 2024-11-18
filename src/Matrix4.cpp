@@ -131,6 +131,16 @@ Matrix4 operator*(const Matrix4& m1, const Matrix4& m2) {
 	return product;
 }
 
+Matrix4 operator+(const Matrix4& m1, const Matrix4& m2) {
+	Matrix4 sum;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			sum.setCoef(i, j, m1.getCoef(i, j) + m2.getCoef(i, j));
+		}
+	}
+	return sum;
+}
+
 void Matrix4::testMatrix4()
 {
 	printf("-- Testing Matrix4 --\n");
@@ -140,6 +150,7 @@ void Matrix4::testMatrix4()
 	std::array<std::array<float, 4>, 4> values2{ {{1,2,3,4},{0,1,2,3},{0,0,1,2},{0,0,0,1}} };
 	std::array<std::array<float, 4>, 4> values3{ {{1,-2,1,0},{0,1,-2,1},{0,0,1,-2},{0,0,0,1}} };
 	std::array<std::array<float, 4>, 4> values4{ {{1,4,10,20},{2,8,20,40},{3,12,30,60},{4,16,40,80}} };
+	std::array<std::array<float, 4>, 4> values5{ {{2,4,6,8},{2,5,8,11},{3,6,10,13},{4,8,12,17}} };
 	Matrix4 m3(values2);
 	Matrix4 m4 = m2 * m3;
 	
@@ -155,5 +166,6 @@ void Matrix4::testMatrix4()
 	assert(m2.getDeterminant() == 0);
 	assert(m3.getInverse() == Matrix4(values3));
 	assert(m4 == Matrix4(values4));
+	assert(m2 + m3 == Matrix4(values5));
 	printf("-- TEST SUCCEEDED --\n");
 }

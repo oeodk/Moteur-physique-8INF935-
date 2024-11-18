@@ -32,6 +32,7 @@ Matrix4 operator*(float value, const Matrix4& m1) {
 	return m1 * value;
 }
 Matrix4 operator*(const Matrix4& m1, const Matrix4& m2);
+Matrix4 operator+(const Matrix4& m1, const Matrix4& m2);
 
 
 namespace constants {
