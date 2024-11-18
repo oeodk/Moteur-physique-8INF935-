@@ -10,14 +10,15 @@ Goat::Goat(const Vector3D& init_pos, const Vector3D& init_vel, const Quaternion&
 		_goat_mesh.load("goatTpose.ply");
 		//_mesh.clearTexCoords();
 		_goat_mesh.clearColors();
-		_texture_image.load("goat_texture.png");
+		_texture_image.load("Goat_texture.png");
 		for (auto& v : _goat_mesh.getTexCoords())
 		{
 			v.x *= 128;
 			v.y *= 128;
 		}
 	}
-	ofLoadImage(_texture, "goat_texture.png");
+	_texture.loadData(_texture_image);
+	//ofLoadImage(_texture, "Goat_texture.png");
 	//_texture.loadData(_texture_image);
 	_mesh = &_goat_mesh;
 }

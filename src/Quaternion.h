@@ -26,7 +26,12 @@ public:
 	Quaternion inverse() const;
 
 	Matrix4 toMatrix() const;
-	static Quaternion fromRotationMatrix(const Matrix3 m);
+	static Quaternion fromRotationMatrix(const Matrix3& m);
+
+	/*
+	*  angles in order Roll, Pitch, Yaw
+	*/
+	static Quaternion fromEulerAngle(const Vector3D angles);
 
 	static Quaternion difference(const Quaternion& q1, const Quaternion& q2);
 	static float dotProduct(const Quaternion& q1, const Quaternion& q2);

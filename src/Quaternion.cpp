@@ -59,7 +59,7 @@ Matrix4 Quaternion::toMatrix() const {
 	return Matrix4(data);
 }
 
-Quaternion Quaternion::fromRotationMatrix(const Matrix3 m) {
+Quaternion Quaternion::fromRotationMatrix(const Matrix3& m) {
 	float trace;
 	Quaternion result;
 
@@ -105,6 +105,24 @@ Quaternion Quaternion::fromRotationMatrix(const Matrix3 m) {
 	}
 
 	return result * (0.5 / sqrt(trace));
+}
+
+Quaternion Quaternion::fromEulerAngle(const Vector3D angles)
+{
+	double cr = cos(angles.x * 0.5);
+	double sr = sin(angles.x * 0.5);
+	double cp = cos(angles.y * 0.5);
+	double sp = sin(angles.y * 0.5);
+	double cy = cos(angles.z * 0.5);
+	double sy = sin(angles.z * 0.5);
+
+	Quaternion q;
+	q.w = cr * cp * cy + sr * sp * sy;
+	q.x = sr * cp * cy - cr * sp * sy;
+	q.y = cr * sp * cy + sr * cp * sy;
+	q.z = cr * cp * sy - sr * sp * cy;
+
+	return q;
 }
 
 Quaternion Quaternion::difference(const Quaternion& q1, const Quaternion& q2){

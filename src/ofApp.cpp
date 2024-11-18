@@ -7,6 +7,7 @@
 #include "particles/BubbleParticle.h"
 #include "particles/rigid_bodies/Chicken.h"
 #include "particles/rigid_bodies/Goat.h"
+#include "particles/rigid_bodies/Sephiroth.h"
 #include "particles/Anchor.h"
 #include "forces/GravityParticleForce.h"
 #include "forces/FrictionForceGenerator.h"
@@ -264,19 +265,23 @@ void ofApp::spawnParticle(BulletType type) {
 	switch (type) {
 	case BULLET:
 	{
-		//newParticle = new BulletParticle(current_position, look_at_dir);
-	{
-			Matrix3 base_orientation_matrix(side_dir, up_dir, look_at_dir);
-			Quaternion base_orientation = Quaternion().fromRotationMatrix(base_orientation_matrix);
+		Quaternion base_orientation = Quaternion::fromEulerAngle(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
 
-		glm::quat base_orientation(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
-
-		//newParticle = new Chicken(current_position, look_at_dir,
-		//	Quaternion(base_orientation.w, base_orientation.x, base_orientation.y, base_orientation.z),
-		//	Vector3D(0, 0, 0), look_at_dir * 10000, Vector3D(0, 10, 0));// look_at_dir * 10, up_dir * 10);
-		newParticle = new Goat(current_position, look_at_dir,
+		/*
+		newParticle = new Chicken(current_position, look_at_dir,
 			Quaternion(base_orientation.w, base_orientation.x, base_orientation.y, base_orientation.z),
-			Vector3D(0, 0, 0), side_dir * 10000, Vector3D(0, 10, 0));
+			Vector3D(0, 0, 0), look_at_dir * 10000, up_dir * 10);
+		*/
+		/*
+		newParticle = new Sephiroth(current_position, look_at_dir,
+			Quaternion(base_orientation.w, base_orientation.x, base_orientation.y, base_orientation.z),
+			Vector3D(0, 0, 0), look_at_dir * 10000, up_dir * 10);
+		*/
+		Vector3D init_force(side_dir);
+		init_force.y = 0;
+		newParticle = new Goat(current_position, look_at_dir,
+			base_orientation,
+			Vector3D(0, 0, 0), side_dir * 10000, up_dir * 10);
 		_particles.push_back(newParticle);
 	}
 		break;
