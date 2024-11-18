@@ -1,5 +1,5 @@
 #include "BarConstrain.h"
-#include "particles/Particle.h"
+#include "../particles/Particle.h"
 
 void BarConstrain::updateConstrain(Particle* particle, float dt)
 {

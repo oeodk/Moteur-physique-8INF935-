@@ -1,5 +1,6 @@
 #define _USE_MATH_DEFINES
 #include "ofApp.h"
+#include "test/TestQuaternion.h"
 #include "particles/BulletParticle.h"
 #include "particles/CannonballParticle.h"
 #include "particles/FireballParticle.h"
@@ -30,6 +31,7 @@ void ofApp::setup() {
 	_render_engine.setCameraPosition(Vector3D(0, 100 + _terrain.getHeight(0, 0), 0));
 
 	Vector3D::testVector3D();
+	TestQuaternion::launchTests();
 	Particle::testParticle();
 	Matrix3::testMatrix3();
 
@@ -261,8 +263,12 @@ void ofApp::spawnParticle(BulletType type) {
 	current_position += (side_dir * 6 + look_at_dir * 24 + up_dir * (-4));
 	switch (type) {
 	case BULLET:
+	{
 		//newParticle = new BulletParticle(current_position, look_at_dir);
 	{
+			Matrix3 base_orientation_matrix(side_dir, up_dir, look_at_dir);
+			Quaternion base_orientation = Quaternion().fromRotationMatrix(base_orientation_matrix);
+
 		glm::quat base_orientation(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
 
 		//newParticle = new Chicken(current_position, look_at_dir,

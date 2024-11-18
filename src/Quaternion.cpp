@@ -48,8 +48,7 @@ Quaternion Quaternion::inverse() const {
 	return conjugate() / getNorm();
 }
 
-Matrix4 Quaternion::toMatrix() const
-{
+Matrix4 Quaternion::toMatrix() const {
 	const float a = w, b = x, c = y, d = z;
 	const std::array<std::array<float, 4>, 4> data = {
 		std::array<float, 4>{ a,-d, c, b},
@@ -58,6 +57,54 @@ Matrix4 Quaternion::toMatrix() const
 		std::array<float, 4>{-b,-c,-d, a}
 	};
 	return Matrix4(data);
+}
+
+Quaternion Quaternion::fromRotationMatrix(const Matrix3 m) {
+	float trace;
+	Quaternion result;
+
+	if (m.getCoef(2, 2) < 0) {
+		if (m.getCoef(0, 0) > m.getCoef(1, 1)) {
+			trace = 1. + m.getCoef(0, 0) - m.getCoef(1, 1) - m.getCoef(2, 2);
+			result = Quaternion(
+				trace,
+				m.getCoef(0, 1) + m.getCoef(1, 0),
+				m.getCoef(2, 0) + m.getCoef(0, 2),
+				m.getCoef(1, 2) - m.getCoef(2, 1)
+			);
+		}
+		else {
+			trace = 1. - m.getCoef(0, 0) + m.getCoef(1, 1) - m.getCoef(2, 2);
+			result = Quaternion(
+				m.getCoef(0, 1) + m.getCoef(1, 0),
+				trace,
+				m.getCoef(1, 2) + m.getCoef(2, 1),
+				m.getCoef(2, 0) - m.getCoef(0, 2)
+			);
+		}
+	}
+	else {
+		if (m.getCoef(0, 0) < -m.getCoef(1, 1)) {
+			trace = 1. - m.getCoef(0, 0) - m.getCoef(1, 1) + m.getCoef(2, 2);
+			result = Quaternion(
+				m.getCoef(2, 0) + m.getCoef(0, 2),
+				m.getCoef(1, 2) + m.getCoef(2, 1),
+				trace,
+				m.getCoef(0, 1) - m.getCoef(1, 0)
+			);
+		}
+		else {
+			trace = 1. + m.getCoef(0, 0) + m.getCoef(1, 1) + m.getCoef(2, 2);
+			result = Quaternion(
+				m.getCoef(1, 2) - m.getCoef(2, 1),
+				m.getCoef(2, 0) - m.getCoef(0, 2),
+				m.getCoef(0, 1) - m.getCoef(1, 0),
+				trace
+			);
+		}
+	}
+
+	return result * (0.5 / sqrt(trace));
 }
 
 Quaternion Quaternion::difference(const Quaternion& q1, const Quaternion& q2){
@@ -127,7 +174,7 @@ Quaternion operator*(const Quaternion& q1, const Quaternion& q2) {
 
 	return Quaternion(
 		q1.w * q2.w,
-		-Vector3D::dotProduct(v1, v2) * (q1.w * v2 + q2.w * Vector3D::crossProduct(v1, v2))
+		-Vector3D::dotProduct(v1, v2) * (q1.w * v2 + q2.w * v1 + Vector3D::crossProduct(v1, v2))
 	);
 }
 

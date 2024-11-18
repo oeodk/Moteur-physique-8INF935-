@@ -1,5 +1,5 @@
 #include "CableConstrain.h"
-#include "particles/Particle.h"
+#include "../particles/Particle.h"
 #include <ofGraphics.h>
 
 void CableConstrain::updateConstrain(Particle* particle, float dt)
