@@ -51,8 +51,15 @@ void RigidBody::draw()
 	_transformation.transformGL();
 	
 	ofSetColor(_color.x, _color.y, _color.z, _alpha);
+	if (_texture.isAllocated())
+	{
+		_texture.bind();
+	}
 	_mesh->draw();
-
+	if (_texture.isAllocated())
+	{
+		_texture.unbind();
+	}
 	_transformation.restoreTransformGL();
 
 	_mass_center_mesh.getVertices().back() = _position;
@@ -65,5 +72,4 @@ void RigidBody::draw()
 void RigidBody::addForceToPoint(const Vector3D& base_force_for_rotation, const Vector3D& application_point)
 {
 	_torque += Vector3D::crossProduct(application_point, base_force_for_rotation);
-	std::cout << "x : " << _torque.x << "y : " << _torque.y << "z : " << _torque.z << std::endl;
 }

@@ -5,6 +5,7 @@
 #include "particles/FireballParticle.h"
 #include "particles/BubbleParticle.h"
 #include "particles/rigid_bodies/Chicken.h"
+#include "particles/rigid_bodies/Goat.h"
 #include "particles/Anchor.h"
 #include "forces/GravityParticleForce.h"
 #include "forces/FrictionForceGenerator.h"
@@ -264,9 +265,12 @@ void ofApp::spawnParticle(BulletType type) {
 	{
 		glm::quat base_orientation(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
 
-		newParticle = new Chicken(current_position, look_at_dir,
+		//newParticle = new Chicken(current_position, look_at_dir,
+		//	Quaternion(base_orientation.w, base_orientation.x, base_orientation.y, base_orientation.z),
+		//	Vector3D(0, 0, 0), look_at_dir * 10000, Vector3D(0, 10, 0));// look_at_dir * 10, up_dir * 10);
+		newParticle = new Goat(current_position, look_at_dir,
 			Quaternion(base_orientation.w, base_orientation.x, base_orientation.y, base_orientation.z),
-			Vector3D(0, 0, 0), look_at_dir * 10000, Vector3D(0, 10, 0));// look_at_dir * 10, up_dir * 10);
+			Vector3D(0, 0, 0), side_dir * 10000, Vector3D(0, 10, 0));
 		_particles.push_back(newParticle);
 	}
 		break;

@@ -2,6 +2,11 @@
 #include "particles/Particle.h"
 #include "Quaternion.h"
 #include "Matrix3.h"
+
+#include <ofPixels.h>
+#include <ofTexture.h>
+#include <ofImage.h>
+
 #include <vector>
 #include <memory>
 
@@ -16,6 +21,7 @@ protected :
 	ofVboMesh* _mesh;
 	ofVboMesh _mass_center_mesh;
 	ofNode _transformation;
+	ofTexture _texture;
 
 	Vector3D _torque;
 	Matrix3 _inertia_moment_inverted;
