@@ -32,6 +32,7 @@ void ofApp::setup() {
 	Vector3D::testVector3D();
 	TestQuaternion::launchTests();
 	Particle::testParticle();
+	Matrix3::testMatrix3();
 
 	_blob_key.insert({ ofKey::OF_KEY_RETURN, false });
 	_blob_key.insert({ ofKey::OF_KEY_UP    , false });

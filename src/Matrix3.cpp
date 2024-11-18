@@ -117,8 +117,15 @@ void Matrix3::testMatrix3() {
 	std::array<std::array<float, 3>, 3> values4{ {{1,2,3},{0,1,4},{0,0,1}} };
 	std::array<std::array<float, 3>, 3> values5{ {{1,-2,5},{0,1,-4},{0,0,1}} };
 	Matrix3 m5(values4);
+
+	Vector3D v(1, 2, 3);
 	
 	assert(m1 == IDENTITY_MATRIX3);
+
+	Vector3D v2 = IDENTITY_MATRIX3 * v;
+
+	assert(v == v2);
+
 	assert(m1 != m2);
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
