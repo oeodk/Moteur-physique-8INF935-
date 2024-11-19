@@ -14,10 +14,10 @@ class ofApp : public ofBaseApp {
 private:
 	inline static std::vector<class Particle*> _particles;
 	std::vector<BulletType> _particle_types = {
-		BulletType::BULLET,
-		BulletType::CANNONBALL,
-		BulletType::FIREBALL,
-		BulletType::BLOB
+		BulletType::CHICKEN,
+		BulletType::MASAMUNE,
+		BulletType::SEPHIROTH,
+		BulletType::GOAT
 	};
 
 	ParticleForceRegistry _forces_registry;

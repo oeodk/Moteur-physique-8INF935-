@@ -3,7 +3,7 @@
 inline static constexpr const char* GOAT_SCREAM[18] = {"Goat_pre_ram1.wav", "Goat_pre_ram2.wav", "Goat_pre_ram3.wav", "Goat_pre_ram4.wav", "Goat_scream1.wav", "Goat_scream2.wav", "Goat_scream3.wav", "Goat_scream4.wav", "Goat_scream5.wav", "Goat_scream6.wav", "Goat_scream7.wav", "Goat_scream8.wav", "Goat_scream9.wav", "Goat_screaming_pre_ram1.wav", "Goat_screaming_pre_ram2.wav", "Goat_screaming_pre_ram3.wav", "Goat_screaming_pre_ram4.wav", "Goat_screaming_pre_ram5.wav"};
 
 Goat::Goat(const Vector3D& init_pos, const Vector3D& init_vel, const Quaternion& init_orientation, const Vector3D& init_angular_vel, const Vector3D& base_force_for_rotation, const Vector3D& application_point)
-	: RigidBody(init_pos, init_vel, 50, 25, init_orientation, init_angular_vel, std::string("Goat_sound/") + GOAT_SCREAM[rand() % 18 + 1])
+	: RigidBody(init_pos, init_vel, 50, 25, init_orientation, init_angular_vel, std::string("Goat_sound/") + GOAT_SCREAM[rand() % 18])
 {
 	if (!mesh_init_)
 	{

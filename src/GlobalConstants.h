@@ -7,6 +7,10 @@ enum BulletType {
 	FIREBALL,
 	BUBBLE,
 	BLOB,
+	CHICKEN,
+	SEPHIROTH,
+	MASAMUNE,
+	GOAT,
 	E_END
 };
 

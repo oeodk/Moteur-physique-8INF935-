@@ -1,8 +1,8 @@
 #pragma once
 //#define DEBUG_RIGID_BODY
-#include "particles/Particle.h"
-#include "Quaternion.h"
-#include "Matrix3.h"
+#include "../Particle.h"
+#include "../../Quaternion.h"
+#include "../../Matrix3.h"
 
 #include <ofPixels.h>
 #include <ofTexture.h>

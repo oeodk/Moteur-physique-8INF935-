@@ -38,6 +38,10 @@ std::string GUIManager::getDisplayName(BulletType bullet_type) {
 	case FIREBALL: return "Boule de feu";
 	case BUBBLE: return "Bulle de savon";
 	case BLOB: return "Noyau de blob";
+	case CHICKEN: return "Poulet";
+	case MASAMUNE: return "Masamune";
+	case SEPHIROTH: return "Sephiroth";
+	case GOAT: return "Chèvre";
 	default: return "";
 	}
 }
@@ -50,6 +54,10 @@ std::string GUIManager::getIconPath(BulletType bullet_type) {
 	case FIREBALL: return "particle_fireball.png";
 	case BUBBLE: return "particle_bubble.png";
 	case BLOB: return "particle_blob.png";
+	case CHICKEN: return "rigidbody_icons/chicken.png";
+	case MASAMUNE: return "rigidbody_icons/masamune.png";
+	case SEPHIROTH: return "rigidbody_icons/sephiroth.png";
+	case GOAT: return "rigidbody_icons/goat.png";
 	default: return "";
 	}
 }
