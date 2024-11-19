@@ -280,17 +280,17 @@ void ofApp::spawnParticle(BulletType type) {
 		base_orientation,
 		Vector3D(0, 0, 0), look_at_dir * 100000, up_dir * 100);
 		*/
-		
+		/*
 		newParticle = new Sephiroth(current_position, look_at_dir,
 			base_orientation,
 			Vector3D(0, 0, 0), up_dir * 500000, side_dir * 120);
-			
+		*/	
 		
-		/*
+		
 		newParticle = new Goat(current_position, look_at_dir,
 			base_orientation,
 			Vector3D(0, 0, 0), look_at_dir * 100000, side_dir * 15);
-		*/
+		
 		_particles.push_back(newParticle);
 	}
 		break;
