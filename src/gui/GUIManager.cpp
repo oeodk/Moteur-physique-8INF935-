@@ -41,7 +41,7 @@ std::string GUIManager::getDisplayName(BulletType bullet_type) {
 	case CHICKEN: return "Poulet";
 	case MASAMUNE: return "Masamune";
 	case SEPHIROTH: return "Sephiroth";
-	case GOAT: return "Chèvre";
+	case GOAT: return "Chevre";
 	default: return "";
 	}
 }
