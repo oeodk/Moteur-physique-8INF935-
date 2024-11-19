@@ -335,6 +335,67 @@ void ofApp::spawnParticle(BulletType type) {
 	}
 		break;
 	default:
+		for (int i = 0; i < 250; i++)
+		{
+			switch (_particle_types[_selected_particle])
+			{
+			case BULLET:
+				newParticle = new BulletParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 200.f));
+				break;
+			case CANNONBALL:
+				newParticle = new CannonballParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 25.f, (rand() % 100 - 50) / 25.f));
+				break;
+			case FIREBALL:
+				newParticle = new FireballParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 100.f, (rand() % 100 - 50) / 100.f));
+				break;
+			case BUBBLE:
+				newParticle = new BubbleParticle(current_position, look_at_dir + Vector3D((rand() % 100 - 50) / 200.f, (rand() % 100 - 50) / 50.f, (rand() % 100 - 50) / 50.f));
+				break;
+			case CHICKEN: {
+				Quaternion base_orientation = Quaternion::fromEulerAngle(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
+				Vector3D base_force(rand() % 1000 / 500.f - 1, rand() % 1000 / 500.f - 1, rand() % 1000 / 500.f - 1);
+
+				newParticle = new Chicken(current_position, look_at_dir,
+					base_orientation,
+					Vector3D(0, 0, 0), base_force * 10000, up_dir * 10);
+
+				_particles.push_back(newParticle);
+			}
+						break;
+			case MASAMUNE: {
+				Quaternion base_orientation = Quaternion::fromEulerAngle(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
+				Vector3D base_force(rand() % 1000 / 500.f - 1, rand() % 1000 / 500.f - 1, rand() % 1000 / 500.f - 1);
+
+				newParticle = new Masamune(current_position, look_at_dir,
+					base_orientation,
+					Vector3D(0, 0, 0), look_at_dir * 900000, up_dir * 100);
+
+				_particles.push_back(newParticle);
+			}
+						 break;
+			case SEPHIROTH: {
+				Quaternion base_orientation = Quaternion::fromEulerAngle(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
+				Vector3D base_force(rand() % 1000 / 500.f - 1, rand() % 1000 / 500.f - 1, rand() % 1000 / 500.f - 1);
+
+				newParticle = new Sephiroth(current_position, look_at_dir,
+					base_orientation,
+					Vector3D(0, 0, 0), up_dir * 500000, side_dir * 120);
+
+				_particles.push_back(newParticle);
+			}
+						  break;
+			case GOAT: {
+				Quaternion base_orientation = Quaternion::fromEulerAngle(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
+				Vector3D base_force(rand() % 1000 / 500.f - 1, rand() % 1000 / 500.f - 1, rand() % 1000 / 500.f - 1);
+
+				newParticle = new Goat(current_position, look_at_dir,
+					base_orientation,
+					Vector3D(0, 0, 0), look_at_dir * 100000, side_dir * 15);
+
+		_particles.push_back(newParticle);
+	}
+		break;
+	default:
 		for (int i = 0; i < 50; i++)
 		{
 			Vector3D current_position2 = current_position + side_dir * (rand() % 1000 - 500) + Vector3D(0, rand() % 500, 0);
