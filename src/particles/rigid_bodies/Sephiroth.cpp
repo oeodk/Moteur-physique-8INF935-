@@ -9,8 +9,13 @@ Sephiroth::Sephiroth(const Vector3D& init_pos, const Vector3D& init_vel, const Q
 
 void Sephiroth::getInertiaMoment(Matrix3& mat) const
 {
-	// Correspond to the rotation around the axis used
-	mat = constants::IDENTITY_MATRIX3 * _mass * (0.25 * 15 * 15 + 0.5 * _radius * _radius);
+	constexpr float CYLINDER_RADIUS_SQUARED = 15 * 15;
+	const float CYNLINDER_HEIGHT_SQUARED = _radius * _radius;
+	mat = _mass * Matrix3(
+		Vector3D(0.25 * CYLINDER_RADIUS_SQUARED + (1 / 12.f) * CYNLINDER_HEIGHT_SQUARED, 0, 0),
+		Vector3D(0, 0.25 * CYLINDER_RADIUS_SQUARED + (1 / 12.f) * CYNLINDER_HEIGHT_SQUARED, 0),
+		Vector3D(0, 0, 0.5 * CYLINDER_RADIUS_SQUARED)
+	);
 }
 
 void Sephiroth::loadMesh()

@@ -310,7 +310,7 @@ void ofApp::spawnParticle(BulletType type) {
 
 		newParticle = new Masamune(current_position, look_at_dir,
 			base_orientation,
-			Vector3D(0, 0, 0), look_at_dir * 900000, up_dir * 100);
+			Vector3D(0, 0, 0), look_at_dir * 1100000, up_dir * 100);
 
 		_particles.push_back(newParticle);
 	}
@@ -322,7 +322,7 @@ void ofApp::spawnParticle(BulletType type) {
 
 		newParticle = new Sephiroth(current_position, look_at_dir,
 			base_orientation,
-			Vector3D(0, 0, 0), up_dir * 500000, side_dir * 120);
+			Vector3D(0, 0, 0), up_dir * 300000, side_dir * 120);
 
 		_particles.push_back(newParticle);
 	}

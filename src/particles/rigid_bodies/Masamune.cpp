@@ -16,8 +16,12 @@ Masamune::Masamune(const Vector3D& init_pos, const Vector3D& init_vel, const Qua
 
 void Masamune::getInertiaMoment(Matrix3& mat) const
 {
-	mat = constants::IDENTITY_MATRIX3 * ((1 / 12.f) * _mass * _radius * _radius);
-
+	const float ROD_LENGTH_SQUARED = _radius * _radius;
+	mat = _mass * Matrix3(
+		Vector3D(0.5 * ROD_LENGTH_SQUARED, 0, 0),
+		Vector3D(0, 0.5 * ROD_LENGTH_SQUARED, 0),
+		Vector3D()
+	);
 }
 #ifdef DEBUG_RIGID_BODY
 void Masamune::drawApproximation()
