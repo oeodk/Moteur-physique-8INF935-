@@ -27,7 +27,7 @@ private:
 	// Array that prevent chunk from beeing moved twice on the same frame
 	std::array<Chunk*, 10> _block_chunk_movement;
 	std::list<Chunk*> _chunk_to_move;
-
+	std::map<std::pair<float, float>, Chunk*> _coordinate_chunk_map;
 
 	std::tuple<int, int> getInGridCoordinate(float x, float z) const;
 	static void generateChunk(int x, int z, Chunk* chunk_to_edit = nullptr);

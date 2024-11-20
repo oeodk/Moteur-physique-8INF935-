@@ -5,11 +5,11 @@ void PhysicsEngine::updateParticles(float dt, const std::vector<class Particle*>
         //std::cout << std::to_string(p->getAcceleration().x) << ", " << std::to_string(p->getAcceleration().y) << ", " << std::to_string(p->getAcceleration().z) << "\n";
         for (auto& p2 : particles)
         {
+            p->checkCollisionTerrain(terrain, dt);
             if (p != p2)
             {
                 p->checkCollision(p2, dt);
             }
-            p->checkCollisionTerrain(terrain, dt);
         }
         
         p->updateConstrain(dt);

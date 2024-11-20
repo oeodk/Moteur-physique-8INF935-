@@ -29,6 +29,7 @@ private:
 	ofVboMesh _terrain;
 	int _chunk_division;
 	Vector3D _grid_coordinate;
+	Vector3D _old_grid_coordinate;
 	Vector3D _spatial_coordinate;
 
 	ofVboMesh* _trees_buffer[2];
@@ -67,9 +68,10 @@ public:
 	void update(float player_distance, float dt);
 
 	const Vector3D& getGridCoordinate() const { return _grid_coordinate; }
+	const Vector3D& getOldGridCoordinate() const { return _old_grid_coordinate; }
 	const Vector3D& getSpatialCoordinate() const { return _spatial_coordinate; }
 	void setGridCoordinate(const Vector3D& grid_coordinate) { _grid_coordinate.set(grid_coordinate); }
 	float getHeight(float x, float z) const;
 	Vector3D getNormal(float x, float z) const;
+	
 };
-

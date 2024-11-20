@@ -38,6 +38,7 @@ void Terrain::setup() {
 	for (int i = -_generation_distance; i < _generation_distance + 1; i++) {
 		for (int j = -_generation_distance; j < _generation_distance + 1; j++) {
 			generateChunk(i, j);
+			_coordinate_chunk_map.insert({std::pair<float, float>(i,j),_chunks.back()});
 		}
 	}
 	_player_previous_chunk.set(0);
@@ -132,6 +133,11 @@ void Terrain::update(const Vector3D& player_position, float dt) {
 		}
 		if (generate) {
 			const Vector3D& chunk_grid_coordinate(_chunk_to_move.front()->getGridCoordinate());
+			const Vector3D& old_grid_coordinate(_chunk_to_move.front()->getOldGridCoordinate());
+			
+			_coordinate_chunk_map.erase(std::pair<float, float>(old_grid_coordinate.x, old_grid_coordinate.z));
+			_coordinate_chunk_map.insert({ std::pair<float, float>(chunk_grid_coordinate.x, chunk_grid_coordinate.z), _chunk_to_move.front()});
+
 			_chunk_generators[index] = (std::async(std::launch::async, &Terrain::generateChunk, chunk_grid_coordinate.x, chunk_grid_coordinate.z, _chunk_to_move.front()));
 			_block_chunk_movement[index] = _chunk_to_move.front();
 			_chunk_to_move.erase(_chunk_to_move.begin());
@@ -161,21 +167,15 @@ void Terrain::keyPressed(ofKeyEventArgs& key) {
 
 float Terrain::getHeight(float x, float z) const {
 	auto [chunk_x, chunk_z] = getInGridCoordinate(x, z);
-	Chunk* relevant_chunk = nullptr;
-	const size_t chunk_number = _chunks.size();
-	size_t i = 0;
-	do {
-		const Vector3D& chunk_coord = _chunks[i]->getGridCoordinate();
-		if (chunk_x == chunk_coord.x && chunk_z == chunk_coord.z) {
-			relevant_chunk = _chunks[i];
-		}
-		i++;
-
-	} while (relevant_chunk == nullptr && i < chunk_number);
-	if (relevant_chunk != nullptr) {
-		return relevant_chunk->getHeight(x, z);
+	// handle extremly rare absurd case with no performance cost
+	try
+	{
+		return _coordinate_chunk_map.at(std::pair<float, float>(chunk_x, chunk_z))->getHeight(x, z);
 	}
-	return 0.0f;
+	catch (const std::exception&)
+	{
+		return 0.f;
+	}
 }
 
 Vector3D Terrain::getNormal(float x, float z) const

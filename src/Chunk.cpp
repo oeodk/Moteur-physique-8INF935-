@@ -81,6 +81,7 @@ void Chunk::setup(float chunk_size, int chunk_division, const Vector3D& grid_coo
 	srand(seed);
 	_world_position = &_spatial_coordinate;
 	_grid_coordinate = grid_coordinate;
+	_old_grid_coordinate = _grid_coordinate;
 	_spatial_coordinate.x = chunk_size * grid_coordinate.x;
 	_spatial_coordinate.y = 0;
 	_spatial_coordinate.z = chunk_size * grid_coordinate.z;
@@ -515,3 +516,7 @@ Vector3D Chunk::interpolateNormal4p(const Vector3D& point_to_interpolate, float 
 	return top_left_part * normales[top_left_index] + top_right_part * normales[top_right_index] + bottom_right_part * normales[bottom_right_index] + bottom_left_part * normales[bottom_left_index];
 }
 
+bool operator<(const Chunk& first, const Chunk& other)
+{
+	return false;
+}
