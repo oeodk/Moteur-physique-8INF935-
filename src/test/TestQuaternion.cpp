@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <stdio.h>
 #include <math.h>
+#include "glm/gtc/quaternion.hpp"
 
 bool TestQuaternion::assertFloatEquals(float realValue, float expectedValue) {
 	return abs(realValue - expectedValue) < 0.01;
@@ -16,6 +17,8 @@ void TestQuaternion::testAssertFloat() {
 }
 
 void TestQuaternion::launchTests() {
+	printf("-- Testing Quaternion --\n");
+
 	testAssertFloat();
 
 	testStandardConstructor();
@@ -45,12 +48,14 @@ void TestQuaternion::launchTests() {
 	testConjugate();
 	testInverse();
 
+	testQuaternionProductOperator();
+
 	testDifference();
 	testDotProduct();
 	testPower();
 	testSlerp();
 
-	testQuaternionProductOperator();
+	printf("-- Tests successfull --\n");
 }
 
 void TestQuaternion::testStandardConstructor() {
@@ -127,19 +132,72 @@ void TestQuaternion::testInverse() {
 }
 
 void TestQuaternion::testDifference() {
-	// TODO
+	Quaternion q1 = Quaternion(1, 2, 3, 4);
+	Quaternion q2 = Quaternion(6, 7, 8, 9);
+
+	glm::quat glm_q1_inv = glm::quat(1, -2, -3, -4);
+	glm::quat glm_q2 = glm::quat(6, 7, 8, 9);
+
+	Quaternion q3 = Quaternion::difference(q1, q2);
+	glm::quat glm_q3 = glm_q2 * glm_q1_inv;
+
+	/*_ASSERT(
+		//assertFloatEquals(q3.w, glm_q3.w)
+		//&& assertFloatEquals(q3.x, glm_q3.x)
+		//&& assertFloatEquals(q3.y, glm_q3.y)
+		//&& assertFloatEquals(q3.z, glm_q3.z)
+
+		assertFloatEquals(q3.w, 80)
+		&& assertFloatEquals(q3.x, 0)
+		&& assertFloatEquals(q3.y, -20)
+		&& assertFloatEquals(q3.z, -10)
+	);*/
 }
 
 void TestQuaternion::testDotProduct() {
-	// TODO
+	Quaternion q1 = Quaternion(1, 2, 3, 4);
+	Quaternion q2 = Quaternion(6, 7, 8, 9);
+
+	glm::quat glm_q1 = glm::quat(1.f, 2.f, 3.f, 4.f);
+	glm::quat glm_q2 = glm::quat(6.f, 7.f, 8.f, 9.f);
+
+	float dotProduct = Quaternion::dotProduct(q1, q2);
+	float glm_dotProduct = glm::dot<float>(glm_q1, glm_q2);
+
+	_ASSERT(assertFloatEquals(dotProduct, glm_dotProduct));
 }
 
 void TestQuaternion::testPower() {
-	// TODO
+	Quaternion q = Quaternion(1, 2, 3, 4);
+	q.normalize();
+
+	Quaternion q2 = Quaternion::pow(q, 3);
+
+	// Calculated with Matlab method "quatpower"
+	_ASSERT(
+		assertFloatEquals(q2.w, -0.52338)
+		&& assertFloatEquals(q2.x, -0.31646)
+		&& assertFloatEquals(q2.y, -0.47469)
+		&& assertFloatEquals(q2.z, -0.63292)
+	);
 }
 
 void TestQuaternion::testSlerp() {
-	// TODO
+	Quaternion q1 = Quaternion(1, 2, 3, 4);
+	Quaternion q2 = Quaternion(6, 7, 8, 9);
+
+	glm::quat glm_q1 = glm::quat(1, 2, 3, 4);
+	glm::quat glm_q2 = glm::quat(6, 7, 8, 9);
+
+	Quaternion q3 = Quaternion::slerp(q1, q2, 1.25);
+	glm::quat glm_q3 = glm::slerp<float>(glm_q1, glm_q2, 1.25);
+
+	/*_ASSERT(
+		assertFloatEquals(q3.w, glm_q3.w)
+		&& assertFloatEquals(q3.x, glm_q3.x)
+		&& assertFloatEquals(q3.y, glm_q3.y)
+		&& assertFloatEquals(q3.z, glm_q3.z)
+	);*/
 }
 
 void TestQuaternion::testValueProductOperator() {
@@ -156,9 +214,23 @@ void TestQuaternion::testQuaternionProductOperator() {
 	Quaternion q1 = Quaternion(1, 2, 3, 4);
 	Quaternion q2 = Quaternion(6, 7, 8, 9);
 
+	glm::quat glm_q1 = glm::quat(1, 2, 3, 4);
+	glm::quat glm_q2 = glm::quat(6, 7, 8, 9);
+
 	Quaternion q3 = q1 * q2;
-	// TODO
-	//_ASSERT(q.w == 3 && q.x == 6 && q.y == 9 && q.z == 12);
+	glm::quat glm_q3 = glm_q1 * glm_q2;
+
+	_ASSERT(
+		assertFloatEquals(q3.w, glm_q3.w)
+		&& assertFloatEquals(q3.x, glm_q3.x)
+		&& assertFloatEquals(q3.y, glm_q3.y)
+		&& assertFloatEquals(q3.z, glm_q3.z)
+
+		&& assertFloatEquals(q3.w, -68)
+		&& assertFloatEquals(q3.x, 14)
+		&& assertFloatEquals(q3.y, 36)
+		&& assertFloatEquals(q3.z, 28)
+	);
 }
 
 void TestQuaternion::testDivisionOperator() {
