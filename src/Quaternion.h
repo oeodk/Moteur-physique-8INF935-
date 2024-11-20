@@ -25,7 +25,8 @@ public:
 	Quaternion conjugate() const;
 	Quaternion inverse() const;
 
-	Matrix4 toMatrix() const;
+	Matrix4 toMatrix4() const;
+	Matrix3 toMatrix3() const;
 	static Quaternion fromRotationMatrix(const Matrix3& m);
 
 	/*

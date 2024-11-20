@@ -48,7 +48,7 @@ Quaternion Quaternion::inverse() const {
 	return conjugate() / getNorm();
 }
 
-Matrix4 Quaternion::toMatrix() const {
+Matrix4 Quaternion::toMatrix4() const {
 	const float a = w, b = x, c = y, d = z;
 	const std::array<std::array<float, 4>, 4> data = {
 		std::array<float, 4>{ a,-d, c, b},
@@ -57,6 +57,15 @@ Matrix4 Quaternion::toMatrix() const {
 		std::array<float, 4>{-b,-c,-d, a}
 	};
 	return Matrix4(data);
+}
+
+Matrix3 Quaternion::toMatrix3() const
+{
+	return Matrix3(
+		Vector3D(1 - 2 * (y * y + z * z), 2 * (x * y - w * z), 2 * (x * z + w * y)),
+		Vector3D(2 * (x * y + w * z), 1 - 2 * (x * x + z * z), 2 * (y * z - w * x)),
+		Vector3D(2 * (x * z - w * y), 2 * (y * z + w * x), 1 - 2 * (x * x + y * y))
+		);
 }
 
 Quaternion Quaternion::fromRotationMatrix(const Matrix3& m) {
