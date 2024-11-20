@@ -58,7 +58,7 @@ void RigidBody::integrate(float dt, IntegrationMethods method)
 	Matrix3 orientation_matrix(_orientation.toMatrix3());
 	Matrix3 inv_orientation_matrix(orientation_matrix.getInverse());
 
-
+	_inertia_moment_inverted = orientation_matrix * (_inertia_moment_inverted * inv_orientation_matrix);
 	_angular_acceleration = _inertia_moment_inverted * _torque;
 	_torque.set(0, 0, 0);
 
@@ -67,7 +67,6 @@ void RigidBody::integrate(float dt, IntegrationMethods method)
 	_orientation += 0.5f * Quaternion(0,_angular_velocity) * _orientation * dt;
 
 	_orientation.normalize();
-	_inertia_moment_inverted = orientation_matrix * (_inertia_moment_inverted * orientation_matrix);
 }
 
 void RigidBody::draw()
