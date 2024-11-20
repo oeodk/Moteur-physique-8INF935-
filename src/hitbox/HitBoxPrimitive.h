@@ -1,0 +1,19 @@
+#pragma once
+#include "Vector3D.h"
+#include "Quaternion.h"
+#include "CollisionData.h"
+
+class HitBoxPrimitive
+{
+protected:
+	Vector3D* _position;
+	Quaternion* _orientation;
+
+	Vector3D _position_offset;
+	virtual bool doCollideWithBox(const class BoxHitbox* box_hitbox, std::array<CollisionData, 6>& colision_data) = 0;
+	
+	HitBoxPrimitive(Vector3D* position, Quaternion* orientation, const Vector3D& position_offset);
+public:
+	bool doCollideWith(HitBoxPrimitive* hitbox, std::array<CollisionData, 6>& colision_data);
+};
+
