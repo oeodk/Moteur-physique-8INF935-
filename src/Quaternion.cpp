@@ -150,7 +150,11 @@ Quaternion Quaternion::pow(const Quaternion& q, float exponent) {
 }
 
 Quaternion Quaternion::slerp(const Quaternion& q1, const Quaternion& q2, float t) {
-	return pow(q2 * q1.inverse(), t) * q1;
+	Quaternion q1n = q1; q1n.normalize();
+	Quaternion q2n = q2; q2n.normalize();
+	Quaternion q = q2n * q1n.inverse();
+	Quaternion q_power = Quaternion::pow(q, t);
+	return q_power * q1n;
 }
 
 
