@@ -6,7 +6,7 @@ HitBoxPrimitive::HitBoxPrimitive(Vector3D* position, Quaternion* orientation, co
 {
 }
 
-bool HitBoxPrimitive::doCollideWith(HitBoxPrimitive* hitbox, std::array<CollisionData, 6>& collision_data)
+bool HitBoxPrimitive::doCollideWith(HitBoxPrimitive* hitbox, std::array<CollisionData, 8>& collision_data)
 {
     if (auto box_hitbox = dynamic_cast<BoxHitbox*>(hitbox))
     {

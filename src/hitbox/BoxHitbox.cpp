@@ -6,7 +6,11 @@ BoxHitbox::BoxHitbox(Vector3D* position, Quaternion* orientation, const Vector3D
 {
 }
 
-bool BoxHitbox::doCollideWithBox(const BoxHitbox* box_hitbox, std::array<CollisionData, 6>& collision_data)
+bool BoxHitbox::doCollideWithBox(const BoxHitbox* box_hitbox, std::array<CollisionData, 8>& collision_data)
 {
+    std::array<Vector3D, 6> other_hitbox_normals;
+    std::array<Vector3D, 8> current_hitbox_points;
+
+
     return false;
 }
