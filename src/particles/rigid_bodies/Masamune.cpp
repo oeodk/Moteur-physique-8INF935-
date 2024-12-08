@@ -12,6 +12,9 @@ Masamune::Masamune(const Vector3D& init_pos, const Vector3D& init_vel, const Qua
 	}
 	_mesh = &_masamune_mesh;
 	initAngularAcceleration(base_force_for_rotation, application_point);
+
+	_hitbox = new BoxHitbox(&_position, &_orientation, getCentroid(), 0.5, 37.5, 0.5);
+	_hitbox->update();
 }
 
 void Masamune::getInertiaMoment(Matrix3& mat) const

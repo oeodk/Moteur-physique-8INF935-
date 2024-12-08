@@ -5,6 +5,9 @@ Sephiroth::Sephiroth(const Vector3D& init_pos, const Vector3D& init_vel, const Q
 {
 	_mesh = &_sephiroth_mesh;
 	initAngularAcceleration(base_force_for_rotation, application_point);
+
+	_hitbox = new BoxHitbox(&_position, &_orientation, _centroid, 7.5, 30, 7.5);
+	_hitbox->update();
 }
 
 void Sephiroth::getInertiaMoment(Matrix3& mat) const

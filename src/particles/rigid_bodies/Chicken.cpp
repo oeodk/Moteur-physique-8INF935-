@@ -12,6 +12,9 @@ Chicken::Chicken(const Vector3D& init_pos, const Vector3D& init_vel, const Quate
 	}
 	_mesh = &_chicken_mesh;
 	initAngularAcceleration(base_force_for_rotation, application_point);
+
+	_hitbox = new BoxHitbox(&_position, &_orientation, constants::EMPTY_VECTOR3D, 7.5, 7.5, 7.5);
+	_hitbox->update();
 }
 
 void Chicken::getInertiaMoment(Matrix3& mat) const
