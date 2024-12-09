@@ -16,6 +16,7 @@ protected:
 	HitBoxPrimitive(Vector3D* position, Quaternion* orientation, const Vector3D& position_offset);
 public:
 	bool doCollideWith(HitBoxPrimitive* hitbox, std::array<CollisionData, 8>& colision_data);
+	virtual bool doCollideWithTerrain(class Terrain* terrain, std::array<CollisionData, 8>& colision_data) = 0;
 	virtual void update() = 0;
 #ifdef HITBOX_DEBUG
 	virtual void drawBox() = 0;

@@ -41,9 +41,10 @@ protected :
 	static Vector3D calculateCentroid(const ofVboMesh& mesh);
 	virtual Vector3D getCentroid() const = 0;
 
-	void solveCollisionTranslation(const Vector3D& contact_normal, const Vector3D& v_relative, RigidBody* other_rigid_body);
-	void solveCollisionRotation(const Vector3D& contact_normal, const Vector3D& v_relative, RigidBody* other_rigid_body, const Vector3D& contact_point);
+	void solveCollisionTranslation(const Vector3D& contact_normal, const Vector3D& v_relative, RigidBody* other_rigid_body, int impact_count);
+	void solveCollisionRotation(const Vector3D& contact_normal, RigidBody* other_rigid_body, const Vector3D& contact_point, int impact_count);
 
+	
 public :
 	RigidBody(const Vector3D& init_pos, const Vector3D& init_vel, float mass, float radius,
 			  const Quaternion& init_orientation, const Vector3D& init_angular_vel,
@@ -52,6 +53,10 @@ public :
 
 	void checkCollision(RigidBody* other_rigid_body, float dt);
 	void solveCollision(RigidBody* other_rigid_body, const std::vector<CollisionData*>& collisions_data);
+
+	void checkCollisionTerrain(class Terrain* terrain, float dt) override;
+	void solveCollisionTerrain(class Terrain* terrain, const std::vector<CollisionData*>& collisions_data);
+
 
 	void incrementAngularVelocityWithDelay(const Vector3D& increment) { _angular_velocity_increment_delay += increment; }
 

@@ -85,9 +85,9 @@ public:
 
 	void solveCollision(Particle* otherParticle, const Vector3D& v_relative, float chevauchement, const Vector3D& contact_normal);
 
-	void checkCollisionTerrain(class Terrain* terrain, float dt);
+	virtual void checkCollisionTerrain(class Terrain* terrain, float dt);
 
-	void solveCollisionTerrain(const Vector3D& v_relative, float chevauchement, const Vector3D& contact_normal);
+	virtual void solveCollisionTerrain(const Vector3D& v_relative, float chevauchement, const Vector3D& contact_normal);
 
 	void resetMovement();
 

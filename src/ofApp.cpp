@@ -547,7 +547,7 @@ void ofApp::spawnRigidBody(BulletType type)
 
 		newParticle = new Masamune(current_position, look_at_dir,
 			base_orientation,
-			Vector3D(0, 0, 0), look_at_dir * 1100000, up_dir * 100);
+			Vector3D(0, 0, 0), look_at_dir * 100000, up_dir * 100);
 
 		_rigid_body.push_back(newParticle);
 	}
@@ -621,7 +621,7 @@ void ofApp::spawnRigidBody(BulletType type)
 
 				newParticle = new Masamune(current_position2, look_at_dir,
 					base_orientation,
-					Vector3D(0, 0, 0), look_at_dir * 900000, up_dir * 100);
+					Vector3D(0, 0, 0), look_at_dir * 100000, up_dir * 100);
 			}
 			break;
 			case SEPHIROTH:
@@ -649,7 +649,7 @@ void ofApp::spawnRigidBody(BulletType type)
 			{
 				Quaternion base_orientation = Quaternion::fromEulerAngle(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
 
-				newParticle = new StaticTestCube(current_position, look_at_dir,
+				newParticle = new StaticTestCube(current_position2, look_at_dir,
 					base_orientation,
 					Vector3D(0, 0, 0), look_at_dir * 100000, side_dir * 15);
 
@@ -659,7 +659,7 @@ void ofApp::spawnRigidBody(BulletType type)
 			{
 				Quaternion base_orientation = Quaternion::fromEulerAngle(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
 
-				newParticle = new MovingTestCube(current_position, look_at_dir,
+				newParticle = new MovingTestCube(current_position2, look_at_dir,
 					base_orientation,
 					Vector3D(0, 0, 0), look_at_dir * 100000, side_dir * 15);
 

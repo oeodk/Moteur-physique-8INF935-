@@ -24,7 +24,7 @@ public:
 	BoxHitbox(Vector3D* position, Quaternion* orientation, const Vector3D& position_offset, float half_width, float half_height, float half_depth);
 	bool doCollideWithBox(const class BoxHitbox* box_hitbox, std::array<CollisionData, 8>& collision_data) override;
 	void update() override;
-
+	bool doCollideWithTerrain(class Terrain* terrain, std::array<CollisionData, 8>& colision_data) override;
 #ifdef HITBOX_DEBUG
 	void drawBox() override;
 	void drawCorner() override;

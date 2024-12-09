@@ -19,11 +19,19 @@ Masamune::Masamune(const Vector3D& init_pos, const Vector3D& init_vel, const Qua
 
 void Masamune::getInertiaMoment(Matrix3& mat) const
 {
-	const float ROD_LENGTH_SQUARED = _radius * _radius;
+	//const float ROD_LENGTH_SQUARED = _radius * _radius;
+	//mat = _mass * Matrix3(
+	//	Vector3D(0.5 * ROD_LENGTH_SQUARED, 0, 0),
+	//	Vector3D(0, 0.5 * ROD_LENGTH_SQUARED, 0),
+	//	Vector3D()
+	//);
+
+	constexpr float CYLINDER_RADIUS_SQUARED = 0.5 * 0.5;
+	const float CYNLINDER_HEIGHT_SQUARED = _radius * _radius;
 	mat = _mass * Matrix3(
-		Vector3D(0.5 * ROD_LENGTH_SQUARED, 0, 0),
-		Vector3D(0, 0.5 * ROD_LENGTH_SQUARED, 0),
-		Vector3D()
+		Vector3D(0.25 * CYLINDER_RADIUS_SQUARED + (1 / 12.f) * CYNLINDER_HEIGHT_SQUARED, 0, 0),
+		Vector3D(0, 0.25 * CYLINDER_RADIUS_SQUARED + (1 / 12.f) * CYNLINDER_HEIGHT_SQUARED, 0),
+		Vector3D(0, 0, 0.5 * CYLINDER_RADIUS_SQUARED)
 	);
 }
 #ifdef DEBUG_RIGID_BODY

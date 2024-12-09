@@ -87,8 +87,8 @@ void RigidBody::solveCollision(RigidBody* other_rigid_body, const std::vector<Co
 
 		avr_penetration += (penetration / std::size(collisions_data));
 
-		solveCollisionTranslation(contact_normal, _velocity - other_rigid_body->_velocity, other_rigid_body);
-		solveCollisionRotation(contact_normal, _angular_velocity - other_rigid_body->_angular_velocity, other_rigid_body, impact_point);
+		solveCollisionTranslation(contact_normal, _velocity - other_rigid_body->_velocity, other_rigid_body, std::size(collisions_data));
+		solveCollisionRotation(contact_normal, other_rigid_body, impact_point, std::size(collisions_data));
 	}
 	Vector3D dep_dir = (other_rigid_body->_position - _position);
 	if (dep_dir.squareNorm() == 0)
@@ -104,65 +104,130 @@ void RigidBody::solveCollision(RigidBody* other_rigid_body, const std::vector<Co
 	other_rigid_body->_position = other_rigid_body->_position + dep_2 * dep_dir;
 }
 
-void RigidBody::solveCollisionTranslation(const Vector3D& contact_normal, const Vector3D& v_relative, RigidBody* other_rigid_body)
+void RigidBody::checkCollisionTerrain(Terrain* terrain, float dt)
+{
+	std::array<CollisionData, 8> collision_data;
+	std::vector<CollisionData*> relevant_collisions_data;
+	relevant_collisions_data.reserve(4);
+	if (_hitbox->doCollideWithTerrain(terrain, collision_data))
+	{
+		// sorting collision data to get lower penetration distance in the front
+		std::sort(collision_data.begin(), collision_data.end(), [](const CollisionData& c1, const CollisionData& c2) {
+			return c1._penetration_distance < c2._penetration_distance;
+			});
+
+		const float min_penetration = collision_data[0]._penetration_distance;
+
+		size_t i = 0;
+		while (i < 4 && min_penetration > collision_data[i]._penetration_distance*0.95 && min_penetration < collision_data[i]._penetration_distance *1.05)
+		{
+			relevant_collisions_data.push_back(&collision_data[i]);
+			i++;
+		}
+		solveCollisionTerrain(terrain, relevant_collisions_data);
+	}
+}
+
+void RigidBody::solveCollisionTerrain(Terrain* terrain, const std::vector<CollisionData*>& collisions_data)
+{
+	float avr_penetration = 0;
+	Vector3D avr_normal;
+	for (size_t i = 0; i < std::size(collisions_data); i++)
+	{
+		const Vector3D& contact_normal = collisions_data[i]->_contact_normal;
+		const float penetration = collisions_data[i]->_penetration_distance;
+		const Vector3D& impact_point = collisions_data[i]->_impact_point;
+
+		avr_normal+= (contact_normal / std::size(collisions_data));
+		avr_penetration += (penetration / std::size(collisions_data));
+		
+		float K;
+		const float e_translation = 0.05; //elasticity
+		const float e_rotation = 0.5; //elasticity
+		// solving translation
+		K = ((e_translation + 1) * Vector3D::dotProduct(contact_normal, _velocity)) / _inverse_mass;
+		incrementVelocityWithDelay(contact_normal * -K * _inverse_mass);
+
+		// solving rotation
+		
+		// Relative position from center of mass to collision point
+		Vector3D c1 = impact_point - _position;
+
+		// Relative velocity at the collision point
+		glm::vec3 relative_velocity = -1 * (_velocity + Vector3D::crossProduct(_angular_velocity, c1));
+
+		// Calculate impulse scalar
+		float relative_velocity_projection = Vector3D::dotProduct(relative_velocity, contact_normal);
+		//if (relativeVelocityAlongNormal > 0.0f) return; // Bodies are separating
+
+		const Matrix3& J1_inv = _inertia_moment_inverted;
+
+		// Compute impulse denominator
+		const Vector3D c1_cross_normal = Vector3D::crossProduct(c1, contact_normal);
+
+		float angular_term = Vector3D::dotProduct(contact_normal, Vector3D::crossProduct(J1_inv * c1_cross_normal, c1));
+
+		K = -(1.0f + e_rotation) * relative_velocity_projection / (_inverse_mass + angular_term);
+		K /= std::size(collisions_data);
+
+		// Impulse vector
+		Vector3D impulse = K * contact_normal;
+
+		// Apply angular impulse
+		incrementAngularVelocityWithDelay((-1) * J1_inv * Vector3D::crossProduct(c1, impulse));
+		
+	}
+	_position = _position + avr_penetration * avr_normal;
+}
+
+void RigidBody::solveCollisionTranslation(const Vector3D& contact_normal, const Vector3D& v_relative, RigidBody* other_rigid_body, int impact_count)
 {
 	float K;
 	constexpr float e = 0.75; //elasticity
 
 	K = ((e + 1) * Vector3D::dotProduct(contact_normal, v_relative)) / (_inverse_mass + other_rigid_body->_inverse_mass);
-	
+	K /= impact_count;
 
 	incrementVelocityWithDelay(contact_normal * -K * _inverse_mass);
 	other_rigid_body->incrementVelocityWithDelay(contact_normal * K * other_rigid_body->_inverse_mass);
 }
 
-void RigidBody::solveCollisionRotation(const Vector3D& contact_normal, const Vector3D& v_relative, RigidBody* other_rigid_body, const Vector3D& contact_point)
+void RigidBody::solveCollisionRotation(const Vector3D& contact_normal, RigidBody* other_rigid_body, const Vector3D& contact_point, int impact_count)
 {
 	constexpr float e = 0.5; //elasticity
 
 	// Relative position from center of mass to collision point
-	Vector3D r1 = contact_point - _position;
-	Vector3D r2 = contact_point - other_rigid_body->_position;
+	Vector3D c1 = contact_point - _position;
+	Vector3D c2 = contact_point - other_rigid_body->_position;
 
 	// Relative velocity at the collision point
-	glm::vec3 vRel = (other_rigid_body->_velocity + Vector3D::crossProduct(other_rigid_body->_angular_velocity, r2)) -
-		(_velocity + Vector3D::crossProduct(_angular_velocity, r1));
+	glm::vec3 relative_velocity = (other_rigid_body->_velocity + Vector3D::crossProduct(other_rigid_body->_angular_velocity, c2)) -
+		(_velocity + Vector3D::crossProduct(_angular_velocity, c1));
 
 	// Calculate impulse scalar
-	float relativeVelocityAlongNormal = Vector3D::dotProduct(vRel, contact_normal);
+	float relative_velocity_projection = Vector3D::dotProduct(relative_velocity, contact_normal);
 	//if (relativeVelocityAlongNormal > 0.0f) return; // Bodies are separating
 
-	Matrix3& I1_inv = _inertia_moment_inverted;
-	Matrix3& I2_inv = other_rigid_body->_inertia_moment_inverted;
+	const Matrix3& J1_inv = _inertia_moment_inverted;
+	const Matrix3& J2_inv = other_rigid_body->_inertia_moment_inverted;
 
 	// Compute impulse denominator
-	float massTerm = (1.0f / _mass) + (1.0f / other_rigid_body->_mass);
-	Vector3D r1CrossN = Vector3D::crossProduct(r1, contact_normal);
-	Vector3D r2CrossN = Vector3D::crossProduct(r2, contact_normal);
+	const float mass_term = (_inverse_mass) +other_rigid_body->_inverse_mass;
+	const Vector3D c1_cross_normal = Vector3D::crossProduct(c1, contact_normal);
+	const Vector3D c2_cross_normal = Vector3D::crossProduct(c2, contact_normal);
 
-	float angularTerm = Vector3D::dotProduct(contact_normal,
-		Vector3D::crossProduct(I1_inv * r1CrossN, r1) + Vector3D::crossProduct(I2_inv * r2CrossN, r2));
+	float angular_term = Vector3D::dotProduct(contact_normal,
+		Vector3D::crossProduct(J1_inv * c1_cross_normal, c1) + Vector3D::crossProduct(J2_inv * c2_cross_normal, c2));
 
-	float impulseMagnitude = -(1.0f + e) * relativeVelocityAlongNormal / (massTerm + angularTerm);
+	float K = -(1.0f + e) * relative_velocity_projection / (mass_term + angular_term);
+	K /= impact_count;
 
 	// Impulse vector
-	Vector3D impulse = impulseMagnitude * contact_normal;
-
-	// Apply impulse to linear velocities
-
-	//incrementVelocityWithDelay(impulse / -_mass);
-	//other_rigid_body->incrementVelocityWithDelay(impulse / other_rigid_body->_mass);
+	Vector3D impulse = K * contact_normal;
 
 	// Apply angular impulse
-	incrementAngularVelocityWithDelay((-1) * I1_inv * Vector3D::crossProduct(r1, impulse));
-	other_rigid_body->incrementAngularVelocityWithDelay(I2_inv * Vector3D::crossProduct(r2, impulse));
-	//Matrix3 K;
-	//Matrix3 tmp = (_inertia_moment_inverted + other_rigid_body->_inertia_moment_inverted).getInverse(); // = (J^(-1) + other_rigid_body.J^(-1))^(-1)
-	//K = ((e + 1) * Vector3D::dotProduct(contact_normal, v_relative)) * tmp;
-	//
-	//
-	//addForceToPoint((-1 * K) * _inertia_moment_inverted * contact_normal * 1000, contact_point);
-	//other_rigid_body->addForceToPoint(K * other_rigid_body->_inverse_mass * contact_normal * 1000, contact_point);
+	incrementAngularVelocityWithDelay((-1) * J1_inv * Vector3D::crossProduct(c1, impulse));
+	other_rigid_body->incrementAngularVelocityWithDelay(J2_inv * Vector3D::crossProduct(c2, impulse));
 }
 
 void RigidBody::integrate(float dt, IntegrationMethods method)
