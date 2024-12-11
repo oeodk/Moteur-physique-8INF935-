@@ -1,8 +1,8 @@
 #pragma once
 #define HITBOX_DEBUG
-#include "Vector3D.h"
-#include "Quaternion.h"
-#include "CollisionData.h"
+#include "../Vector3D.h"
+#include "../Quaternion.h"
+#include "../CollisionData.h"
 
 class HitBoxPrimitive
 {

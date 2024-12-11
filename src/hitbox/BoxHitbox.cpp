@@ -1,5 +1,5 @@
 #include "BoxHitbox.h"
-#include "Terrain.h"
+#include "../Terrain.h"
 #ifdef HITBOX_DEBUG
 #include <ofGraphics.h>
 #include <of3DGraphics.h>
