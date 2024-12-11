@@ -66,6 +66,7 @@ Vector3D Particle::eulerUpdateVelocity(float dt)
 {
 	//Vector3D v =  std::pow(_drag, dt) * _velocity + dt * _acceleration + _velocity_increment_delay;
 	Vector3D v = _velocity + dt * _acceleration + _velocity_increment_delay;
+	_velocity_increment_delay.set(0);
 	if (v.squareNorm() != 0)
 	{
 		if (_velocity.squareNorm() == 0)
@@ -76,7 +77,6 @@ Vector3D Particle::eulerUpdateVelocity(float dt)
 			}
 		}
 	}
-	_velocity_increment_delay.set(0);
 	return v;
 }
 
@@ -181,7 +181,6 @@ void Particle::solveCollision(Particle* other_particle, const Vector3D& v_relati
 
 	incrementVelocityWithDelay(contact_normal * -K * _inverse_mass);
 	other_particle->incrementVelocityWithDelay(contact_normal * K * other_particle->_inverse_mass);
-
 }
 
 void Particle::checkCollisionTerrain(Terrain* terrain, float dt)

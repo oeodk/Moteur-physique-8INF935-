@@ -318,3 +318,4 @@ void TestQuaternion::testInequality() {
 
 	_ASSERT(q1 != q2 && q2 != q1);
 }
+

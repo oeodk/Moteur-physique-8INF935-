@@ -6,6 +6,8 @@
 #include "../constrain/Constrain.h"
 #include "ofNode.h"
 
+#include "hitbox/BoxHitbox.h"
+
 class Particle : public Drawable
 {
 protected:
@@ -40,7 +42,7 @@ public:
 
 	Particle();
 	Particle(const Vector3D& init_pos, const Vector3D& init_vel, float mass, float radius, const Vector3D& color, float alpha);
-	~Particle() = default;
+	virtual ~Particle() = default;
 
 	void addForce(const Vector3D& force);
 	void clearAccum();
@@ -83,9 +85,9 @@ public:
 
 	void solveCollision(Particle* otherParticle, const Vector3D& v_relative, float chevauchement, const Vector3D& contact_normal);
 
-	void checkCollisionTerrain(class Terrain* terrain, float dt);
+	virtual void checkCollisionTerrain(class Terrain* terrain, float dt);
 
-	void solveCollisionTerrain(const Vector3D& v_relative, float chevauchement, const Vector3D& contact_normal);
+	virtual void solveCollisionTerrain(const Vector3D& v_relative, float chevauchement, const Vector3D& contact_normal);
 
 	void resetMovement();
 

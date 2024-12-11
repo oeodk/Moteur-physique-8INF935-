@@ -21,6 +21,11 @@ public:
 
 	void normalize();
 
+	void rotatePoint(Vector3D& point) const;
+	Vector3D getLookAtDir() const;
+	Vector3D getSideDir() const;
+	Vector3D getUpDir() const;
+
 	Quaternion negate() const;
 	Quaternion conjugate() const;
 	Quaternion inverse() const;

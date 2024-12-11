@@ -3,8 +3,9 @@
 
 struct CollisionData
 {
-	bool _collision_detected;
-	Vector3D _impact_point;
-	float _penetration_distance;
+	bool _collision_detected = false;
+	Vector3D _impact_point; //nul constructor exist
+	Vector3D _contact_normal; //nul constructor exist
+	float _penetration_distance = FLT_MAX;
 };
 

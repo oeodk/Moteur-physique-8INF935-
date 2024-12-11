@@ -36,6 +36,27 @@ void Quaternion::normalize()
 	z /= norm;
 }
 
+void Quaternion::rotatePoint(Vector3D& point) const
+{
+	Quaternion rotated_point = (*this) * Quaternion(0, point) * conjugate();
+	point.set(rotated_point.x, rotated_point.y, rotated_point.z);
+}
+
+Vector3D Quaternion::getLookAtDir() const
+{
+	return { 2 * (x * z + w * y), 2 * (y * z - w * x), 1 - 2 * (x * x + y * y) };
+}
+
+Vector3D Quaternion::getSideDir() const
+{
+	return { 1 - 2 * (y * y + z * z), 2 * (x * y + w * z), 2 * (x * z - w * y) };
+}
+
+Vector3D Quaternion::getUpDir() const
+{
+	return { 2 * (x * y - w * z), 1 - 2 * (x * x + z * z), 2 * (y * z + w * x) };
+}
+
 Quaternion Quaternion::negate() const {
 	return Quaternion(-w, -x, -y, -z);
 }

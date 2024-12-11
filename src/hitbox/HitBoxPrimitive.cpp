@@ -14,3 +14,4 @@ bool HitBoxPrimitive::doCollideWith(HitBoxPrimitive* hitbox, std::array<Collisio
     }
     return false;
 }
+

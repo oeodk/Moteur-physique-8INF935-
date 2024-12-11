@@ -1,4 +1,6 @@
 #pragma once
+#define RIGID_BODY_ONLY
+
 #include "ofMain.h"
 #include "forces/ParticleForceRegistry.h"
 #include "RenderEngine.h"
@@ -14,15 +16,14 @@
 class ofApp : public ofBaseApp {
 private:
 	inline static std::vector<class Particle*> _particles;
+	inline static std::vector<class RigidBody*> _rigid_body;
 	std::vector<BulletType> _particle_types = {
-		BulletType::BULLET,
-		BulletType::CANNONBALL,
-		BulletType::FIREBALL,
-		BulletType::BLOB,
 		BulletType::CHICKEN,
 		BulletType::MASAMUNE,
 		BulletType::SEPHIROTH,
-		BulletType::GOAT
+		BulletType::GOAT,
+		BulletType::STATIC_CUBE,
+		BulletType::MOVING_CUBE
 	};
 	ocTree _particles_octree;
 
@@ -60,7 +61,9 @@ public:
 	void gotMessage(ofMessage msg);
 
 	void spawnParticle(BulletType type = BULLET);
+	void spawnRigidBody(BulletType type = BULLET);
 	void moveBlobs();
 
 	static void addParticle(Particle* particle) { _particles.push_back(particle); }
+	static void addRigidBody(RigidBody* particle) { _rigid_body.push_back(particle); }
 };

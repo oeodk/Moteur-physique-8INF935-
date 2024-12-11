@@ -11,6 +11,8 @@ enum BulletType {
 	SEPHIROTH,
 	MASAMUNE,
 	GOAT,
+	STATIC_CUBE,
+	MOVING_CUBE,
 	E_END
 };
 

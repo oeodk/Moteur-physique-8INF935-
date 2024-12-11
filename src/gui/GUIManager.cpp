@@ -42,6 +42,8 @@ std::string GUIManager::getDisplayName(BulletType bullet_type) {
 	case MASAMUNE: return "Masamune";
 	case SEPHIROTH: return "Sephiroth";
 	case GOAT: return "Chevre";
+	case STATIC_CUBE: return "Cube de test immobile";
+	case MOVING_CUBE: return "Cube de test mobile";
 	default: return "";
 	}
 }
@@ -58,6 +60,8 @@ std::string GUIManager::getIconPath(BulletType bullet_type) {
 	case MASAMUNE: return "rigidbody_icons/masamune.png";
 	case SEPHIROTH: return "rigidbody_icons/sephiroth.png";
 	case GOAT: return "rigidbody_icons/goat.png";
+	case STATIC_CUBE: return "rigidbody_icons/static_cube.png";
+	case MOVING_CUBE: return "rigidbody_icons/moving_cube.png";
 	default: return "";
 	}
 }
