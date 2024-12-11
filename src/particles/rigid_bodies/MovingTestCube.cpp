@@ -13,8 +13,8 @@ MovingTestCube::MovingTestCube(const Vector3D& init_pos, const Vector3D& init_ve
 	_mesh = &_cube_mesh;
 	initAngularAcceleration(constants::EMPTY_VECTOR3D, constants::EMPTY_VECTOR3D);
 
-	_hitbox = new BoxHitbox(&_position, &_orientation, constants::EMPTY_VECTOR3D, 10, 10, 10);
-	_hitbox->update();
+	_hitbox.push_back(new BoxHitbox(&_position, &_orientation, constants::EMPTY_VECTOR3D, 10, 10, 10));
+	_hitbox.back()->update();
 }
 
 void MovingTestCube::getInertiaMoment(Matrix3& mat) const

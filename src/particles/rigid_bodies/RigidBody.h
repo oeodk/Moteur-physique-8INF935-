@@ -34,7 +34,7 @@ protected :
 
 	Vector3D _angular_velocity_increment_delay;
 
-	BoxHitbox* _hitbox = nullptr;
+	std::vector<BoxHitbox*> _hitbox;
 
 	void initAngularAcceleration(const Vector3D& base_force_for_rotation, const Vector3D& application_point);
 	void displaceInertiaMoment(Matrix3& inertia_moment, const Vector3D& displacement);
@@ -49,7 +49,7 @@ public :
 	RigidBody(const Vector3D& init_pos, const Vector3D& init_vel, float mass, float radius,
 			  const Quaternion& init_orientation, const Vector3D& init_angular_vel,
 			  const std::string& sound_path);
-	~RigidBody() { if(_hitbox) delete _hitbox; }
+	~RigidBody() { for(auto& hitbox : _hitbox) delete hitbox; }
 
 	void checkCollision(RigidBody* other_rigid_body, float dt);
 	void solveCollision(RigidBody* other_rigid_body, const std::vector<CollisionData*>& collisions_data);

@@ -74,8 +74,10 @@ void ofApp::update() {
 	for (RigidBody* rigid_body: _rigid_body)
 	{
 		if(!dynamic_cast<StaticTestCube*>(rigid_body) && !dynamic_cast<MovingTestCube*>(rigid_body))
-		_forces_registry.add(rigid_body, &gravity_force);
-		_forces_registry.add(rigid_body, &friction_force);
+		{
+			_forces_registry.add(rigid_body, &gravity_force);
+			_forces_registry.add(rigid_body, &friction_force);
+		}
 	}
 
 	_forces_registry.updateForces(_dt);
@@ -547,7 +549,7 @@ void ofApp::spawnRigidBody(BulletType type)
 
 		newParticle = new Masamune(current_position, look_at_dir,
 			base_orientation,
-			Vector3D(0, 0, 0), look_at_dir * 100000, up_dir * 100);
+			Vector3D(0, 0, 0), look_at_dir * 250000, up_dir * 100);
 
 		_rigid_body.push_back(newParticle);
 	}
@@ -621,7 +623,7 @@ void ofApp::spawnRigidBody(BulletType type)
 
 				newParticle = new Masamune(current_position2, look_at_dir,
 					base_orientation,
-					Vector3D(0, 0, 0), look_at_dir * 100000, up_dir * 100);
+					Vector3D(0, 0, 0), look_at_dir * 250000, up_dir * 100);
 			}
 			break;
 			case SEPHIROTH:

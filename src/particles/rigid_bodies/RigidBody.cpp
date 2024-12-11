@@ -57,22 +57,27 @@ void RigidBody::checkCollision(RigidBody* other_rigid_body, float dt)
 	std::array<CollisionData, 8> collision_data;
 	std::vector<CollisionData*> relevant_collisions_data;
 	relevant_collisions_data.reserve(4);
-	if (_hitbox->doCollideWith(other_rigid_body->_hitbox, collision_data))
+	for(HitBoxPrimitive* hitbox : _hitbox)
 	{
-		// sorting collision data to get lower penetration distance in the front
-		std::sort(collision_data.begin(), collision_data.end(), [](const CollisionData& c1, const CollisionData& c2) {
-			return c1._penetration_distance < c2._penetration_distance;
-			});
-
-		const float min_penetration = collision_data[0]._penetration_distance;
-
-		size_t i = 0;
-		while (i < 4 && min_penetration == collision_data[i]._penetration_distance)
+		for(HitBoxPrimitive* other_hitbox : other_rigid_body->_hitbox)
+		if (hitbox->doCollideWith(other_hitbox, collision_data))
 		{
-			relevant_collisions_data.push_back(&collision_data[i]);
-			i++;
+			// sorting collision data to get lower penetration distance in the front
+			std::sort(collision_data.begin(), collision_data.end(), [](const CollisionData& c1, const CollisionData& c2) {
+				return c1._penetration_distance < c2._penetration_distance;
+				});
+
+			const float min_penetration = collision_data[0]._penetration_distance;
+
+			size_t i = 0;
+			while (i < 4 && min_penetration == collision_data[i]._penetration_distance)
+			{
+				relevant_collisions_data.push_back(&collision_data[i]);
+				i++;
+			}
+			solveCollision(other_rigid_body, relevant_collisions_data);
+			return;
 		}
-		solveCollision(other_rigid_body, relevant_collisions_data);
 	}
 }
 
@@ -109,22 +114,26 @@ void RigidBody::checkCollisionTerrain(Terrain* terrain, float dt)
 	std::array<CollisionData, 8> collision_data;
 	std::vector<CollisionData*> relevant_collisions_data;
 	relevant_collisions_data.reserve(4);
-	if (_hitbox->doCollideWithTerrain(terrain, collision_data))
+	for(HitBoxPrimitive*  hitbox : _hitbox)
 	{
-		// sorting collision data to get lower penetration distance in the front
-		std::sort(collision_data.begin(), collision_data.end(), [](const CollisionData& c1, const CollisionData& c2) {
-			return c1._penetration_distance < c2._penetration_distance;
-			});
-
-		const float min_penetration = collision_data[0]._penetration_distance;
-
-		size_t i = 0;
-		while (i < 4 && min_penetration > collision_data[i]._penetration_distance*0.95 && min_penetration < collision_data[i]._penetration_distance *1.05)
+		if (hitbox->doCollideWithTerrain(terrain, collision_data))
 		{
-			relevant_collisions_data.push_back(&collision_data[i]);
-			i++;
+			// sorting collision data to get lower penetration distance in the front
+			std::sort(collision_data.begin(), collision_data.end(), [](const CollisionData& c1, const CollisionData& c2) {
+				return c1._penetration_distance < c2._penetration_distance;
+				});
+
+			const float min_penetration = collision_data[0]._penetration_distance;
+
+			size_t i = 0;
+			while (i < 4 && min_penetration > collision_data[i]._penetration_distance * 0.95 && min_penetration < collision_data[i]._penetration_distance * 1.05)
+			{
+				relevant_collisions_data.push_back(&collision_data[i]);
+				i++;
+			}
+			solveCollisionTerrain(terrain, relevant_collisions_data);
+			return;
 		}
-		solveCollisionTerrain(terrain, relevant_collisions_data);
 	}
 }
 
@@ -250,8 +259,10 @@ void RigidBody::integrate(float dt, IntegrationMethods method)
 	_orientation += 0.5f * Quaternion(0,_angular_velocity) * _orientation * dt;
 
 	_orientation.normalize();
-
-	_hitbox->update();
+	for (HitBoxPrimitive* hitbox : _hitbox)
+	{
+		hitbox->update();
+	}
 }
 
 void RigidBody::draw()
@@ -276,7 +287,10 @@ void RigidBody::draw()
 	}
 
 #ifdef HITBOX_DEBUG
-	_hitbox->drawBox();
+	for (HitBoxPrimitive* hitbox : _hitbox)
+	{
+		hitbox->drawBox();
+	}
 #endif // HITBOX_DEBUG
 
 #ifdef DEBUG_RIGID_BODY
@@ -285,9 +299,15 @@ void RigidBody::draw()
 	_transformation.restoreTransformGL();
 
 #ifdef HITBOX_DEBUG
-	_hitbox->drawCorner();
+	for (HitBoxPrimitive* hitbox : _hitbox)
+	{
+		hitbox->drawCorner();
+	}
 #endif // HITBOX_DEBUG
-	_hitbox->update();
+	for (HitBoxPrimitive* hitbox : _hitbox)
+	{
+		hitbox->update();
+	}
 
 	_mass_center_mesh.getVertices().back() = _position;
 	ofDisableDepthTest();

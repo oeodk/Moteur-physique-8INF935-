@@ -23,8 +23,8 @@ Goat::Goat(const Vector3D& init_pos, const Vector3D& init_vel, const Quaternion&
 	_mesh = &_goat_mesh;
 	initAngularAcceleration(base_force_for_rotation, application_point);
 
-	_hitbox = new BoxHitbox(&_position, &_orientation, constants::EMPTY_VECTOR3D, 12.5, 20, 12.5);
-	_hitbox->update();
+	_hitbox.push_back(new BoxHitbox(&_position, &_orientation, constants::EMPTY_VECTOR3D, 12.5, 20, 12.5));
+	_hitbox.back()->update();
 }
 
 void Goat::getInertiaMoment(Matrix3& mat) const

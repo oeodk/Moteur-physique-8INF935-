@@ -17,8 +17,8 @@ StaticTestCube::StaticTestCube(const Vector3D& init_pos, const Vector3D& init_ve
 	_mesh = &_cube_mesh;
 	initAngularAcceleration(constants::EMPTY_VECTOR3D, constants::EMPTY_VECTOR3D);
 
-	_hitbox = new BoxHitbox(&_position, &_orientation, constants::EMPTY_VECTOR3D, 50, 50, 50);
-	_hitbox->update();
+	_hitbox.push_back(new BoxHitbox(&_position, &_orientation, constants::EMPTY_VECTOR3D, 50, 50, 50));
+	_hitbox.back()->update();
 }
 
 void StaticTestCube::getInertiaMoment(Matrix3& mat) const
