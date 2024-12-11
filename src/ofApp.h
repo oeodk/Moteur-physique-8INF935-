@@ -7,6 +7,7 @@
 #include "Terrain.h"
 #include "GlobalConstants.h"
 #include "particles/Blob.h"
+#include "ocTree.h"
 
 #include <vector>
 
@@ -23,6 +24,7 @@ private:
 		BulletType::SEPHIROTH,
 		BulletType::GOAT
 	};
+	ocTree _particles_octree;
 
 	ParticleForceRegistry _forces_registry;
 	PhysicsEngine _physics_engine;

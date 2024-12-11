@@ -66,6 +66,9 @@ void ofApp::update() {
 	}
 	moveBlobs();
 
+	_particles_octree = ocTree(_render_engine.getCameraPosition(), Vector3D(5000));
+	_particles_octree.build(_particles);
+
 	_forces_registry.updateForces(_dt);
 	_physics_engine.updateParticles(_dt, _particles, &_terrain);
 	_terrain.update(_render_engine.getCameraPosition(), _dt);
@@ -106,6 +109,8 @@ void ofApp::draw() {
 		_render_engine.addRenderTarget(particle);
 		_render_engine.addRenderTarget(particle, false);
 	}
+
+	_render_engine.addRenderTarget(&_particles_octree);
 
 	_render_engine.render();
 	_gui_manager.draw();

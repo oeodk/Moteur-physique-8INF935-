@@ -1,7 +1,7 @@
 #pragma once
-#include "Vector3D.h"
-#include "Quaternion.h"
-#include "CollisionData.h"
+#include "../Vector3D.h"
+#include "../Quaternion.h"
+#include "../CollisionData.h"
 
 class HitBoxPrimitive
 {
