@@ -9,6 +9,7 @@ using namespace std;
 
 constexpr int PARTICLE_PER_NODE = 2;
 constexpr int CHILD_PER_NODE = 8;
+constexpr int MAX_DEPTH = 8;
 
 constexpr int TopLeftFront = 0;
 constexpr int TopRightFront = 1;
@@ -37,16 +38,19 @@ protected:
 	Cube* _nodeVolume;
 	vector<Particle*> _particles;
 	vector<ocTree*> _children;
+	int _depth;
 
 	ofVboMesh _octree_mesh;
 
 public:
 	ocTree();
-	ocTree(const Vector3D& origin, const Vector3D& size);
+	ocTree(const Vector3D& origin, const Vector3D& size, int depth = 0);
 	~ocTree();
 
 	void build(const vector<RigidBody*>& particles);
 	vector<int> getAffectedChildIndices(Particle* p);
+
+	void checkCollisions(float dt);
 
 	void drawNoLight() override;
 };
