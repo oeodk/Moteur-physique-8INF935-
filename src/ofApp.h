@@ -23,7 +23,8 @@ private:
 		BulletType::SEPHIROTH,
 		BulletType::GOAT,
 		BulletType::STATIC_CUBE,
-		BulletType::MOVING_CUBE
+		BulletType::MOVING_CUBE,
+		BulletType::IMMOBILE_BLOCK
 	};
 	ocTree _particles_octree;
 
@@ -44,6 +45,8 @@ private:
 
 	bool _do_simulation = true;
 	bool _show_octree = true;
+
+	ofSoundPlayer _za_warudo;
 public:
 	inline static bool _show_hitbox = true;
 	

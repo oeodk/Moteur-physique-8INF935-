@@ -10,6 +10,7 @@
 #include "particles/rigid_bodies/Sephiroth.h"
 #include "particles/rigid_bodies/Masamune.h"
 #include "particles/rigid_bodies/MovingTestCube.h"
+#include "particles/rigid_bodies/ImmovableBlock.h"
 #include "particles/rigid_bodies/StaticTestCube.h"
 #include "particles/Anchor.h"
 #include "forces/GravityParticleForce.h"
@@ -76,7 +77,7 @@ void ofApp::update() {
 	{
 		for (RigidBody* rigid_body : _rigid_body)
 		{
-			if (!dynamic_cast<StaticTestCube*>(rigid_body) && !dynamic_cast<MovingTestCube*>(rigid_body))
+			if (!dynamic_cast<StaticTestCube*>(rigid_body) && !dynamic_cast<MovingTestCube*>(rigid_body) && !dynamic_cast<ImmovableBlock*>(rigid_body))
 			{
 				_forces_registry.add(rigid_body, &gravity_force);
 				_forces_registry.add(rigid_body, &friction_force);
@@ -87,7 +88,7 @@ void ofApp::update() {
 		_particles_octree.build(_rigid_body);
 
 		_forces_registry.updateForces(_dt);
-		_physics_engine.updateRigidBody(_dt, _rigid_body, &_terrain);
+		_physics_engine.updateRigidBody(_dt, _rigid_body, &_terrain, _particles_octree);
 #endif
 
 		_terrain.update(_render_engine.getCameraPosition(), _dt);
@@ -199,6 +200,16 @@ void ofApp::keyPressed(int key) {
 	if (key == ofKey::OF_KEY_F1)
 	{
 		_do_simulation = !_do_simulation;
+		if (_do_simulation)
+		{
+			_za_warudo.load("sound/time_resume.mp3");
+			_za_warudo.play();
+		}
+		else
+		{
+			_za_warudo.load("sound/time_stop.mp3");
+			_za_warudo.play();
+		}
 	}
 	if (key == ofKey::OF_KEY_F2)
 	{
@@ -438,6 +449,17 @@ void ofApp::spawnParticle(BulletType type) {
 		_particles.push_back(newParticle);
 	}
 	break;
+	case IMMOBILE_BLOCK:
+	{
+		Quaternion base_orientation = Quaternion::fromEulerAngle(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
+
+		newParticle = new ImmovableBlock(current_position, look_at_dir,
+			base_orientation,
+			Vector3D(0, 0, 0), look_at_dir * 100000, side_dir * 15);
+
+		_particles.push_back(newParticle);
+	}
+	break;
 	case MOVING_CUBE:
 	{
 		Quaternion base_orientation = Quaternion::fromEulerAngle(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
@@ -524,6 +546,16 @@ void ofApp::spawnParticle(BulletType type) {
 					Quaternion base_orientation = Quaternion::fromEulerAngle(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
 
 					newParticle = new MovingTestCube(current_position, look_at_dir,
+						base_orientation,
+						Vector3D(0, 0, 0), look_at_dir * 100000, side_dir * 15);
+
+				}
+				break;
+				case IMMOBILE_BLOCK:
+				{
+					Quaternion base_orientation = Quaternion::fromEulerAngle(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
+
+					newParticle = new ImmovableBlock(current_position, look_at_dir,
 						base_orientation,
 						Vector3D(0, 0, 0), look_at_dir * 100000, side_dir * 15);
 
@@ -626,6 +658,17 @@ void ofApp::spawnRigidBody(BulletType type)
 		_rigid_body.push_back(newParticle);
 	}
 	break;
+	case IMMOBILE_BLOCK:
+	{
+		Quaternion base_orientation = Quaternion::fromEulerAngle(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
+
+		newParticle = new ImmovableBlock(current_position, look_at_dir,
+			base_orientation,
+			Vector3D(0, 0, 0), look_at_dir * 100000, side_dir * 15);
+
+		_rigid_body.push_back(newParticle);
+	}
+	break;
 	default:
 		for (int i = 0; i < 50; i++)
 		{
@@ -688,6 +731,16 @@ void ofApp::spawnRigidBody(BulletType type)
 				Quaternion base_orientation = Quaternion::fromEulerAngle(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
 
 				newParticle = new MovingTestCube(current_position2, look_at_dir,
+					base_orientation,
+					Vector3D(0, 0, 0), look_at_dir * 100000, side_dir * 15);
+
+			}
+			break;
+			case IMMOBILE_BLOCK:
+			{
+				Quaternion base_orientation = Quaternion::fromEulerAngle(Vector3D(camera.getPitchRad(), camera.getHeadingRad(), camera.getRollRad()));
+
+				newParticle = new ImmovableBlock(current_position2, look_at_dir,
 					base_orientation,
 					Vector3D(0, 0, 0), look_at_dir * 100000, side_dir * 15);
 

@@ -19,7 +19,7 @@ Chicken::Chicken(const Vector3D& init_pos, const Vector3D& init_vel, const Quate
 
 void Chicken::getInertiaMoment(Matrix3& mat) const
 {
-	mat = constants::IDENTITY_MATRIX3 * (0.4 * _mass * _radius * _radius);
+	mat = constants::IDENTITY_MATRIX3 * (0.4 * _mass * 15 * 15);
 }
 #ifdef DEBUG_RIGID_BODY
 void Chicken::drawApproximation()

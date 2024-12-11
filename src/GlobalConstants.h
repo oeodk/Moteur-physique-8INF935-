@@ -13,6 +13,7 @@ enum BulletType {
 	GOAT,
 	STATIC_CUBE,
 	MOVING_CUBE,
+	IMMOBILE_BLOCK,
 	E_END
 };
 

@@ -164,7 +164,7 @@ void RigidBody::solveCollisionTerrain(Terrain* terrain, const std::vector<Collis
 		avr_penetration += (penetration / std::size(collisions_data));
 		
 		float K;
-		const float e_translation = 0.05; //elasticity
+		const float e_translation = 0.5; //elasticity
 		const float e_rotation = 0.5; //elasticity
 		// solving translation
 		K = ((e_translation + 1) * Vector3D::dotProduct(contact_normal, _velocity)) / _inverse_mass;
@@ -323,6 +323,9 @@ void RigidBody::draw()
 		}
 	}
 #endif // HITBOX_DEBUG
+
+	//ofSetColor(0, 255, 255, 120);
+	//ofDrawSphere(_position, _radius);
 
 	_mass_center_mesh.getVertices().back() = _position;
 	ofDisableDepthTest();

@@ -8,6 +8,28 @@ ocTree::ocTree(const Vector3D& origin, const Vector3D& size, int depth) :
 	_depth(depth)
 {
 	_children.assign(8, nullptr);
+	_octree_mesh.setMode(OF_PRIMITIVE_LINES);
+
+	for (int i = 0; i < 7; i++)
+	{
+		_octree_mesh.addIndex(i);
+		_octree_mesh.addIndex(i + 1);
+	}
+	_octree_mesh.addIndex(7);
+	_octree_mesh.addIndex(0);
+
+	_octree_mesh.addIndex(7);
+	_octree_mesh.addIndex(2);
+
+	_octree_mesh.addIndex(6);
+	_octree_mesh.addIndex(3);
+
+	_octree_mesh.addIndex(0);
+	_octree_mesh.addIndex(5);
+
+	_octree_mesh.addIndex(1);
+	_octree_mesh.addIndex(4);
+
 }
 
 ocTree::~ocTree()
@@ -111,7 +133,7 @@ void ocTree::build(const vector<RigidBody*>& particles) {
 }
 
 void ocTree::checkCollisions(float dt) {
-	if (_particles.size() >= 2) {
+	if (_particles.size() > 1) {
 		for (auto& p : _particles)
 		{
 			for (auto& p2 : _particles)
@@ -128,20 +150,23 @@ void ocTree::checkCollisions(float dt) {
 }
 
 void ocTree::drawNoLight() {
-	_octree_mesh.clear();
+	_octree_mesh.clearVertices();
 	ofVboMesh tmp_mesh;
 	tmp_mesh.setMode(OF_PRIMITIVE_TRIANGLES);
 	const Vector3D& size = _nodeVolume->getSize();
 	
-	// Create a box mesh
-	tmp_mesh.append(ofVboMesh::box(size.x, size.y, size.z));
-	for (auto& v : tmp_mesh.getVertices())
+	_octree_mesh.addVertex({ -size.x / 2.f, -size.y / 2.f, -size.z / 2.f});
+	_octree_mesh.addVertex({ -size.x / 2.f, -size.y / 2.f,  size.z / 2.f});
+	_octree_mesh.addVertex({ -size.x / 2.f,  size.y / 2.f,  size.z / 2.f});
+	_octree_mesh.addVertex({  size.x / 2.f,  size.y / 2.f,  size.z / 2.f});
+	_octree_mesh.addVertex({  size.x / 2.f, -size.y / 2.f,  size.z / 2.f});
+	_octree_mesh.addVertex({  size.x / 2.f, -size.y / 2.f, -size.z / 2.f});
+	_octree_mesh.addVertex({  size.x / 2.f,  size.y / 2.f, -size.z / 2.f});
+	_octree_mesh.addVertex({ -size.x / 2.f,  size.y / 2.f, -size.z / 2.f});
+	for (auto& v : _octree_mesh.getVertices())
 		v += glm::vec3(_nodeVolume->getOrigin());
-
-	_octree_mesh.addVertices(tmp_mesh.getVertices());
-	_octree_mesh.addIndices(tmp_mesh.getIndices());
-
-	ofSetColor(255, 255, 255, 255);
+	
+	ofSetColor(255.0 / (_depth + 1), 255.0 / (_depth + 1), 255.0 / (_depth + 1), 255);
 
 	// Draw the box
 	_octree_mesh.drawWireframe();

@@ -44,6 +44,7 @@ std::string GUIManager::getDisplayName(BulletType bullet_type) {
 	case GOAT: return "Chevre";
 	case STATIC_CUBE: return "Cube de test immobile";
 	case MOVING_CUBE: return "Cube de test mobile";
+	case IMMOBILE_BLOCK: return "Mur";
 	default: return "";
 	}
 }
@@ -62,6 +63,7 @@ std::string GUIManager::getIconPath(BulletType bullet_type) {
 	case GOAT: return "rigidbody_icons/goat.png";
 	case STATIC_CUBE: return "rigidbody_icons/static_cube.png";
 	case MOVING_CUBE: return "rigidbody_icons/moving_cube.png";
+	case IMMOBILE_BLOCK: return "rigidbody_icons/immovable_block.png";
 	default: return "";
 	}
 }
@@ -116,11 +118,9 @@ void GUIManager::drawInstructions() {
 		"Ctrl gauche : Sprint",
 		"Tab : Montrer / cacher les trainees des particules",
 		"Alt : Effacer toutes les particules",
-		"Flèches et Entree : Deplacer le blob",
-		"Maj droite : Arrêter les mouvements du blob",
-		"Ctrl droite : Separer le blob",
-		"1 : Exemple contrainte de cable",
-		"2 : Exemple contrainte de tige"
+		"F1 : Mettre en pause / continuer la simulation",
+		"F2 : Montrer / cacher l'octree",
+		"F3 : Montrer / cacher les boites de collisions"
 	};
 
 	int length = sizeof(messages) / sizeof(messages[0]);

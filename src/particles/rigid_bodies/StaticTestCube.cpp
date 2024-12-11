@@ -1,7 +1,7 @@
 #include "StaticTestCube.h"
 
 StaticTestCube::StaticTestCube(const Vector3D& init_pos, const Vector3D& init_vel, const Quaternion& init_orientation, const Vector3D& init_angular_vel, const Vector3D& base_force_for_rotation, const Vector3D& application_point)
-	: RigidBody(init_pos, constants::EMPTY_VECTOR3D, 10, 10, init_orientation, init_angular_vel, "placing_block.mp3")
+	: RigidBody(init_pos, constants::EMPTY_VECTOR3D, 10, 100, init_orientation, init_angular_vel, "placing_block.mp3")
 {
 	if (!mesh_init_)
 	{
@@ -40,7 +40,7 @@ StaticTestCube::StaticTestCube(const Vector3D& init_pos, const Vector3D& init_ve
 
 void StaticTestCube::getInertiaMoment(Matrix3& mat) const
 {
-	mat = constants::IDENTITY_MATRIX3 * ((1 / 6.f) * _mass * _radius * _radius);
+	mat = constants::IDENTITY_MATRIX3 * ((1 / 6.f) * _mass * 10 * 10);
 }
 
 #ifdef DEBUG_RIGID_BODY

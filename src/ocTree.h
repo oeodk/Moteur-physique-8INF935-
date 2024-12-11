@@ -36,7 +36,7 @@ public:
 class ocTree : public Drawable {
 protected:
 	Cube* _nodeVolume;
-	vector<Particle*> _particles;
+	vector<RigidBody*> _particles;
 	vector<ocTree*> _children;
 	int _depth;
 
