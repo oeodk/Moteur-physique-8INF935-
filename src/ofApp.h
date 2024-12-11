@@ -42,8 +42,11 @@ private:
 	std::vector<Blob*> _blobs;
 	std::map<ofKey, bool> _blob_key;
 
-	bool _do_simulation;
+	bool _do_simulation = true;
+	bool _show_octree = true;
 public:
+	inline static bool _show_hitbox = true;
+	
 	void setup();
 	void update();
 	void draw();

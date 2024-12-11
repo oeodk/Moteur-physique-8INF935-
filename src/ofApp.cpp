@@ -72,59 +72,63 @@ void ofApp::update() {
 	_forces_registry.updateForces(_dt);
 	_physics_engine.updateParticles(_dt, _particles, &_terrain);
 #else
-
-	for (RigidBody* rigid_body: _rigid_body)
+	if(_do_simulation)
 	{
-		if(!dynamic_cast<StaticTestCube*>(rigid_body) && !dynamic_cast<MovingTestCube*>(rigid_body))
+		for (RigidBody* rigid_body : _rigid_body)
 		{
-			_forces_registry.add(rigid_body, &gravity_force);
-			_forces_registry.add(rigid_body, &friction_force);
+			if (!dynamic_cast<StaticTestCube*>(rigid_body) && !dynamic_cast<MovingTestCube*>(rigid_body))
+			{
+				_forces_registry.add(rigid_body, &gravity_force);
+				_forces_registry.add(rigid_body, &friction_force);
+			}
 		}
-	}
 
-	_particles_octree = ocTree(_render_engine.getCameraPosition(), Vector3D(5000));
-	_particles_octree.build(_rigid_body);
+		_particles_octree = ocTree(_render_engine.getCameraPosition(), Vector3D(5000));
+		_particles_octree.build(_rigid_body);
 
-	_forces_registry.updateForces(_dt);
-	_physics_engine.updateRigidBody(_dt, _rigid_body, &_terrain);
+		_forces_registry.updateForces(_dt);
+		_physics_engine.updateRigidBody(_dt, _rigid_body, &_terrain);
 #endif
 
-	_terrain.update(_render_engine.getCameraPosition(), _dt);
-	_forces_registry.clear();
+		_terrain.update(_render_engine.getCameraPosition(), _dt);
+		_forces_registry.clear();
 #ifndef RIGID_BODY_ONLY
 
-	//Delete a particle if it is too high or too low
-	for (size_t i = 0; i < _particles.size(); i++) {
-		Vector3D particle_dist(_particles[i]->getParticlePosition() - _render_engine.getCameraPosition());
-		if (particle_dist.squareNorm() > std::pow(_render_engine.getFarPlane(), 2)) {
-			if (Blob* blob = dynamic_cast<Blob*>(_particles[i]))
-			{
-				auto& blob_pos = std::find(_blobs.begin(), _blobs.end(), blob);
-				if (blob_pos != _blobs.end())
-				{
-					_blobs.erase(blob_pos);
-				}
-			}
-			delete _particles[i];
-			_particles.erase(_particles.begin() + i);
-			i--;
-		}
-	}
-#else
-	//Delete a particle if it is too high or too low
-	for (size_t i = 0; i < _rigid_body.size(); i++)
-	{
-		Vector3D particle_dist(_rigid_body[i]->getParticlePosition() - _render_engine.getCameraPosition());
-		if (particle_dist.squareNorm() > std::pow(_render_engine.getFarPlane(), 2))
+		//Delete a particle if it is too high or too low
+		for (size_t i = 0; i < _particles.size(); i++)
 		{
-			delete _rigid_body[i];
-			_rigid_body.erase(_rigid_body.begin() + i);
-			i--;
-		}
+			Vector3D particle_dist(_particles[i]->getParticlePosition() - _render_engine.getCameraPosition());
+			if (particle_dist.squareNorm() > std::pow(_render_engine.getFarPlane(), 2))
+			{
+				if (Blob* blob = dynamic_cast<Blob*>(_particles[i]))
+				{
+					auto& blob_pos = std::find(_blobs.begin(), _blobs.end(), blob);
+					if (blob_pos != _blobs.end())
+					{
+						_blobs.erase(blob_pos);
+					}
+				}
+				delete _particles[i];
+				_particles.erase(_particles.begin() + i);
+				i--;
 	}
+}
+#else
+		//Delete a particle if it is too high or too low
+		for (size_t i = 0; i < _rigid_body.size(); i++)
+		{
+			Vector3D particle_dist(_rigid_body[i]->getParticlePosition() - _render_engine.getCameraPosition());
+			if (particle_dist.squareNorm() > std::pow(_render_engine.getFarPlane(), 2))
+			{
+				delete _rigid_body[i];
+				_rigid_body.erase(_rigid_body.begin() + i);
+				i--;
+			}
+		}
 
 #endif
 
+}
 	_render_engine.update(_dt);
 
 	_gui_manager.update(_dt, _selected_particle);
@@ -151,8 +155,10 @@ void ofApp::draw() {
 		_render_engine.addRenderTarget(rigid_body, false);
 	}
 #endif
-
-	_render_engine.addRenderTarget(&_particles_octree, false);
+	if(_show_octree)
+	{
+		_render_engine.addRenderTarget(&_particles_octree, false);
+	}
 
 	_render_engine.render();
 	_gui_manager.draw();
@@ -193,6 +199,14 @@ void ofApp::keyPressed(int key) {
 	if (key == ofKey::OF_KEY_F1)
 	{
 		_do_simulation = !_do_simulation;
+	}
+	if (key == ofKey::OF_KEY_F2)
+	{
+		_show_octree = !_show_octree;
+	}
+	if (key == ofKey::OF_KEY_F3)
+	{
+		_show_hitbox = !_show_hitbox;
 	}
 	if (key == ofKey::OF_KEY_ALT)
 	{

@@ -1,4 +1,5 @@
 #include "RigidBody.h"
+#include "ofApp.h"
 
 #include "glm/mat3x3.hpp"
 void RigidBody::initAngularAcceleration(const Vector3D& base_force_for_rotation, const Vector3D& application_point)
@@ -49,6 +50,7 @@ RigidBody::RigidBody(const Vector3D& init_pos, const Vector3D& init_vel, float m
 
 	_sound.load("sound/" + sound_path);
 	_sound.play();
+	_hit_sound.load("sound/hit.mp3");
 
 }
 
@@ -63,18 +65,24 @@ void RigidBody::checkCollision(RigidBody* other_rigid_body, float dt)
 		if (hitbox->doCollideWith(other_hitbox, collision_data))
 		{
 			// sorting collision data to get lower penetration distance in the front
-			std::sort(collision_data.begin(), collision_data.end(), [](const CollisionData& c1, const CollisionData& c2) {
-				return c1._penetration_distance < c2._penetration_distance;
+			std::sort(collision_data.begin(), collision_data.end(), [](const CollisionData& c1, const CollisionData& c2)
+				{
+					if (c1._collision_detected != c2._collision_detected)
+					{
+						return c1._collision_detected > c2._collision_detected; // `true` elements first
+					}
+					return c1._penetration_distance > c2._penetration_distance;
 				});
 
 			const float min_penetration = collision_data[0]._penetration_distance;
 
 			size_t i = 0;
-			while (i < 4 && min_penetration == collision_data[i]._penetration_distance)
+			while (i < 4 && min_penetration > collision_data[i]._penetration_distance * 0.95 && min_penetration < collision_data[i]._penetration_distance * 1.05)
 			{
 				relevant_collisions_data.push_back(&collision_data[i]);
 				i++;
 			}
+			_hit_sound.play();
 			solveCollision(other_rigid_body, relevant_collisions_data);
 			return;
 		}
@@ -119,8 +127,13 @@ void RigidBody::checkCollisionTerrain(Terrain* terrain, float dt)
 		if (hitbox->doCollideWithTerrain(terrain, collision_data))
 		{
 			// sorting collision data to get lower penetration distance in the front
-			std::sort(collision_data.begin(), collision_data.end(), [](const CollisionData& c1, const CollisionData& c2) {
-				return c1._penetration_distance < c2._penetration_distance;
+			std::sort(collision_data.begin(), collision_data.end(), [](const CollisionData& c1, const CollisionData& c2) 
+				{
+					if (c1._collision_detected != c2._collision_detected)
+					{
+						return c1._collision_detected > c2._collision_detected; // `true` elements first
+					}
+					return c1._penetration_distance > c2._penetration_distance;
 				});
 
 			const float min_penetration = collision_data[0]._penetration_distance;
@@ -287,9 +300,12 @@ void RigidBody::draw()
 	}
 
 #ifdef HITBOX_DEBUG
-	for (HitBoxPrimitive* hitbox : _hitbox)
+	if(ofApp::_show_hitbox)
 	{
-		hitbox->drawBox();
+		for (HitBoxPrimitive* hitbox : _hitbox)
+		{
+			hitbox->drawBox();
+		}
 	}
 #endif // HITBOX_DEBUG
 
@@ -299,15 +315,14 @@ void RigidBody::draw()
 	_transformation.restoreTransformGL();
 
 #ifdef HITBOX_DEBUG
-	for (HitBoxPrimitive* hitbox : _hitbox)
+	if(ofApp::_show_hitbox)
 	{
-		hitbox->drawCorner();
+		for (HitBoxPrimitive* hitbox : _hitbox)
+		{
+			hitbox->drawCorner();
+		}
 	}
 #endif // HITBOX_DEBUG
-	for (HitBoxPrimitive* hitbox : _hitbox)
-	{
-		hitbox->update();
-	}
 
 	_mass_center_mesh.getVertices().back() = _position;
 	ofDisableDepthTest();

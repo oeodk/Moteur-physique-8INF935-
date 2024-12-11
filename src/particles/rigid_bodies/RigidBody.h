@@ -27,6 +27,7 @@ protected :
 	ofTexture _texture;
 
 	ofSoundPlayer _sound;
+	ofSoundPlayer _hit_sound;
 
 	Vector3D _torque;
 	Matrix3 _inertia_moment;

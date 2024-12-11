@@ -17,8 +17,25 @@ StaticTestCube::StaticTestCube(const Vector3D& init_pos, const Vector3D& init_ve
 	_mesh = &_cube_mesh;
 	initAngularAcceleration(constants::EMPTY_VECTOR3D, constants::EMPTY_VECTOR3D);
 
-	_hitbox.push_back(new BoxHitbox(&_position, &_orientation, constants::EMPTY_VECTOR3D, 50, 50, 50));
+	_hitbox.push_back(new BoxHitbox(&_position, &_orientation, Vector3D(-25, -25, -25), 25, 25, 25));
 	_hitbox.back()->update();
+	_hitbox.push_back(new BoxHitbox(&_position, &_orientation, Vector3D(-25, -25,  25), 25, 25, 25));
+	_hitbox.back()->update();
+	_hitbox.push_back(new BoxHitbox(&_position, &_orientation, Vector3D(-25,  25, -25), 25, 25, 25));
+	_hitbox.back()->update();
+	_hitbox.push_back(new BoxHitbox(&_position, &_orientation, Vector3D(-25,  25,  25), 25, 25, 25));
+	_hitbox.back()->update();
+	_hitbox.push_back(new BoxHitbox(&_position, &_orientation, Vector3D( 25, -25, -25), 25, 25, 25));
+	_hitbox.back()->update();
+	_hitbox.push_back(new BoxHitbox(&_position, &_orientation, Vector3D( 25, -25,  25), 25, 25, 25));
+	_hitbox.back()->update();
+	_hitbox.push_back(new BoxHitbox(&_position, &_orientation, Vector3D( 25,  25, -25), 25, 25, 25));
+	_hitbox.back()->update();
+	_hitbox.push_back(new BoxHitbox(&_position, &_orientation, Vector3D( 25,  25,  25), 25, 25, 25));
+	_hitbox.back()->update();
+	_hitbox.push_back(new BoxHitbox(&_position, &_orientation, constants::EMPTY_VECTOR3D, 25, 25, 25));
+	_hitbox.back()->update();
+
 }
 
 void StaticTestCube::getInertiaMoment(Matrix3& mat) const

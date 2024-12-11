@@ -110,6 +110,7 @@ void ocTree::build(const vector<RigidBody*>& particles) {
 }
 
 void ocTree::drawNoLight() {
+	_octree_mesh.clear();
 	ofVboMesh tmp_mesh;
 	tmp_mesh.setMode(OF_PRIMITIVE_TRIANGLES);
 	const Vector3D& size = _nodeVolume->getSize();
@@ -120,7 +121,6 @@ void ocTree::drawNoLight() {
 		v += glm::vec3(_nodeVolume->getOrigin());
 
 	_octree_mesh.addVertices(tmp_mesh.getVertices());
-	_octree_mesh.addNormals(tmp_mesh.getNormals());
 	_octree_mesh.addIndices(tmp_mesh.getIndices());
 
 	ofSetColor(255, 255, 255, 255);
