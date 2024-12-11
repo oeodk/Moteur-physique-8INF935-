@@ -6,7 +6,7 @@
 #include "Vector3D.h"
 #include "Drawable.h"
 #include "Terrain.h"
-
+#include "ocTree.h"
 constexpr int RENDER_DISTANCE = 5000;
 constexpr int NOON_COLOR = 190;
 constexpr int DELTA_NIGHT_COLOR = 50;
@@ -194,7 +194,7 @@ void RenderEngine::render() {
 #endif // DEBUG_CAMERA
 
 	for (Drawable* render_target : _render_targets_no_light) {
-		if (willRender(*render_target->getPosition())) {
+		if (dynamic_cast<ocTree*>(render_target) || willRender(*render_target->getPosition())) {
 			render_target->drawNoLight();
 		}
 	}
@@ -203,7 +203,7 @@ void RenderEngine::render() {
 	_night_light_source.enable();
 	
 	for (Drawable* render_target : _render_targets) {
-		if (willRender(*render_target->getPosition())) {
+		if (dynamic_cast<ocTree*>(render_target) || willRender(*render_target->getPosition())) {
 			render_target->draw();
 		}
 	}

@@ -68,12 +68,11 @@ void ofApp::update() {
 	}
 	moveBlobs();
 
-	_particles_octree = ocTree(_render_engine.getCameraPosition(), Vector3D(5000));
-	_particles_octree.build(_particles);
 
 	_forces_registry.updateForces(_dt);
 	_physics_engine.updateParticles(_dt, _particles, &_terrain);
 #else
+
 	for (RigidBody* rigid_body: _rigid_body)
 	{
 		if(!dynamic_cast<StaticTestCube*>(rigid_body) && !dynamic_cast<MovingTestCube*>(rigid_body))
@@ -82,6 +81,9 @@ void ofApp::update() {
 			_forces_registry.add(rigid_body, &friction_force);
 		}
 	}
+
+	_particles_octree = ocTree(_render_engine.getCameraPosition(), Vector3D(5000));
+	_particles_octree.build(_rigid_body);
 
 	_forces_registry.updateForces(_dt);
 	_physics_engine.updateRigidBody(_dt, _rigid_body, &_terrain);
@@ -150,7 +152,7 @@ void ofApp::draw() {
 	}
 #endif
 
-	_render_engine.addRenderTarget(&_particles_octree);
+	_render_engine.addRenderTarget(&_particles_octree, false);
 
 	_render_engine.render();
 	_gui_manager.draw();
@@ -187,6 +189,10 @@ void ofApp::keyPressed(int key) {
 		{
 			blob->split();
 		}
+	}
+	if (key == ofKey::OF_KEY_F1)
+	{
+		_do_simulation = !_do_simulation;
 	}
 	if (key == ofKey::OF_KEY_ALT)
 	{

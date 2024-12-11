@@ -4,20 +4,20 @@
 
 #include <vector>
 #include "Vector3D.h"
-#include "particles/Particle.h"
+#include "particles/rigid_bodies/RigidBody.h"
 using namespace std;
 
 constexpr int PARTICLE_PER_NODE = 2;
 constexpr int CHILD_PER_NODE = 8;
 
-#define TopLeftFront 0
-#define TopRightFront 1
-#define BottomRightFront 2
-#define BottomLeftFront 3
-#define TopLeftBack 4
-#define TopRightBack 5
-#define BottomRightBack 6
-#define BottomLeftBack 7
+constexpr int TopLeftFront = 0;
+constexpr int TopRightFront = 1;
+constexpr int BottomRightFront = 2;
+constexpr int BottomLeftFront = 3;
+constexpr int TopLeftBack = 4;
+constexpr int TopRightBack = 5;
+constexpr int BottomRightBack = 6;
+constexpr int BottomLeftBack = 7;
 
 class Cube {
 private:
@@ -25,9 +25,9 @@ private:
 	Vector3D _size;
 
 public:
-	const Vector3D getOrigin() { return _origin; }
-	const Vector3D getSize() { return _size; }
-	Cube(Vector3D origin = Vector3D(0., 0., 0.), Vector3D size = Vector3D(1., 1., 1.)) :
+	const Vector3D& getOrigin() { return _origin; }
+	const Vector3D& getSize() { return _size; }
+	Cube(const Vector3D& origin = Vector3D(0., 0., 0.), const Vector3D& size = Vector3D(1., 1., 1.)) :
 		_origin(origin), _size(size) {}
 };
 
@@ -42,12 +42,12 @@ protected:
 
 public:
 	ocTree();
-	ocTree(Vector3D origin, Vector3D size);
+	ocTree(const Vector3D& origin, const Vector3D& size);
+	~ocTree();
 
-	void build(const vector<Particle*>& particles);
+	void build(const vector<RigidBody*>& particles);
 	vector<int> getAffectedChildIndices(Particle* p);
 
-	void draw() override;
 	void drawNoLight() override;
 };
 

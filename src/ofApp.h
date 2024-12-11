@@ -41,6 +41,8 @@ private:
 
 	std::vector<Blob*> _blobs;
 	std::map<ofKey, bool> _blob_key;
+
+	bool _do_simulation;
 public:
 	void setup();
 	void update();
