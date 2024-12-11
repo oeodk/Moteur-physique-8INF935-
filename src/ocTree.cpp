@@ -3,8 +3,9 @@
 ocTree::ocTree():
 	_nodeVolume(new Cube()) {}
 
-ocTree::ocTree(const Vector3D& origin, const Vector3D& size) :
-	_nodeVolume(new Cube(origin, size))
+ocTree::ocTree(const Vector3D& origin, const Vector3D& size, int depth) :
+	_nodeVolume(new Cube(origin, size)),
+	_depth(depth)
 {
 	_children.assign(8, nullptr);
 }
@@ -72,8 +73,8 @@ void ocTree::build(const vector<RigidBody*>& particles) {
 		relevantParticles.push_back(p);
 	}
 
-	// If there is not enough particles to fill the node, it's a leaf
-	if (relevantParticles.size() <= PARTICLE_PER_NODE) {
+	// If there is not enough particles to fill the node or if the max depth is reached, it's a leaf
+	if (relevantParticles.size() <= PARTICLE_PER_NODE || _depth >= MAX_DEPTH) {
 		for (RigidBody* p : relevantParticles)
 			_particles.push_back(p);
 
@@ -104,9 +105,26 @@ void ocTree::build(const vector<RigidBody*>& particles) {
 			case BottomRightBack:	origin += Vector3D(size.x,	size.y,	 size.z ) / 2; break;
 			default: break;
 		}
-		_children[i] = new ocTree(origin, size);
+		_children[i] = new ocTree(origin, size, _depth + 1);
 		_children[i]->build(childParticles[i]);
 	}
+}
+
+void ocTree::checkCollisions(float dt) {
+	if (_particles.size() >= 2) {
+		for (auto& p : _particles)
+		{
+			for (auto& p2 : _particles)
+			{
+				if (p != p2)
+					p->checkCollision(p2, dt);
+			}
+		}
+	}
+
+	for (auto child : _children)
+		if (child != nullptr)
+			child->checkCollisions(dt);
 }
 
 void ocTree::drawNoLight() {
