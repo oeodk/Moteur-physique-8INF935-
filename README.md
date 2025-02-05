@@ -1,5 +1,8 @@
 # Moteur-physique-8INF935-
 Projet du cours math physique pour le jeu vidéo , création d'un moteur physique "réaliste"
+![Screenshot](https://github.com/oeodk/Moteur-physique-8INF935-/blob/main/screenshot.png)
+
+
 <h3>But</h3>
 <p>Créer un moteur physique dont les objets sont des corps rigides
 et dont la résolution de collisions se fait de manière itérative à
