@@ -1,5 +1,14 @@
 # Moteur-physique-8INF935-
 Projet du cours math physique pour le jeu vidéo , création d'un moteur physique "réaliste"
+
+# Vidéo de présentation (Cliquez pour la lancer)
+<p align="center">
+  <a href="https://youtu.be/awgftAQNNck">
+    <img src="https://img.youtube.com/vi/awgftAQNNck/hqdefault.jpg" alt="Watch the video" />
+  </a>
+</p>
+
+# Screenshot du projet
 ![Screenshot](https://github.com/oeodk/Moteur-physique-8INF935-/blob/main/screenshot.png)
 
 
