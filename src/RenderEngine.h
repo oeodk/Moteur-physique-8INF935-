@@ -32,7 +32,7 @@ private:
 
 	static constexpr float _CAMERA_SPEED = 250;//100
 	static constexpr float _CAMERA_SPRINT_VALUE = 5;//5
-	static constexpr float _MOUSE_SENSIBILITY = 5.f;
+	static constexpr float _MOUSE_SENSIBILITY = 4.f;
 
 	static constexpr int _FORWARD_KEY = 'z';
 	static constexpr int _FORWARD_KEY_ALT = 'w';
@@ -91,4 +91,6 @@ public:
 	void setWeaponColor(const ofColor& new_color) { _cannon_color = new_color; }
 
 	void updateSelectedParticle(BulletType bullet);
+
+	void setOldMousePos(int x, int y);
 };

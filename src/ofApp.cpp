@@ -19,12 +19,15 @@
 #include "constrain/CableConstrain.h"
 #include <execution>
 #include <cmath>
+#include <GLFW/glfw3.h>
 
 constexpr int SPEED_RANGE = 100;
 constexpr float TRAJECTORY_POINT_NUMBER = 100;
 
 //--------------------------------------------------------------
 void ofApp::setup() {
+	ofHideCursor();
+
 	time(NULL);
 	_elapsed_time = 0;
 	_selected_particle = 0;
@@ -133,6 +136,20 @@ void ofApp::update() {
 	_render_engine.update(_dt);
 
 	_gui_manager.update(_dt, _selected_particle);
+	ofAppBaseWindow* win = ofGetWindowPtr();
+
+	if (auto window = dynamic_cast<ofAppGLFWWindow*>(win)) {
+		GLFWwindow* glfwWindow = window->getGLFWWindow();
+		
+		int window_width, window_height;
+		glfwGetWindowSize(glfwWindow, &window_width, &window_height);
+
+		const float windows_center_x = static_cast<float>(window_width) / 2.f;
+		const float windows_center_y = static_cast<float>(window_height) / 2.f;
+		
+		glfwSetCursorPos(glfwWindow, windows_center_x, windows_center_y);
+		_render_engine.setOldMousePos(windows_center_x, windows_center_y);
+	}
 }
 
 //--------------------------------------------------------------

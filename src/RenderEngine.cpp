@@ -300,6 +300,12 @@ void RenderEngine::updateSelectedParticle(BulletType bullet) {
 	}
 }
 
+void RenderEngine::setOldMousePos(int x, int y)
+{
+	_old_mouse_x = x;
+	_old_mouse_y = y;
+}
+
 bool RenderEngine::willRender(Vector3D target_position) const {
 	Vector3D look_at_dir(_camera.getLookAtDir());
 	Vector3D camera_target_vector(target_position - _camera.getPosition());

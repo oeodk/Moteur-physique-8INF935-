@@ -6,7 +6,7 @@
 #include "../constrain/Constrain.h"
 #include "ofNode.h"
 
-#include "hitbox/BoxHitbox.h"
+#include "../hitbox/BoxHitbox.h"
 
 class Particle : public Drawable
 {

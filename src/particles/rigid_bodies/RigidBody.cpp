@@ -1,5 +1,5 @@
 #include "RigidBody.h"
-#include "ofApp.h"
+#include "../../ofApp.h"
 
 #include "glm/mat3x3.hpp"
 void RigidBody::initAngularAcceleration(const Vector3D& base_force_for_rotation, const Vector3D& application_point)
